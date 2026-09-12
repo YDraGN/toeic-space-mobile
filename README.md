@@ -28,7 +28,7 @@ This release targets Android only. Tuition payment, invoice, and refund manageme
 
 ## 🏗️ Architecture
 
-The project uses Clean Architecture with a package-by-feature structure. Each feature is organized into `data`, `domain`, and `presentation` layers. See [`GUIDELINE_MOBILE.md`](GUIDELINE_MOBILE.md) for the full architecture, coding conventions, and Compose Preview guidelines.
+The project uses Clean Architecture with a package-by-feature structure. Each feature is organized into `data`, `domain`, and `presentation` layers. See [`docs/GUIDELINE_MOBILE.md`](docs/GUIDELINE_MOBILE.md) for the full architecture, coding conventions, and Compose Preview guidelines.
 
 ## 🛠️ Installation
 
@@ -99,10 +99,9 @@ Run lint checks:
 ```text
 docs/
 ├── api-integration.md
+├── GUIDELINE_ANDROID.md
 ├── release.md
 └── screens-flow.md
-
-GUIDELINE_ANDROID.md
 ```
 
 ## 📄 License
