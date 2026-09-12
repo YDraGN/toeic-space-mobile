@@ -26,6 +26,24 @@ Dự án áp dụng **Clean Architecture** kết hợp **MVVM**, tổ chức the
 
 ## 3. Cấu trúc thư mục
 
+### 3.1 Cấu trúc repo (root level)
+
+```
+toeic-space-mobile/
+├── app/                          # Android project (xem chi tiết ở Mục 3.2)
+├── docs/
+│   ├── api-integration.md        # Nhóm API, response format, xử lý lỗi mạng
+│   ├── screens-flow.md           # Luồng màn hình, phân quyền theo role
+│   └── release.md                # Hướng dẫn build & phân phối APK
+├── .editorconfig
+├── .gitignore
+├── GUIDELINE_ANDROID.md
+├── LICENSE
+└── README.md
+```
+
+### 3.2 Cấu trúc package (`app/src/main/java/com/toeicspace/android/`)
+
 ```
 com.toeicspace.android/
 ├── core/
@@ -38,8 +56,21 @@ com.toeicspace.android/
 │   │   ├── components/
 │   │   └── theme/
 │   └── util/
+│       └── Constants.kt
 ├── feature/
 │   ├── auth/
+│   │   ├── data/
+│   │   │   ├── local/
+│   │   │   ├── remote/
+│   │   │   └── repository/
+│   │   ├── domain/
+│   │   │   ├── model/
+│   │   │   ├── repository/
+│   │   │   └── usecase/
+│   │   └── presentation/
+│   │       ├── login/
+│   │       ├── register/
+│   │       └── onboarding/
 │   ├── home/
 │   ├── explore/
 │   ├── course/
@@ -57,7 +88,9 @@ com.toeicspace.android/
 └── MainActivity.kt
 ```
 
-Mỗi feature bên trong đều có đủ 3 layer `data/domain/presentation` như Mục 2.1. Feature nào chưa cần `data` (ví dụ chỉ là màn hình tĩnh) thì có thể bỏ layer đó, không bắt buộc tạo folder rỗng.
+`auth` được để làm ví dụ minh hoạ đầy đủ 3 layer (`data/domain/presentation`) theo đúng quy tắc ở Mục 2.1. Các feature còn lại (`home`, `explore`, `course`...) áp dụng cùng cấu trúc 3 layer này khi triển khai — không liệt kê lặp lại ở đây để bảng gọn, nhưng bắt buộc tuân theo cùng khuôn.
+
+Feature nào chưa cần `data` (ví dụ chỉ là màn hình tĩnh, không gọi API/DB) thì có thể bỏ layer đó, không bắt buộc tạo folder rỗng.
 
 ## 4. Git Workflow
 
