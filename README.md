@@ -98,9 +98,9 @@ Run lint checks:
 
 ```text
 docs/
-├── architecture.md
-├── folder-structure.md
-└── coding-conventions.md
+├── api-integration.md
+├── release.md
+└── screens-flow.md
 
 GUIDELINE_ANDROID.md
 ```
