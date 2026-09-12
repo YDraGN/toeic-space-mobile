@@ -1,4 +1,4 @@
-package com.toeicspace.android.ui.theme
+package com.toeicspace.android.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
