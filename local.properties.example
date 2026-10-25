@@ -1,0 +1,16 @@
+# Copy to local.properties (git-ignored) and fill in your own values.
+# Android Studio writes sdk.dir automatically.
+
+# API Gateway base URL. Must end with "/".
+# Emulator → host machine: http://10.0.2.2:5050/
+# Physical device: http://<your-LAN-IP>:5050/
+API_BASE_URL=http://10.0.2.2:5050/
+
+# Google Sign-In: the *Web* OAuth client ID that the backend verifies ID tokens against.
+GOOGLE_WEB_CLIENT_ID=
+
+# Release signing (only on the machine that builds release APKs).
+RELEASE_STORE_FILE=
+RELEASE_STORE_PASSWORD=
+RELEASE_KEY_ALIAS=
+RELEASE_KEY_PASSWORD=
