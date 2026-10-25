@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Backend API issue
+    url: https://github.com/bnguien/toeic-space-be/issues
+    about: Problems with endpoints, auth, or data belong in the backend repository.
