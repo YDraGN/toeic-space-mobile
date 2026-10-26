@@ -28,9 +28,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.AvatarGuestBorder
+import com.toeicspace.android.core.ui.theme.AvatarStreakBorder
+import com.toeicspace.android.core.ui.theme.AvatarUserBorder
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PillShape
-import com.toeicspace.android.core.ui.theme.SunlitGold
+import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 @Composable
@@ -45,10 +48,11 @@ fun UserAvatar(
     val hasActiveStreak = streakCount != null && streakCount > 0
     val borderColor =
         when {
-            hasActiveStreak -> SunlitGold
-            isGuest -> Color(0xFFC1C6D4)
-            else -> Color(0xFF1467C2)
+            hasActiveStreak -> AvatarStreakBorder
+            isGuest -> AvatarGuestBorder
+            else -> AvatarUserBorder
         }
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -59,30 +63,26 @@ fun UserAvatar(
             shape = CircleShape,
             color = Color.White,
             border = BorderStroke(width = 1.5.dp, color = borderColor),
-            shadowElevation = 3.dp,
+            shadowElevation = 2.dp,
         ) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                when {
-                    avatarPainter != null -> {
-                        Image(
-                            painter = avatarPainter,
-                            contentDescription = "User Avatar",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-
-                    else -> {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_account),
-                            contentDescription = "Default Account",
-                            tint = OceanicInk,
-                            modifier = Modifier.size(size * 0.55f),
-                        )
-                    }
+                if (avatarPainter != null) {
+                    Image(
+                        painter = avatarPainter,
+                        contentDescription = "User Avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_account),
+                        contentDescription = "Default Account",
+                        tint = OceanicInk,
+                        modifier = Modifier.size(size * 0.55f),
+                    )
                 }
             }
         }
@@ -94,7 +94,7 @@ fun UserAvatar(
                         .align(Alignment.BottomEnd)
                         .offset(x = 6.dp, y = 3.dp),
                 shape = PillShape,
-                color = SunlitGold,
+                color = AvatarStreakBorder,
                 border = BorderStroke(1.5.dp, Color.White),
                 shadowElevation = 2.dp,
             ) {
@@ -126,28 +126,18 @@ fun UserAvatar(
 private fun UserAvatarPreview() {
     ToeicSpaceTheme {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.gutter),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // 1. Có Streak 3 ngày
             UserAvatar(
                 onClick = {},
-                avatarPainter = painterResource(id = R.drawable.ic_launcher_foreground),
                 streakCount = 3,
             )
-            // 2. Không có Streak
             UserAvatar(
                 onClick = {},
-                avatarPainter = painterResource(id = R.drawable.ic_launcher_foreground),
-                streakCount = null, // Hoặc 0
+                streakCount = null,
             )
-            // 3. Tài khoản chưa có ảnh đại diện
-            UserAvatar(
-                onClick = {},
-                streakCount = 7,
-            )
-            // 4. Khách vãng lai
             UserAvatar(
                 onClick = {},
                 isGuest = true,

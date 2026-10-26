@@ -6,8 +6,10 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -35,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -48,7 +51,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.theme.CoralBadge
+import com.toeicspace.android.core.ui.theme.IconButtonBackground
+import com.toeicspace.android.core.ui.theme.IconButtonBorder
+import com.toeicspace.android.core.ui.theme.IconButtonSelectedBackground
+import com.toeicspace.android.core.ui.theme.IconButtonSelectedBorder
+import com.toeicspace.android.core.ui.theme.IconButtonSelectedContent
 import com.toeicspace.android.core.ui.theme.OceanicInk
+import com.toeicspace.android.core.ui.theme.PillButtonBackground
+import com.toeicspace.android.core.ui.theme.PillButtonBorder
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.PrimaryGradientCenter
 import com.toeicspace.android.core.ui.theme.PrimaryGradientEnd
@@ -60,7 +70,7 @@ import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceShapes
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
-private val DefaultPrimaryBrush =
+val BrandGradientBrush =
     Brush.horizontalGradient(
         colors = listOf(PrimaryGradientStart, PrimaryGradientCenter, PrimaryGradientEnd),
     )
@@ -88,12 +98,7 @@ fun PrimaryButton(
     trailingIcon: (@Composable () -> Unit)? = null,
 ) {
     val isInteractive = enabled && !isLoading
-    val currentBrush =
-        if (isInteractive) {
-            DefaultPrimaryBrush
-        } else {
-            DisabledPrimaryBrush
-        }
+    val currentBrush = if (isInteractive) BrandGradientBrush else DisabledPrimaryBrush
 
     Button(
         onClick = onClick,
@@ -222,14 +227,14 @@ fun IconButton(
     val containerColor =
         when {
             !enabled -> Color.White.copy(alpha = 0.5f)
-            isSelected -> Color(0xFFE9EDFF)
-            else -> Color.White
+            isSelected -> IconButtonSelectedBackground
+            else -> IconButtonBackground
         }
 
     val contentColor =
         when {
             !enabled -> OceanicInk.copy(alpha = 0.38f)
-            isSelected -> Color(0xFF1467C2)
+            isSelected -> IconButtonSelectedContent
             else -> OceanicInk
         }
 
@@ -240,7 +245,7 @@ fun IconButton(
         Box(
             modifier =
                 Modifier
-                    .size(Spacing.space40)
+                    .size(Spacing.space36)
                     .graphicsLayer {
                         scaleX = scale
                         scaleY = scale
@@ -248,27 +253,22 @@ fun IconButton(
         ) {
             Surface(
                 onClick = onClick,
-                modifier = Modifier.size(Spacing.space40),
+                modifier = Modifier.size(Spacing.space36),
                 shape = CircleShape,
                 color = containerColor,
                 border =
                     BorderStroke(
                         width = 1.dp,
-                        color =
-                            if (isSelected) {
-                                Color(0xFF1467C2).copy(alpha = 0.3f)
-                            } else {
-                                Color(0xFFE9EDFF)
-                            },
+                        color = if (isSelected) IconButtonSelectedBorder else IconButtonBorder,
                     ),
-                shadowElevation = if (enabled) 2.dp else 0.dp,
+                shadowElevation = if (enabled) 1.dp else 0.dp,
                 interactionSource = interactionSource,
                 enabled = enabled,
             ) {
                 CompositionLocalProvider(LocalContentColor provides contentColor) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(Spacing.space40),
+                        modifier = Modifier.size(Spacing.space36),
                     ) {
                         Box(
                             modifier = Modifier.size(20.dp),
@@ -317,7 +317,66 @@ fun IconButton(
     }
 }
 
-// --- COMPOSE PREVIEW ---
+@Composable
+fun PillButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundBrush: Brush? = null,
+    containerColor: Color = PillButtonBackground,
+    contentColor: Color = OceanicInk,
+    borderColor: Color? = PillButtonBorder,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
+) {
+    val backgroundModifier =
+        when {
+            backgroundBrush != null && enabled -> Modifier.background(backgroundBrush)
+            backgroundBrush != null && !enabled -> Modifier.background(DisabledPrimaryBrush)
+            else -> Modifier.background(containerColor)
+        }
+
+    val borderModifier =
+        when {
+            backgroundBrush == null && borderColor != null -> {
+                Modifier.border(1.dp, borderColor, PillShape)
+            }
+            else -> Modifier
+        }
+
+    Box(
+        modifier =
+            modifier
+                .heightIn(min = 32.dp)
+                .clip(PillShape)
+                .then(backgroundModifier)
+                .then(borderModifier)
+                .clickable(
+                    enabled = enabled,
+                    onClick = onClick,
+                ).padding(horizontal = 14.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            leadingIcon?.invoke()
+            Text(
+                text = text,
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = contentColor,
+                    ),
+                maxLines = 1,
+            )
+            trailingIcon?.invoke()
+        }
+    }
+}
+
 @Preview(name = "Primary - Full Width", showBackground = true)
 @Composable
 private fun PrimaryButtonFullWidthPreview() {
@@ -338,42 +397,6 @@ private fun PrimaryButtonFullWidthPreview() {
     }
 }
 
-@Preview(name = "Primary - Loading State", showBackground = true)
-@Composable
-private fun PrimaryButtonLoadingPreview() {
-    ToeicSpaceTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
-            PrimaryButton(
-                text = "TIẾP THEO",
-                onClick = {},
-                isLoading = true,
-                modifier = Modifier.fillMaxWidth(),
-                loadingText = "Đang xử lý...",
-            )
-        }
-    }
-}
-
-@Preview(name = "Secondary - Login Action", showBackground = true)
-@Composable
-private fun SecondaryButtonPreview() {
-    ToeicSpaceTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
-            SecondaryButton(
-                text = "Đã có tài khoản? Đăng nhập",
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_log_in),
-                        contentDescription = null,
-                    )
-                },
-            )
-        }
-    }
-}
-
 @Preview(name = "Secondary - Pill Quick Action", showBackground = true)
 @Composable
 private fun SecondaryButtonPillPreview() {
@@ -383,9 +406,7 @@ private fun SecondaryButtonPillPreview() {
                 text = "Chuỗi Streak",
                 shape = PillShape,
                 onClick = {},
-                leadingIcon = {
-                    Text(text = "🔥")
-                },
+                leadingIcon = { Text(text = "🔥") },
             )
         }
     }
@@ -396,71 +417,68 @@ private fun SecondaryButtonPillPreview() {
 private fun ToeicIconButtonsPreview() {
     ToeicSpaceTheme {
         Row(
-            horizontalArrangement =
-                androidx.compose.foundation.layout.Arrangement
-                    .spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(16.dp),
         ) {
-            // 1. Chuông có chấm hồng san hô
             IconButton(
                 icon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_bell),
+                        painterResource(id = R.drawable.ic_bell),
                         contentDescription = null,
                     )
                 },
                 onClick = {},
                 hasBadge = true,
-                contentDescription = "Notification Dot",
             )
-
-            // 2. Chuông có số lượng thông báo (ví dụ 5)
             IconButton(
                 icon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_bell),
+                        painterResource(id = R.drawable.ic_bell),
                         contentDescription = null,
                     )
                 },
                 onClick = {},
                 badgeCount = 5,
-                contentDescription = "Notification Count",
             )
-
-            // 3. Kính lúp tìm kiếm
             IconButton(
                 icon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_search),
+                        painterResource(id = R.drawable.ic_search),
                         contentDescription = null,
                     )
                 },
                 onClick = {},
-                contentDescription = "Search",
             )
+        }
+    }
+}
 
-            // 4. Mũi tên quay lại
-            IconButton(
-                icon = {
+@Preview(name = "Pill Button", showBackground = true, backgroundColor = 0xFFFAF9FF)
+@Composable
+private fun PillButtonPreview() {
+    ToeicSpaceTheme {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            PillButton(
+                text = "Bỏ qua",
+                onClick = {},
+                trailingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_chevron_right),
                         contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = OceanicInk,
                     )
                 },
-                onClick = {},
-                contentDescription = "Back",
             )
-
-            // 5. Làm mới
-            IconButton(
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_refresh),
-                        contentDescription = null,
-                    )
-                },
+            PillButton(
+                text = "Đăng nhập",
                 onClick = {},
-                contentDescription = "Refresh",
+                backgroundBrush = BrandGradientBrush,
+                contentColor = Color.White,
             )
         }
     }

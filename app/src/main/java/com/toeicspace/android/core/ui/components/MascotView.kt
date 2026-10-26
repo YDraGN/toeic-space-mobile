@@ -27,6 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.CoralBadge
+import com.toeicspace.android.core.ui.theme.PrimaryGradientCenter
+import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 @Composable
@@ -77,7 +80,7 @@ fun MascotView(
 @Composable
 private fun MascotViewBasePreview() {
     ToeicSpaceTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(Spacing.gutter)) {
             MascotView(
                 mascotResId = R.drawable.oy2_base,
                 size = 140.dp,
@@ -94,7 +97,7 @@ private fun MascotViewBasePreview() {
 @Composable
 private fun MascotViewWithGlowPreview() {
     ToeicSpaceTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(Spacing.gutter)) {
             MascotView(
                 mascotResId = R.drawable.oy2_streak,
                 size = 140.dp,
@@ -102,9 +105,9 @@ private fun MascotViewWithGlowPreview() {
                     Brush.radialGradient(
                         colors =
                             listOf(
-                                Color(0xFFFF9092).copy(alpha = 0.75f), // Hồng san hô rực rỡ ở tâm
-                                Color(0xFF2087E6).copy(alpha = 0.45f), // Xanh đại dương chuyển tiếp
-                                Color.Transparent, // Tỏa mờ dần ra ngoài
+                                CoralBadge.copy(alpha = 0.75f),
+                                PrimaryGradientCenter.copy(alpha = 0.45f),
+                                Color.Transparent,
                             ),
                     ),
             )
@@ -117,25 +120,13 @@ private fun MascotViewWithGlowPreview() {
 private fun MascotViewEmotionSetPreview() {
     ToeicSpaceTheme {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.gutter),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Mascot cổ vũ
-            MascotView(
-                mascotResId = R.drawable.oy2_cheer,
-                size = 90.dp,
-            )
-            // Mascot hoàn thành bài học
-            MascotView(
-                mascotResId = R.drawable.oy2_success,
-                size = 90.dp,
-            )
-            // Mascot danh sách trống
-            MascotView(
-                mascotResId = R.drawable.oy2_empty,
-                size = 90.dp,
-            )
+            MascotView(mascotResId = R.drawable.oy2_cheer, size = 90.dp)
+            MascotView(mascotResId = R.drawable.oy2_success, size = 90.dp)
+            MascotView(mascotResId = R.drawable.oy2_empty, size = 90.dp)
         }
     }
 }

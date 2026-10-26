@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,9 +41,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.NavDropletBorder
+import com.toeicspace.android.core.ui.theme.NavDropletGradientEnd
+import com.toeicspace.android.core.ui.theme.NavDropletGradientStart
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PrimaryGradientCenter
 import com.toeicspace.android.core.ui.theme.Spacing
+import com.toeicspace.android.core.ui.theme.ToeicSpaceShapes
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 enum class BottomNavTab(
@@ -71,7 +74,7 @@ fun BottomNavBar(
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.smd, vertical = Spacing.sm)
                 .height(64.dp),
-        shape = RoundedCornerShape(32.dp),
+        shape = ToeicSpaceShapes.large,
         color = Color.White.copy(alpha = 0.95f),
         shadowElevation = 8.dp,
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f)),
@@ -121,22 +124,19 @@ private fun TabItem(
             ),
         label = "DropletScale",
     )
-    val activeColor = PrimaryGradientCenter
-    val inactiveColor = OceanicInk.copy(alpha = 0.5f)
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) activeColor else inactiveColor,
+        targetValue = if (isSelected) PrimaryGradientCenter else OceanicInk.copy(alpha = 0.5f),
         animationSpec = tween(durationMillis = 200),
         label = "TabContentColor",
     )
 
     Column(
         modifier =
-            modifier
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    onClick = onClick,
-                ),
+            modifier.clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -157,15 +157,15 @@ private fun TabItem(
                                     Brush.verticalGradient(
                                         colors =
                                             listOf(
-                                                Color(0xFFEBF3FF),
-                                                Color(0xFFDCEBFF),
+                                                NavDropletGradientStart,
+                                                NavDropletGradientEnd,
                                             ),
                                     ),
-                                shape = RoundedCornerShape(16.dp),
+                                shape = ToeicSpaceShapes.small,
                             ).border(
                                 width = 1.dp,
-                                color = Color(0xFFC7DEFF),
-                                shape = RoundedCornerShape(16.dp),
+                                color = NavDropletBorder,
+                                shape = ToeicSpaceShapes.small,
                             ),
                 )
             }
@@ -209,9 +209,7 @@ private fun ToeicBottomNavBarPreview() {
         ) {
             BottomNavBar(
                 currentRoute = selectedRoute,
-                onNavigate = { newRoute ->
-                    selectedRoute = newRoute
-                },
+                onNavigate = { selectedRoute = it },
             )
         }
     }

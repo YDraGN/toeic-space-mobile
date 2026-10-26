@@ -20,6 +20,7 @@ object Spacing {
     val space12: Dp = 12.dp
     val space18: Dp = 18.dp
     val space22: Dp = 22.dp
+    val space36: Dp = 36.dp
     val space40: Dp = 40.dp
 
     // --- Layout ---
