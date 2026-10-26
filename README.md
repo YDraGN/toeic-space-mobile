@@ -1,109 +1,123 @@
-# TOEICSpace Mobile
+<h1 align="center">TOEICSpace Mobile</h1>
 
 <p align="center">
-  <img alt="Kotlin" src="https://img.shields.io/badge/KOTLIN-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" />
-  <img alt="Jetpack Compose" src="https://img.shields.io/badge/JETPACK%20COMPOSE-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" />
-  <img alt="Android" src="https://img.shields.io/badge/ANDROID-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
-  <img alt="Architecture" src="https://img.shields.io/badge/ARCHITECTURE-CLEAN%20%2B%20MVVM-0A66C2?style=for-the-badge" />
-  <img alt="License" src="https://img.shields.io/badge/LICENSE-MIT-green?style=for-the-badge" />
+  Native Android client for <b>TOEICSpace</b>: TOEIC Listening &amp; Reading practice combined with an LMS for language centers.
 </p>
 
-TOEICSpace Mobile is the native Android client for TOEICSpace, an online TOEIC Listening & Reading learning and test preparation platform combined with a Learning Management System (LMS) for language centers.
+<p align="center">
+  <a href="https://github.com/YDraGN/toeic-space-mobile/actions/workflows/android-ci.yml"><img alt="Android CI" src="https://github.com/YDraGN/toeic-space-mobile/actions/workflows/android-ci.yml/badge.svg?branch=develop" /></a>
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-green" />
+  <img alt="Min SDK" src="https://img.shields.io/badge/minSdk-28-3DDC84?logo=android&logoColor=white" />
+  <img alt="Target SDK" src="https://img.shields.io/badge/targetSdk-37-3DDC84?logo=android&logoColor=white" />
+</p>
 
-The app follows Clean Architecture combined with the MVVM pattern, built entirely with Kotlin and Jetpack Compose, and shares the same Backend/API as the TOEICSpace web application.
+<p align="center">
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.2-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" />
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" />
+  <img alt="Hilt" src="https://img.shields.io/badge/Hilt-DI-2196F3?style=for-the-badge&logo=android&logoColor=white" />
+  <img alt="Coroutines" src="https://img.shields.io/badge/Coroutines%20%26%20Flow-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" />
+  <img alt="Retrofit" src="https://img.shields.io/badge/Retrofit%20%2B%20OkHttp-48B983?style=for-the-badge&logo=square&logoColor=white" />
+  <img alt="Gradle" src="https://img.shields.io/badge/Gradle-Kotlin%20DSL-02303A?style=for-the-badge&logo=gradle&logoColor=white" />
+</p>
 
-## ✨ Features
+---
 
-- Course, module, and lesson learning with progress tracking.
-- Vocabulary learning via flashcards, personal vocabulary sets, and vocabulary review.
-- TOEIC Part 1–7 practice, mini tests, and mock tests with timer, auto-save, and auto-submit.
-- Test results, attempt history, and on-demand answer explanations.
-- Mistake Notebook and Smart Review sessions.
-- Placement test, TOEIC goal setting, and personalized learning roadmap.
-- Assignment tracking, class schedule, and attendance.
-- In-app notifications.
-- Guest mode with local caching for practice results, mistakes, and quick-added vocabulary.
+## Overview
 
-This release targets Android only. Tuition payment, invoice, and refund management are handled outside the app and are out of scope for this repository.
+TOEICSpace Mobile shares the same backend (an ASP.NET Core microservices system behind an API Gateway) with the TOEICSpace web app.
 
-## 🏗️ Architecture
+- **Learn:** courses, modules, lessons, and progress tracking.
+- **Vocabulary:** flashcards, personal sets, and spaced review.
+- **Practice:** TOEIC Parts 1–7, mini tests, and timed mock tests with auto-save and auto-submit.
+- **Review:** results, attempt history, explanations, Mistake Notebook, and Smart Review.
+- **Roadmap:** placement test, score goal, and a personalized roadmap.
+- **Classroom:** assignments, schedule, attendance, and notifications.
+- **Guest mode:** practice without an account, with local caching.
 
-The project uses Clean Architecture with a package-by-feature structure. Each feature is organized into `data`, `domain`, and `presentation` layers. See [`docs/GUIDELINE_MOBILE.md`](docs/GUIDELINE_MOBILE.md) for the full architecture, coding conventions, and Compose Preview guidelines.
+Payments, invoices, and refunds are handled outside the app.
 
-## 🛠️ Installation
+## Tech stack
+
+| Area | Choice |
+|---|---|
+| Language | Kotlin 2.2 |
+| UI | Jetpack Compose, Material 3, Compose Navigation (type-safe routes) |
+| Architecture | MVVM + Clean Architecture (UI / Domain / Data), package-by-feature, single Gradle module |
+| DI | Hilt |
+| Async | Kotlin Coroutines, Flow, `StateFlow` |
+| Network | Retrofit, OkHttp, kotlinx.serialization |
+| Local storage | DataStore (Preferences), Room (offline cache) |
+| Build | AGP 9, Gradle version catalog, ktlint |
+| CI | GitHub Actions: ktlint, Android Lint, unit tests, debug build |
+
+## Getting started
 
 ### Prerequisites
 
 - Android Studio (latest stable)
-- JDK `17`
-- Android SDK Platform `34` (compileSdk), minSdk `28`
-- Git
+- JDK 17 or newer to launch Gradle (the Gradle daemon itself runs on JDK 25 and is downloaded automatically, see `gradle/gradle-daemon-jvm.properties`)
+- Android SDK Platform 37
+- A device or emulator on Android 9 (API 28) or newer
 
-### Local setup
-
-1. Clone the repository:
+### Setup
 
 ```bash
-   git clone git@github.com:YDraGN/toeic-space-mobile.git
-   cd toeic-space-mobile
+git clone git@github.com:YDraGN/toeic-space-mobile.git
+cd toeic-space-mobile
+cp local.properties.example local.properties
 ```
 
-2. Open the project in Android Studio and let Gradle Sync complete.
-
-3. Create the local configuration file:
-
-```bash
-   cp local.properties.example local.properties
-```
-
-4. Set the backend API URL in `local.properties`:
+Edit `local.properties` and point the app at the API Gateway:
 
 ```properties
-   API_BASE_URL=http://localhost:8080
+# Android emulator → host machine
+API_BASE_URL=http://10.0.2.2:5050/
 ```
 
-## 🚀 Usage
+On a physical device, use your machine's LAN IP instead of `10.0.2.2`. See [docs/api-integration.md](docs/api-integration.md).
 
-Run the app on an emulator or physical device directly from Android Studio, or via Gradle:
+### Common commands
 
 ```bash
-./gradlew installDebug
+./gradlew installDebug          # build and install on a connected device
+./gradlew ktlintCheck           # code style
+./gradlew lintDebug             # Android Lint
+./gradlew testDebugUnitTest     # unit tests
+./gradlew assembleRelease       # release APK (see docs/release.md)
 ```
 
-Build a debug APK:
-
-```bash
-./gradlew assembleDebug
-```
-
-Build a release APK:
-
-```bash
-./gradlew assembleRelease
-```
-
-Run unit tests:
-
-```bash
-./gradlew test
-```
-
-Run lint checks:
-
-```bash
-./gradlew ktlintCheck
-```
-
-## 📚 Documentation
+## Project structure
 
 ```text
-docs/
-├── api-integration.md
-├── GUIDELINE_ANDROID.md
-├── release.md
-└── screens-flow.md
+app/src/main/java/com/toeicspace/android/
+├── core/          # shared code: designsystem, network, datastore, navigation, di, common
+└── feature/       # one package per feature: splash, onboarding, auth, home, ...
+    └── <feature>/
+        ├── data/          # API services, DTOs, repository implementations
+        ├── domain/        # models, repository interfaces, use cases
+        └── presentation/  # Route + Screen composables, ViewModel, UiState
 ```
 
-## 📄 License
+Details: [docs/architecture.md](docs/architecture.md).
 
-This project is licensed under the [MIT License](LICENSE).
+## Documentation
+
+| Document | Content |
+|---|---|
+| [Architecture](docs/architecture.md) | Layers, single source of truth, navigation, DI |
+| [Coding conventions](docs/coding-conventions.md) | Kotlin, Compose, naming, constants, string resources |
+| [Design system](docs/design-system.md) | Color, typography, spacing, dimensions, accessibility, orientation |
+| [Screens flow](docs/screens-flow.md) | Loading → Onboarding → Auth → Home, guest mode |
+| [API integration](docs/api-integration.md) | Gateway, authentication, Google Sign-In, error format |
+| [Release](docs/release.md) | Versioning, signing, building the APK |
+| [Decision records](docs/adr/) | Why we made the key technical choices |
+| [Contributing](CONTRIBUTING.md) | Branches, commits, pull requests, issues |
+
+## Related repositories
+
+- [toeic-space-be](https://github.com/bnguien/toeic-space-be): backend microservices and API Gateway
+- [toeic-space-fe](https://github.com/bnguien/toeic-space-fe): web frontend
+
+## License
+
+Released under the [MIT License](LICENSE).
