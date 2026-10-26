@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">TOEICSpace</string>
+    <string name="btn_start">BẮT ĐẦU</string>
+    <string name="btn_continue">TIẾP THEO</string>
+    <string name="btn_skip">Bỏ qua</string>
+    <string name="onboarding_auth_prompt">Chọn phương thức để bắt đầu </string>
+    <string name="btn_register_new">ĐĂNG KÝ TÀI KHOẢN MỚI</string>
+    <string name="btn_login_existing">Đã có tài khoản? Đăng nhập</string>
+    <string name="btn_guest_explore">Dùng thử không cần tài khoản (Khách)</string>
+
+    <string name="txt_greeting">Sẵn sàng chinh phục TOEIC cùng Oysteic!</string>
+    <!-- Onboarding Slide 1 -->
+    <string name="onboarding_greeting_1">Chào bạn, mình là Oysteic!</string>
+    <string name="onboarding_title_1">Hành trình học của riêng bạn</string>
+    <string name="onboarding_desc_1"><![CDATA[Không gian cá nhân hoá thông minh: theo dõi <b>chuỗi streak ngọc trai</b>, tiếp tục đúng bài học dở dang và nhận gợi ý nhiệm vụ vừa vặn mỗi ngày.]]></string>
+    <string name="onboarding_tag_1_1">Chuỗi Streak</string>
+    <string name="onboarding_tag_1_2">Tiến trình học</string>
+
+    <!-- Onboarding Slide 2 -->
+    <string name="onboarding_greeting_2">Định hướng rõ ràng, tiết kiệm thời gian</string>
+    <string name="onboarding_title_2">Tìm đúng trung tâm, đúng lộ trình</string>
+    <string name="onboarding_desc_2"><![CDATA[Duyệt và lọc trung tâm hoặc khoá học TOEIC chuẩn xác nhất theo <b>mục tiêu điểm (450–990)</b>, mức học phí, khoảng cách và hình thức học Online / Offline.]]></string>
+    <string name="onboarding_tag_2_1">Mục tiêu điểm</string>
+    <string name="onboarding_tag_2_2">Học phí rõ ràng</string>
+    <string name="onboarding_tag_2_3">Review xác thực</string>
+
+    <!-- Onboarding Slide 3 -->
+    <string name="onboarding_greeting_3">Luyện tập mọi lúc, mọi nơi!</string>
+    <string name="onboarding_title_3">Luyện đúng phần, đúng lúc</string>
+    <string name="onboarding_desc_3"><![CDATA[Tách biệt linh hoạt: Luyện sâu <b>Nghe (Part 1–4)</b>, nhịp nhàng <b>Đọc (Part 5–7)</b> hoặc bấm giờ thi thử <b>Full Test 120 phút</b> nghiêm ngặt như thi thật.]]></string>
+    <string name="onboarding_tag_3_1">Nghe Part 1–4</string>
+    <string name="onboarding_tag_3_2">Đọc Part 5–7</string>
+    <string name="onboarding_tag_3_3">Full Test 120p</string>
 </resources>
