@@ -5,12 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -22,15 +20,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.AvatarGuestBorder
+import com.toeicspace.android.core.ui.theme.AvatarStreakBorder
+import com.toeicspace.android.core.ui.theme.AvatarUserBorder
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PillShape
-import com.toeicspace.android.core.ui.theme.SunlitGold
+import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 @Composable
@@ -45,10 +47,11 @@ fun UserAvatar(
     val hasActiveStreak = streakCount != null && streakCount > 0
     val borderColor =
         when {
-            hasActiveStreak -> SunlitGold
-            isGuest -> Color(0xFFC1C6D4)
-            else -> Color(0xFF1467C2)
+            hasActiveStreak -> AvatarStreakBorder
+            isGuest -> AvatarGuestBorder
+            else -> AvatarUserBorder
         }
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -59,30 +62,26 @@ fun UserAvatar(
             shape = CircleShape,
             color = Color.White,
             border = BorderStroke(width = 1.5.dp, color = borderColor),
-            shadowElevation = 3.dp,
+            shadowElevation = 2.dp,
         ) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                when {
-                    avatarPainter != null -> {
-                        Image(
-                            painter = avatarPainter,
-                            contentDescription = "User Avatar",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-
-                    else -> {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_account),
-                            contentDescription = "Default Account",
-                            tint = OceanicInk,
-                            modifier = Modifier.size(size * 0.55f),
-                        )
-                    }
+                if (avatarPainter != null) {
+                    Image(
+                        painter = avatarPainter,
+                        contentDescription = stringResource(id = R.string.common_cd_avatar),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_account),
+                        contentDescription = stringResource(id = R.string.common_cd_default_avatar),
+                        tint = OceanicInk,
+                        modifier = Modifier.size(size * 0.55f),
+                    )
                 }
             }
         }
@@ -94,12 +93,13 @@ fun UserAvatar(
                         .align(Alignment.BottomEnd)
                         .offset(x = 6.dp, y = 3.dp),
                 shape = PillShape,
-                color = SunlitGold,
+                color = AvatarStreakBorder,
                 border = BorderStroke(1.5.dp, Color.White),
                 shadowElevation = 2.dp,
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -107,7 +107,6 @@ fun UserAvatar(
                         fontSize = 8.sp,
                         lineHeight = 10.sp,
                     )
-                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = streakCount.toString(),
                         color = OceanicInk,
@@ -126,28 +125,18 @@ fun UserAvatar(
 private fun UserAvatarPreview() {
     ToeicSpaceTheme {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.gutter),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // 1. Có Streak 3 ngày
             UserAvatar(
                 onClick = {},
-                avatarPainter = painterResource(id = R.drawable.ic_launcher_foreground),
                 streakCount = 3,
             )
-            // 2. Không có Streak
             UserAvatar(
                 onClick = {},
-                avatarPainter = painterResource(id = R.drawable.ic_launcher_foreground),
-                streakCount = null, // Hoặc 0
+                streakCount = null,
             )
-            // 3. Tài khoản chưa có ảnh đại diện
-            UserAvatar(
-                onClick = {},
-                streakCount = 7,
-            )
-            // 4. Khách vãng lai
             UserAvatar(
                 onClick = {},
                 isGuest = true,

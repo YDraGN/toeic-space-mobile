@@ -1,3 +1,60 @@
 <resources>
-    <string name="app_name">TOEICSpace</string>
+    <string name="app_name" translatable="false">TOEICSpace</string>
+
+    <!-- Common -->
+    <string name="common_action_skip">Bỏ qua</string>
+    <string name="common_action_next">TIẾP THEO</string>
+    <string name="common_action_retry">Thử kết nối lại</string>
+    <string name="common_cd_logo">Logo TOEICSpace</string>
+    <string name="common_cd_avatar">Ảnh đại diện</string>
+    <string name="common_cd_default_avatar">Tài khoản</string>
+    <string name="common_cd_notifications">Thông báo</string>
+    <string name="common_label_tab_home">Trang chủ</string>
+    <string name="common_label_tab_explore">Khám phá</string>
+    <string name="common_label_tab_practice">Luyện tập</string>
+    <string name="common_label_tab_vocabulary">Từ vựng</string>
+    <string name="common_label_tab_account">Tài khoản</string>
+    <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
+
+    <!-- Splash -->
+    <string name="splash_subtitle_tagline">Mở sổ tay — Luyện từng lớp xà cừ</string>
+    <string name="splash_msg_loading">Đang chuẩn bị không gian học cho bạn…</string>
+    <string name="splash_title_network_error">Sóng biển đang chập chờn</string>
+    <string name="splash_body_network_error">Oysteic tạm thời chưa bắt được tín hiệu mạng. Bạn kiểm tra lại Wi-Fi hoặc 4G rồi thử lại nhé!</string>
+
+    <!-- Placeholder destinations -->
+    <string name="home_title_placeholder">Trang chủ</string>
+    <string name="auth_title_sign_up">Đăng ký tài khoản</string>
+    <string name="auth_title_sign_in">Đăng nhập</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_action_get_started">BẮT ĐẦU</string>
+    <string name="onboarding_subtitle_choose_method">Chọn phương thức để bắt đầu</string>
+    <string name="onboarding_action_sign_up">ĐĂNG KÝ TÀI KHOẢN MỚI</string>
+    <string name="onboarding_action_sign_in">Đã có tài khoản? Đăng nhập</string>
+    <string name="onboarding_action_continue_as_guest">Dùng thử không cần tài khoản (Khách)</string>
+    <string name="onboarding_title_ready">Sẵn sàng chinh phục TOEIC cùng Oysteic!</string>
+
+    <!-- Onboarding Slide 1 -->
+    <string name="onboarding_greeting_1">Chào bạn, mình là Oysteic!</string>
+    <string name="onboarding_title_1">Hành trình học của riêng bạn</string>
+    <string name="onboarding_desc_1"><![CDATA[Không gian cá nhân hoá thông minh: theo dõi <b>chuỗi streak ngọc trai</b>, tiếp tục đúng bài học dở dang và nhận gợi ý nhiệm vụ vừa vặn mỗi ngày.]]></string>
+    <string name="onboarding_tag_1_1">Chuỗi Streak</string>
+    <string name="onboarding_tag_1_2">Tiến trình học</string>
+
+    <!-- Onboarding Slide 2 -->
+    <string name="onboarding_greeting_2">Định hướng rõ ràng, tiết kiệm thời gian</string>
+    <string name="onboarding_title_2">Tìm đúng trung tâm, đúng lộ trình</string>
+    <string name="onboarding_desc_2"><![CDATA[Duyệt và lọc trung tâm hoặc khoá học TOEIC chuẩn xác nhất theo <b>mục tiêu điểm (450–990)</b>, mức học phí, khoảng cách và hình thức học Online / Offline.]]></string>
+    <string name="onboarding_tag_2_1">Mục tiêu điểm</string>
+    <string name="onboarding_tag_2_2">Học phí rõ ràng</string>
+    <string name="onboarding_tag_2_3">Review xác thực</string>
+
+    <!-- Onboarding Slide 3 -->
+    <string name="onboarding_greeting_3">Luyện tập mọi lúc, mọi nơi!</string>
+    <string name="onboarding_title_3">Luyện đúng phần, đúng lúc</string>
+    <string name="onboarding_desc_3"><![CDATA[Tách biệt linh hoạt: Luyện sâu <b>Nghe (Part 1–4)</b>, nhịp nhàng <b>Đọc (Part 5–7)</b> hoặc bấm giờ thi thử <b>Full Test 120 phút</b> nghiêm ngặt như thi thật.]]></string>
+    <string name="onboarding_tag_3_1">Nghe Part 1–4</string>
+    <string name="onboarding_tag_3_2">Đọc Part 5–7</string>
+    <string name="onboarding_tag_3_3">Full Test 120p</string>
 </resources>

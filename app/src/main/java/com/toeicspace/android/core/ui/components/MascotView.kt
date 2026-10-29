@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -22,13 +21,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.CoralBadge
+import com.toeicspace.android.core.ui.theme.PrimaryGradientCenter
+import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
+/**
+ * Oysteic mascot with an optional floating animation and glow behind it.
+ * The mascot is decorative by default; pass [contentDescription] when it carries meaning.
+ */
 @Composable
 fun MascotView(
     @DrawableRes mascotResId: Int,
@@ -36,6 +43,7 @@ fun MascotView(
     size: Dp = 120.dp,
     isFloating: Boolean = true,
     backgroundBrush: Brush? = null,
+    contentDescription: String? = null,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "MascotBobbing")
     val offsetY by infiniteTransition.animateFloat(
@@ -48,27 +56,29 @@ fun MascotView(
             ),
         label = "MascotOffsetY",
     )
-    val currentOffset = if (isFloating) offsetY.dp else 0.dp
 
     Box(
         modifier = modifier.size(size),
         contentAlignment = Alignment.Center,
     ) {
-        backgroundBrush?.let { brush ->
+        if (backgroundBrush != null) {
             Box(
                 modifier =
                     Modifier
                         .size(size * 2f)
-                        .background(brush, CircleShape),
+                        .background(backgroundBrush, CircleShape),
             )
         }
         Image(
             painter = painterResource(id = mascotResId),
-            contentDescription = "TOEICSpace Mascot",
+            contentDescription = contentDescription,
             modifier =
                 Modifier
                     .size(size)
-                    .offset(y = currentOffset),
+                    .graphicsLayer {
+                        // Read in the draw phase so the animation does not recompose.
+                        translationY = if (isFloating) offsetY.dp.toPx() else 0f
+                    },
         )
     }
 }
@@ -77,7 +87,7 @@ fun MascotView(
 @Composable
 private fun MascotViewBasePreview() {
     ToeicSpaceTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(Spacing.gutter)) {
             MascotView(
                 mascotResId = R.drawable.oy2_base,
                 size = 140.dp,
@@ -94,7 +104,7 @@ private fun MascotViewBasePreview() {
 @Composable
 private fun MascotViewWithGlowPreview() {
     ToeicSpaceTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(Spacing.gutter)) {
             MascotView(
                 mascotResId = R.drawable.oy2_streak,
                 size = 140.dp,
@@ -102,9 +112,9 @@ private fun MascotViewWithGlowPreview() {
                     Brush.radialGradient(
                         colors =
                             listOf(
-                                Color(0xFFFF9092).copy(alpha = 0.75f), // Hồng san hô rực rỡ ở tâm
-                                Color(0xFF2087E6).copy(alpha = 0.45f), // Xanh đại dương chuyển tiếp
-                                Color.Transparent, // Tỏa mờ dần ra ngoài
+                                CoralBadge.copy(alpha = 0.75f),
+                                PrimaryGradientCenter.copy(alpha = 0.45f),
+                                Color.Transparent,
                             ),
                     ),
             )
@@ -117,25 +127,13 @@ private fun MascotViewWithGlowPreview() {
 private fun MascotViewEmotionSetPreview() {
     ToeicSpaceTheme {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.gutter),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Mascot cổ vũ
-            MascotView(
-                mascotResId = R.drawable.oy2_cheer,
-                size = 90.dp,
-            )
-            // Mascot hoàn thành bài học
-            MascotView(
-                mascotResId = R.drawable.oy2_success,
-                size = 90.dp,
-            )
-            // Mascot danh sách trống
-            MascotView(
-                mascotResId = R.drawable.oy2_empty,
-                size = 90.dp,
-            )
+            MascotView(mascotResId = R.drawable.oy2_cheer, size = 90.dp)
+            MascotView(mascotResId = R.drawable.oy2_success, size = 90.dp)
+            MascotView(mascotResId = R.drawable.oy2_empty, size = 90.dp)
         }
     }
 }
