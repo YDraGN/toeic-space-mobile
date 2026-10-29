@@ -130,7 +130,7 @@ class SignInViewModel @Inject constructor(
 
 ## 6. Navigation
 
-- Dùng Navigation Compose với **route type-safe** (`@Serializable`). Không dùng route dạng chuỗi. **(chưa áp dụng)**
+- Dùng Navigation Compose với **route type-safe** (`@Serializable`). Không dùng route dạng chuỗi.
 - Mỗi feature tự khai báo trong `feature/<x>/navigation/XxxNavigation.kt`:
 
 ```kotlin

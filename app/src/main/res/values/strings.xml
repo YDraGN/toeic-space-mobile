@@ -1,14 +1,40 @@
 <resources>
-    <string name="app_name">TOEICSpace</string>
-    <string name="btn_start">BẮT ĐẦU</string>
-    <string name="btn_continue">TIẾP THEO</string>
-    <string name="btn_skip">Bỏ qua</string>
-    <string name="onboarding_auth_prompt">Chọn phương thức để bắt đầu </string>
-    <string name="btn_register_new">ĐĂNG KÝ TÀI KHOẢN MỚI</string>
-    <string name="btn_login_existing">Đã có tài khoản? Đăng nhập</string>
-    <string name="btn_guest_explore">Dùng thử không cần tài khoản (Khách)</string>
+    <string name="app_name" translatable="false">TOEICSpace</string>
 
-    <string name="txt_greeting">Sẵn sàng chinh phục TOEIC cùng Oysteic!</string>
+    <!-- Common -->
+    <string name="common_action_skip">Bỏ qua</string>
+    <string name="common_action_next">TIẾP THEO</string>
+    <string name="common_action_retry">Thử kết nối lại</string>
+    <string name="common_cd_logo">Logo TOEICSpace</string>
+    <string name="common_cd_avatar">Ảnh đại diện</string>
+    <string name="common_cd_default_avatar">Tài khoản</string>
+    <string name="common_cd_notifications">Thông báo</string>
+    <string name="common_label_tab_home">Trang chủ</string>
+    <string name="common_label_tab_explore">Khám phá</string>
+    <string name="common_label_tab_practice">Luyện tập</string>
+    <string name="common_label_tab_vocabulary">Từ vựng</string>
+    <string name="common_label_tab_account">Tài khoản</string>
+    <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
+
+    <!-- Splash -->
+    <string name="splash_subtitle_tagline">Mở sổ tay — Luyện từng lớp xà cừ</string>
+    <string name="splash_msg_loading">Đang chuẩn bị không gian học cho bạn…</string>
+    <string name="splash_title_network_error">Sóng biển đang chập chờn</string>
+    <string name="splash_body_network_error">Oysteic tạm thời chưa bắt được tín hiệu mạng. Bạn kiểm tra lại Wi-Fi hoặc 4G rồi thử lại nhé!</string>
+
+    <!-- Placeholder destinations -->
+    <string name="home_title_placeholder">Trang chủ</string>
+    <string name="auth_title_sign_up">Đăng ký tài khoản</string>
+    <string name="auth_title_sign_in">Đăng nhập</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_action_get_started">BẮT ĐẦU</string>
+    <string name="onboarding_subtitle_choose_method">Chọn phương thức để bắt đầu</string>
+    <string name="onboarding_action_sign_up">ĐĂNG KÝ TÀI KHOẢN MỚI</string>
+    <string name="onboarding_action_sign_in">Đã có tài khoản? Đăng nhập</string>
+    <string name="onboarding_action_continue_as_guest">Dùng thử không cần tài khoản (Khách)</string>
+    <string name="onboarding_title_ready">Sẵn sàng chinh phục TOEIC cùng Oysteic!</string>
+
     <!-- Onboarding Slide 1 -->
     <string name="onboarding_greeting_1">Chào bạn, mình là Oysteic!</string>
     <string name="onboarding_title_1">Hành trình học của riêng bạn</string>
