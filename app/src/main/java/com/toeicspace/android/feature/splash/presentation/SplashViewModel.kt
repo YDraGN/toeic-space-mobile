@@ -2,64 +2,53 @@ package com.toeicspace.android.feature.splash.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.toeicspace.android.core.datastore.UserPreferences
+import com.toeicspace.android.core.data.repository.SessionRepository
+import com.toeicspace.android.core.network.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class SplashViewModel
     @Inject
     constructor(
-        private val userPreferences: UserPreferences,
+        private val networkMonitor: NetworkMonitor,
+        private val sessionRepository: SessionRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow<SplashUiState>(SplashUiState.Loading)
         val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
 
-        private var isSimulatingNetworkError = false
+        private var resolveJob: Job? = null
 
         init {
-            checkInitialDestination()
+            resolveStartDestination()
         }
 
-        fun restart(simulateError: Boolean = false) {
-            isSimulatingNetworkError = simulateError
+        fun onRetryClick() {
+            resolveStartDestination()
+        }
+
+        private fun resolveStartDestination() {
+            resolveJob?.cancel()
             _uiState.value = SplashUiState.Loading
-            checkInitialDestination()
-        }
-
-        fun retryConnection() {
-            isSimulatingNetworkError = !isSimulatingNetworkError
-            _uiState.value = SplashUiState.Loading
-            checkInitialDestination()
-        }
-
-        private fun checkInitialDestination() {
-            viewModelScope.launch {
-                delay(5000L.milliseconds)
-
-                if (isSimulatingNetworkError) {
-                    _uiState.value = SplashUiState.NetworkError("Không có kết nối Internet")
-                    return@launch
-                }
-
-                val isOnboarded = userPreferences.isOnboardingCompleted.first()
-                val token = userPreferences.authToken.first()
-
-                val target =
-                    when {
-                        !isOnboarded -> SplashNavTarget.ONBOARDING
-                        token.isNullOrBlank() -> SplashNavTarget.AUTH
-                        else -> SplashNavTarget.HOME
+            resolveJob =
+                viewModelScope.launch {
+                    if (!networkMonitor.isOnline.first()) {
+                        _uiState.value = SplashUiState.NetworkError
+                        return@launch
                     }
-
-                _uiState.value = SplashUiState.Success(target)
-            }
+                    val startDestination =
+                        if (sessionRepository.isOnboardingCompleted.first()) {
+                            StartDestination.HOME
+                        } else {
+                            StartDestination.ONBOARDING
+                        }
+                    _uiState.value = SplashUiState.Ready(startDestination)
+                }
         }
     }

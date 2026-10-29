@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -24,8 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -37,19 +35,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.MascotView
@@ -60,120 +59,89 @@ import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PrimaryGradientCenter
 import com.toeicspace.android.core.ui.theme.PrimaryGradientStart
 import com.toeicspace.android.core.ui.theme.SeaTurquoise
+import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
-/**
- * Route component kết nối ViewModel & Navigation (dùng trong NavHost).
- */
+private val MascotGlowBrush =
+    Brush.radialGradient(
+        colors =
+            listOf(
+                CoralBadge.copy(alpha = 0.45f),
+                SeaTurquoise.copy(alpha = 0.65f),
+                Color.Transparent,
+            ),
+    )
+
+private val ProgressBarBrush =
+    Brush.horizontalGradient(colors = listOf(PrimaryGradientCenter, PrimaryGradientStart))
+
 @Composable
-fun SplashRoute(
-    onNavigate: (SplashNavTarget) -> Unit,
+internal fun SplashRoute(
+    onNavigateToOnboarding: () -> Unit,
+    onNavigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState) {
-        if (uiState is SplashUiState.Success) {
-            onNavigate((uiState as SplashUiState.Success).target)
+        val readyState = uiState as? SplashUiState.Ready ?: return@LaunchedEffect
+        when (readyState.startDestination) {
+            StartDestination.ONBOARDING -> onNavigateToOnboarding()
+            StartDestination.HOME -> onNavigateToHome()
         }
     }
 
     SplashScreen(
         uiState = uiState,
-        onRetry = viewModel::retryConnection,
+        onRetryClick = viewModel::onRetryClick,
         modifier = modifier,
     )
 }
 
-/**
- * Screen component hiển thị giao diện thuần (Stateless).
- */
 @Composable
-fun SplashScreen(
+internal fun SplashScreen(
     uiState: SplashUiState,
-    onRetry: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    SplashBackground(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .systemBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
+    val isNetworkError = uiState is SplashUiState.NetworkError
 
-            BrandHeader()
-
-            Spacer(modifier = Modifier.height(22.dp))
-
-            val mascotRes =
-                if (uiState is SplashUiState.NetworkError) {
-                    R.drawable.oy2_offline
-                } else {
-                    R.drawable.oy2_base
-                }
-
-            MascotView(
-                mascotResId = mascotRes,
-                size = 180.dp,
-                backgroundBrush =
-                    Brush.radialGradient(
-                        colors =
-                            listOf(
-                                CoralBadge.copy(alpha = 0.45f),
-                                SeaTurquoise.copy(alpha = 0.65f),
-                                Color.Transparent,
-                            ),
-                    ),
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-            ) {
-                when (uiState) {
-                    is SplashUiState.Loading,
-                    is SplashUiState.Success,
-                    -> {
-                        PearlLoadingProgressBar()
-                    }
-
-                    is SplashUiState.NetworkError -> {
-                        NetworkErrorCard(onRetry = onRetry)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1.35f))
-        }
-    }
-}
-
-@Composable
-private fun SplashBackground(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.img_splash_background),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
         )
-        content()
+
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .systemBarsPadding()
+                    .padding(horizontal = Spacing.lg),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            BrandHeader()
+            Spacer(modifier = Modifier.height(Spacing.space22))
+            MascotView(
+                mascotResId = if (isNetworkError) R.drawable.oy2_offline else R.drawable.oy2_base,
+                size = 180.dp,
+                backgroundBrush = MascotGlowBrush,
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            if (isNetworkError) {
+                NetworkErrorCard(onRetryClick = onRetryClick)
+            } else {
+                PearlLoadingIndicator()
+            }
+            Spacer(modifier = Modifier.weight(1.35f))
+        }
     }
 }
 
-/**
- * Header thương hiệu
- */
 @Composable
 private fun BrandHeader(modifier: Modifier = Modifier) {
     Column(
@@ -182,20 +150,59 @@ private fun BrandHeader(modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.img_brand_header),
-            contentDescription = "ToeicSpace Logo",
+            contentDescription = stringResource(id = R.string.common_cd_logo),
             modifier =
                 Modifier
                     .fillMaxWidth(0.9f)
                     .widthIn(min = 200.dp, max = 300.dp),
             contentScale = ContentScale.Fit,
         )
-
         Text(
-            text = "Mở sổ tay — Luyện từng lớp xà cừ",
+            text = stringResource(id = R.string.splash_subtitle_tagline),
             fontFamily = DancingScript,
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Medium,
             fontSize = 22.sp,
+            color = OceanicInk,
+        )
+    }
+}
+
+@Composable
+private fun PearlLoadingIndicator(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "PearlWave")
+    val pearlScale by infiniteTransition.animateFloat(
+        initialValue = 0.92f,
+        targetValue = 1.08f,
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "PearlPulse",
+    )
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_glowing_pearl),
+            contentDescription = null,
+            modifier =
+                Modifier
+                    .size(Spacing.xxl)
+                    .graphicsLayer {
+                        scaleX = pearlScale
+                        scaleY = pearlScale
+                    },
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        SmoothLinearProgressBar()
+        Spacer(modifier = Modifier.height(Spacing.smd))
+        Text(
+            text = stringResource(id = R.string.splash_msg_loading),
+            style = MaterialTheme.typography.bodySmall,
             color = OceanicInk,
         )
     }
@@ -214,6 +221,7 @@ private fun SmoothLinearProgressBar(modifier: Modifier = Modifier) {
             ),
         label = "ProgressOffset",
     )
+
     BoxWithConstraints(
         modifier =
             modifier
@@ -225,161 +233,82 @@ private fun SmoothLinearProgressBar(modifier: Modifier = Modifier) {
     ) {
         val trackWidth = maxWidth
         val barWidth = trackWidth * 0.45f
-        val startX = -barWidth
-        val currentX = startX + (trackWidth - startX) * progress
-
         Box(
             modifier =
                 Modifier
                     .width(barWidth)
                     .fillMaxHeight()
-                    .offset(x = currentX)
-                    .clip(CircleShape)
-                    .background(
-                        brush =
-                            Brush.horizontalGradient(
-                                colors =
-                                    listOf(
-                                        PrimaryGradientCenter,
-                                        PrimaryGradientStart,
-                                    ),
-                            ),
-                    ),
-        )
-    }
-}
-
-@Composable
-private fun PearlLoadingProgressBar(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "PearlWave")
-
-    val pearlScale by infiniteTransition.animateFloat(
-        initialValue = 0.92f,
-        targetValue = 1.08f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "PearlPulse",
-    )
-
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(48.dp)
                     .graphicsLayer {
-                        scaleX = pearlScale
-                        scaleY = pearlScale
-                    },
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_glowing_pearl),
-                contentDescription = null,
-                modifier = Modifier.size(48.dp),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        SmoothLinearProgressBar()
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "Đang chuẩn bị không gian học cho bạn...",
-            style = MaterialTheme.typography.bodySmall,
-            color = OceanicInk,
+                        // Slide from fully hidden on the left to fully hidden on the right.
+                        val travel = (trackWidth + barWidth).toPx()
+                        translationX = -barWidth.toPx() + travel * progress
+                    }.clip(CircleShape)
+                    .background(ProgressBarBrush),
         )
     }
 }
 
-/**
- * Card lỗi mạng (dự phòng).
- */
 @Composable
 private fun NetworkErrorCard(
-    onRetry: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val shape = RoundedCornerShape(Spacing.lg)
     Card(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .shadow(8.dp, RoundedCornerShape(24.dp)),
-        shape = RoundedCornerShape(24.dp),
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(Spacing.lg),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             Text(
-                text = "Sóng biển đang chập chờn",
+                text = stringResource(id = R.string.splash_title_network_error),
                 style = MaterialTheme.typography.headlineSmall,
                 color = OceanicInk,
                 textAlign = TextAlign.Center,
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             Text(
-                text =
-                    "Oysteic tạm thời chưa bắt được tín hiệu mạng. " +
-                        "Bạn kiểm tra lại Wi-Fi hoặc 4G rồi thử lại nhé!",
+                text = stringResource(id = R.string.splash_body_network_error),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
             PrimaryButton(
-                text = "Thử kết nối lại",
-                onClick = onRetry,
+                text = stringResource(id = R.string.common_action_retry),
+                onClick = onRetryClick,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = Spacing.smd),
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Refresh,
+                        painter = painterResource(id = R.drawable.ic_refresh),
                         contentDescription = null,
                         tint = Color.White,
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
 }
 
-// ==========================================
-// PREVIEWS
-// ==========================================
-
-@Preview(name = "Splash - Loading State", showBackground = true)
+@Preview(name = "Splash - Loading", showBackground = true)
+@PreviewScreenSizes
 @Composable
 private fun SplashScreenLoadingPreview() {
     ToeicSpaceTheme {
-        SplashScreen(
-            uiState = SplashUiState.Loading,
-            onRetry = {},
-        )
+        SplashScreen(uiState = SplashUiState.Loading, onRetryClick = {})
     }
 }
 
-@Preview(name = "Splash - Network Error State", showBackground = true)
+@Preview(name = "Splash - Network error", showBackground = true)
 @Composable
 private fun SplashScreenNetworkErrorPreview() {
     ToeicSpaceTheme {
-        SplashScreen(
-            uiState = SplashUiState.NetworkError(),
-            onRetry = {},
-        )
+        SplashScreen(uiState = SplashUiState.NetworkError, onRetryClick = {})
     }
 }

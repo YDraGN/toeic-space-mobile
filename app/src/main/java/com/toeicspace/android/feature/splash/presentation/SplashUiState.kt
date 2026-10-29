@@ -1,19 +1,17 @@
 package com.toeicspace.android.feature.splash.presentation
 
-enum class SplashNavTarget {
+/** Screen the app should open after the splash. */
+enum class StartDestination {
     ONBOARDING,
-    AUTH,
     HOME,
 }
 
 sealed interface SplashUiState {
     data object Loading : SplashUiState
 
-    data class Success(
-        val target: SplashNavTarget,
-    ) : SplashUiState
+    data object NetworkError : SplashUiState
 
-    data class NetworkError(
-        val message: String? = null,
+    data class Ready(
+        val startDestination: StartDestination,
     ) : SplashUiState
 }
