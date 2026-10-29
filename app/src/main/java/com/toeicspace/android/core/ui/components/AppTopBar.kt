@@ -13,17 +13,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.BrandGradientBrush
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 @Composable
 fun AppTopBar(
-    modifier: Modifier = Modifier,
     leadingContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     trailingContent: @Composable () -> Unit = {},
 ) {
     Row(
@@ -49,7 +51,7 @@ private fun AppTopBarOnboardingPreview() {
             leadingContent = { BrandLogo() },
             trailingContent = {
                 PillButton(
-                    text = "Bỏ qua",
+                    text = stringResource(id = R.string.common_action_skip),
                     onClick = {},
                     trailingIcon = {
                         Icon(
@@ -73,7 +75,7 @@ private fun AppTopBarHomeGuestPreview() {
             leadingContent = { BrandLogo() },
             trailingContent = {
                 PillButton(
-                    text = "Đăng nhập",
+                    text = stringResource(id = R.string.auth_title_sign_in),
                     onClick = {},
                     backgroundBrush = BrandGradientBrush,
                     contentColor = Color.White,
@@ -83,26 +85,23 @@ private fun AppTopBarHomeGuestPreview() {
     }
 }
 
-@Preview(name = "TopBar - Home Logged In", showBackground = true, backgroundColor = 0xFFFAF9FF)
+@Preview(name = "TopBar - Home Signed In", showBackground = true, backgroundColor = 0xFFFAF9FF)
 @Composable
-private fun AppTopBarHomeLoggedInPreview() {
+private fun AppTopBarHomeSignedInPreview() {
     ToeicSpaceTheme {
         AppTopBar(
-            leadingContent = {
-                BrandLogo()
-            },
+            leadingContent = { BrandLogo() },
             trailingContent = {
-                IconButton(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_bell),
-                            contentDescription = "Thông báo",
-                        )
-                    },
+                ToeicIconButton(
                     onClick = {},
-                    hasBadge = true,
                     badgeCount = 3,
-                )
+                    contentDescription = stringResource(id = R.string.common_cd_notifications),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bell),
+                        contentDescription = null,
+                    )
+                }
             },
         )
     }
