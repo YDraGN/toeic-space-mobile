@@ -62,8 +62,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
 
     // --- Navigation ---
     implementation(libs.androidx.navigation.compose)
@@ -71,7 +69,7 @@ dependencies {
     // --- Hilt ---
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
 
     // --- Networking ---
     implementation(libs.retrofit.core)
