@@ -1,25 +1,32 @@
 package com.toeicspace.android.core.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.toeicspace.android.R
@@ -44,44 +51,51 @@ fun PrimaryButton(
     val isInteractive = enabled && !isLoading
     val brush = if (isInteractive) BrandGradientBrush else DisabledBrandGradientBrush
 
-    Button(
-        onClick = onClick,
+    // Clip before the click so the ripple fills the whole rounded gradient, not an inner box.
+    Row(
         modifier =
             modifier
-                .background(brush, shape)
-                .heightIn(min = Spacing.xxl),
-        enabled = isInteractive,
-        shape = shape,
-        colors =
-            ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-            ),
-        contentPadding = PaddingValues(horizontal = Spacing.lg, vertical = Spacing.sm),
+                .heightIn(min = Spacing.xxl)
+                .clip(shape)
+                .background(brush)
+                .clickable(
+                    enabled = isInteractive,
+                    role = Role.Button,
+                    interactionSource = null,
+                    indication = ripple(color = Color.White),
+                    onClick = onClick,
+                ).padding(horizontal = Spacing.lg, vertical = Spacing.sm),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(Spacing.space18),
-                strokeWidth = Spacing.space2,
+        CompositionLocalProvider(LocalContentColor provides Color.White) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(Spacing.space18),
+                    strokeWidth = Spacing.space2,
+                    color = Color.White,
+                )
+                Spacer(modifier = Modifier.width(Spacing.sm))
+            } else if (leadingIcon != null) {
+                leadingIcon()
+                Spacer(modifier = Modifier.width(Spacing.sm))
+            }
+
+            // Wraps to a second line instead of cutting the label at large font scales.
+            Text(
+                text = if (isLoading && loadingText != null) loadingText else text,
+                style = MaterialTheme.typography.labelLarge,
                 color = Color.White,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
             )
-            Spacer(modifier = Modifier.width(Spacing.sm))
-        } else if (leadingIcon != null) {
-            leadingIcon()
-            Spacer(modifier = Modifier.width(Spacing.sm))
-        }
 
-        Text(
-            text = if (isLoading && loadingText != null) loadingText else text,
-            style = MaterialTheme.typography.labelLarge,
-            color = Color.White,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-
-        if (!isLoading && trailingIcon != null) {
-            Spacer(modifier = Modifier.width(Spacing.sm))
-            trailingIcon()
+            if (!isLoading && trailingIcon != null) {
+                Spacer(modifier = Modifier.width(Spacing.sm))
+                trailingIcon()
+            }
         }
     }
 }
