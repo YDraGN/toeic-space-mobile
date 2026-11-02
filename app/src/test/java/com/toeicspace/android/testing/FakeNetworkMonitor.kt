@@ -11,6 +11,8 @@ class FakeNetworkMonitor(
 
     override val isOnline: Flow<Boolean> = online
 
+    override fun isCurrentlyOnline(): Boolean = online.value
+
     fun setOnline(isOnline: Boolean) {
         online.value = isOnline
     }
