@@ -4,7 +4,7 @@
     <!-- Common -->
     <string name="common_action_skip">Bỏ qua</string>
     <string name="common_action_next">TIẾP THEO</string>
-    <string name="common_action_retry">Thử kết nối lại</string>
+    <string name="common_action_back">Quay lại</string>
     <string name="common_cd_logo">Logo TOEICSpace</string>
     <string name="common_cd_avatar">Ảnh đại diện</string>
     <string name="common_cd_default_avatar">Tài khoản</string>
@@ -15,24 +15,106 @@
     <string name="common_label_tab_vocabulary">Từ vựng</string>
     <string name="common_label_tab_account">Tài khoản</string>
     <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
+    <string name="common_error_network">Không có kết nối mạng. Bạn kiểm tra Wi-Fi hoặc 4G rồi thử lại nhé.</string>
+    <string name="common_error_server_unreachable">Chưa kết nối được tới máy chủ TOEICSpace. Bạn thử lại sau ít phút nhé.</string>
+    <string name="common_error_server">Máy chủ đang bận. Bạn thử lại sau ít phút nhé.</string>
+    <string name="common_error_unknown">Đã có lỗi xảy ra. Bạn thử lại nhé.</string>
 
     <!-- Splash -->
     <string name="splash_subtitle_tagline">Mở sổ tay — Luyện từng lớp xà cừ</string>
     <string name="splash_msg_loading">Đang chuẩn bị không gian học cho bạn…</string>
-    <string name="splash_title_network_error">Sóng biển đang chập chờn</string>
-    <string name="splash_body_network_error">Oysteic tạm thời chưa bắt được tín hiệu mạng. Bạn kiểm tra lại Wi-Fi hoặc 4G rồi thử lại nhé!</string>
 
-    <!-- Placeholder destinations -->
+    <!-- Home (placeholder until the Home shell is built) -->
     <string name="home_title_placeholder">Trang chủ</string>
-    <string name="auth_title_sign_up">Đăng ký tài khoản</string>
+    <string name="home_greeting_user">Xin chào, %1$s!</string>
+    <string name="home_greeting_guest">Bạn đang dùng thử với tư cách khách</string>
+    <string name="home_action_sign_out">Đăng xuất</string>
+    <string name="home_action_sign_in">Đăng nhập để lưu tiến trình</string>
+
+    <!-- Auth: fields -->
+    <string name="auth_label_email">Email</string>
+    <string name="auth_label_password">Mật khẩu</string>
+    <string name="auth_label_full_name">Họ và tên</string>
+    <string name="auth_label_phone">Số điện thoại</string>
+    <string name="auth_hint_optional">Không bắt buộc</string>
+    <string name="auth_label_confirm_password">Nhập lại mật khẩu</string>
+    <string name="auth_label_new_password">Mật khẩu mới</string>
+    <string name="auth_label_otp">Mã xác thực (6 số)</string>
+    <string name="auth_cd_show_password">Hiện mật khẩu</string>
+    <string name="auth_cd_hide_password">Ẩn mật khẩu</string>
+    <string name="auth_hint_password_rules">Tối thiểu 8 ký tự, gồm chữ in hoa, chữ số và ký tự đặc biệt.</string>
+    <string name="auth_hint_reset_password_rules">Tối thiểu 8 ký tự, gồm chữ in hoa và ký tự đặc biệt.</string>
+
+    <!-- Auth: field errors (checked on the device before any request) -->
+    <string name="auth_error_required">Vui lòng nhập thông tin này</string>
+    <string name="auth_error_email_invalid">Email chưa đúng định dạng</string>
+    <string name="auth_error_too_long">Nội dung quá dài</string>
+    <string name="auth_error_password_too_short">Mật khẩu cần ít nhất 8 ký tự</string>
+    <string name="auth_error_password_uppercase">Mật khẩu cần ít nhất một chữ in hoa (A–Z)</string>
+    <string name="auth_error_password_digit">Mật khẩu cần ít nhất một chữ số</string>
+    <string name="auth_error_password_special">Mật khẩu cần ít nhất một ký tự đặc biệt</string>
+    <string name="auth_error_password_mismatch">Mật khẩu nhập lại không khớp</string>
+    <string name="auth_error_phone_invalid">Số di động Việt Nam chưa hợp lệ</string>
+    <string name="auth_error_otp_format">Mã xác thực gồm 6 chữ số</string>
+    <string name="auth_error_field_rejected">Thông tin này chưa hợp lệ</string>
+
+    <!-- Auth: backend error codes -->
+    <string name="auth_error_invalid_credentials">Email hoặc mật khẩu chưa đúng</string>
+    <string name="auth_error_account_locked">Tài khoản này đang bị khoá. Bạn liên hệ hỗ trợ để được giúp nhé.</string>
+    <string name="auth_error_login_temporarily_locked">Bạn đã thử sai quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.</string>
+    <string name="auth_error_otp_invalid">Mã xác thực không đúng hoặc đã hết hạn</string>
+    <string name="auth_error_otp_rate_limited">Bạn đã yêu cầu mã quá nhiều lần. Vui lòng đợi rồi thử lại.</string>
+    <string name="auth_error_registration_failed">Không thể đăng ký với thông tin này. Nếu đã có tài khoản, bạn hãy đăng nhập.</string>
+    <string name="auth_error_email_already_verified">Email này đã được xác thực. Bạn hãy đăng nhập.</string>
+    <string name="auth_error_reset_session_expired">Phiên đặt lại mật khẩu đã hết hạn. Vui lòng nhập lại email.</string>
+    <string name="auth_error_password_same_as_old">Mật khẩu mới phải khác mật khẩu cũ</string>
+    <string name="auth_error_too_many_requests">Bạn thao tác hơi nhanh. Vui lòng đợi một chút rồi thử lại.</string>
+
+    <!-- Auth: sign in -->
     <string name="auth_title_sign_in">Đăng nhập</string>
+    <string name="auth_subtitle_sign_in">Chào mừng bạn quay lại không gian học!</string>
+    <string name="auth_action_sign_in">ĐĂNG NHẬP</string>
+    <string name="auth_action_signing_in">Đang đăng nhập…</string>
+    <string name="auth_action_forgot_password">Quên mật khẩu?</string>
+    <string name="auth_prompt_no_account">Chưa có tài khoản?</string>
+    <string name="auth_action_go_to_sign_up">Đăng ký ngay</string>
+    <string name="auth_notice_email_verified">Email đã được xác thực. Bạn đăng nhập để bắt đầu nhé!</string>
+    <string name="auth_notice_password_reset">Đã đổi mật khẩu. Bạn đăng nhập lại bằng mật khẩu mới nhé.</string>
+
+    <!-- Auth: sign up -->
+    <string name="auth_title_sign_up">Đăng ký tài khoản</string>
+    <string name="auth_subtitle_sign_up">Tạo tài khoản để lưu lại tiến trình học của bạn</string>
+    <string name="auth_action_sign_up">TẠO TÀI KHOẢN</string>
+    <string name="auth_action_signing_up">Đang tạo tài khoản…</string>
+    <string name="auth_prompt_have_account">Đã có tài khoản?</string>
+    <string name="auth_action_go_to_sign_in">Đăng nhập</string>
+
+    <!-- Auth: verify email -->
+    <string name="auth_title_verify_email">Xác thực email</string>
+    <string name="auth_body_verify_email">Oysteic đã gửi mã 6 số tới %1$s. Bạn kiểm tra cả thư mục Spam nhé.</string>
+    <string name="auth_action_verify">XÁC THỰC</string>
+    <string name="auth_action_resend_otp">Gửi lại mã</string>
+    <plurals name="auth_action_resend_otp_in">
+        <item quantity="other">Gửi lại mã sau %1$d giây</item>
+    </plurals>
+    <string name="auth_notice_otp_resent">Đã gửi mã mới. Bạn kiểm tra hộp thư nhé.</string>
+
+    <!-- Auth: forgot password -->
+    <string name="auth_title_forgot_password">Quên mật khẩu</string>
+    <string name="auth_body_forgot_email">Nhập email đã đăng ký, Oysteic sẽ gửi mã xác thực cho bạn.</string>
+    <string name="auth_body_forgot_otp">Nhập mã 6 số đã gửi tới %1$s.</string>
+    <string name="auth_body_forgot_new_password">Tạo mật khẩu mới cho tài khoản của bạn.</string>
+    <string name="auth_action_send_otp">GỬI MÃ</string>
+    <string name="auth_action_continue">TIẾP TỤC</string>
+    <string name="auth_action_save_password">LƯU MẬT KHẨU MỚI</string>
+    <string name="auth_action_change_email">Đổi email</string>
 
     <!-- Onboarding -->
     <string name="onboarding_action_get_started">BẮT ĐẦU</string>
     <string name="onboarding_subtitle_choose_method">Chọn phương thức để bắt đầu</string>
     <string name="onboarding_action_sign_up">ĐĂNG KÝ TÀI KHOẢN MỚI</string>
-    <string name="onboarding_action_sign_in">Đã có tài khoản? Đăng nhập</string>
-    <string name="onboarding_action_continue_as_guest">Dùng thử không cần tài khoản (Khách)</string>
+    <string name="onboarding_action_sign_in">Tôi đã có tài khoản</string>
+    <string name="onboarding_action_continue_as_guest">Dùng thử không cần tài khoản</string>
     <string name="onboarding_title_ready">Sẵn sàng chinh phục TOEIC cùng Oysteic!</string>
 
     <!-- Onboarding Slide 1 -->

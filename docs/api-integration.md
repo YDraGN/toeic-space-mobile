@@ -1,6 +1,6 @@
 # API integration
 
-> Đối chiếu với `toeic-space-be` nhánh `develop` tại commit `31dec9f` (25/10/2026). Khi backend thay đổi hợp đồng API, cập nhật file này trong cùng PR tích hợp.
+> Đối chiếu với `toeic-space-be` nhánh `develop` tại commit `70ee748` (30/10/2026), cộng với chế độ client native ở nhánh `feature/mobile-auth-session` (mục 4.3). Khi backend thay đổi hợp đồng API, cập nhật file này trong cùng PR tích hợp.
 
 ## 1. Kết nối tới backend
 
@@ -75,43 +75,45 @@ App dựa vào `code` để chọn chuỗi hiển thị. Không hiển thị th�
 | Đổi mật khẩu: xin OTP | `POST /api/v1/auth/change-password/otp` | `currentPassword`; cần Bearer |
 | Đổi mật khẩu | `PUT /api/v1/auth/change-password` | `currentPassword`, `newPassword`, `confirmPassword`, `otp`; cần Bearer |
 
-`AuthResponse` gồm `accessToken`, `tokenType`, `expiresIn`, `expiresAt`, `user { id, fullName, email, role }`.
+`AuthResponse` gồm `accessToken`, `tokenType`, `expiresIn`, `expiresAt`, `user { id, fullName, email, role }`. Với header `X-Client-Type: mobile` có thêm `refreshToken`, `refreshTokenExpiresAt` (xem 4.3).
 
-Quy tắc mật khẩu mới (đặt lại, đổi mật khẩu): 8–128 ký tự, có ít nhất một chữ in hoa A–Z và một ký tự không phải chữ, số hay khoảng trắng. App kiểm tra trước ở client, nhưng backend vẫn là nơi quyết định cuối cùng.
+Quy tắc mật khẩu. App kiểm tra trước ở `AuthValidator` để không tốn request, backend vẫn là nơi quyết định cuối cùng:
+
+| Luồng | Quy tắc |
+|---|---|
+| Đăng ký | 8–128 ký tự, có chữ in hoa, **chữ số** và ký tự đặc biệt |
+| Đặt lại, đổi mật khẩu | 8–128 ký tự, có chữ in hoa A–Z và ký tự không phải chữ, số hay khoảng trắng |
+| Đăng nhập | Chỉ kiểm tra có nhập và tối đa 128 ký tự, để không gợi ý chính sách mật khẩu |
+
+Số điện thoại: di động Việt Nam `0[35789]xxxxxxxx`, chấp nhận `+84`, `0084`, dấu cách, chấm, gạch như backend.
 
 ### 4.2 Token
 
 | | Access token | Refresh token |
 |---|---|---|
 | Dạng | JWT ES256, sống 10 phút | Chuỗi opaque, sống tối đa 7 ngày, hết hạn sau 24 giờ không dùng |
-| Lưu ở app | Trong bộ nhớ | `TokenStorage` (mã hoá bằng Tink, khoá trong Android Keystore), không được backup |
+| Lưu ở app | Trong bộ nhớ | `SessionTokenStore`: AES-256-GCM với khoá nằm trong Android Keystore (`KeystoreTokenCipher`), DataStore `toeic_space_session`, không được backup |
 | Gửi đi | `Authorization: Bearer`, do `AuthInterceptor` gắn | Chỉ gửi khi refresh |
 
-- Refresh token **chỉ dùng được một lần**. Nếu gửi lại một token đã dùng, backend thu hồi mọi phiên của tài khoản. Vì vậy `TokenAuthenticator` phải dùng `Mutex`, chỉ một request được refresh tại một thời điểm.
-- Refresh thất bại thì xoá session, app quay về màn Sign in.
+- Refresh token **chỉ dùng được một lần**. Nếu gửi lại một token đã dùng, backend thu hồi mọi phiên của tài khoản. Vì vậy `TokenRefresher` dùng `Mutex`: chỉ một request được refresh tại một thời điểm, các request đang chờ dùng lại token vừa nhận.
+- Refresh bị từ chối (401) thì xoá session, app quay về màn Sign in. Mất mạng hoặc lỗi 5xx thì **giữ** session, để người dùng vẫn ở trong app khi offline.
+- Access token không được lưu xuống đĩa. Sau khi mở lại app, `AuthInterceptor` refresh trước request cần đăng nhập đầu tiên, thay vì gửi đi rồi nhận 401. Refresh token đã hết hạn theo đồng hồ máy thì xoá luôn, không gọi server.
 - Đặt lại hoặc đổi mật khẩu thành công sẽ thu hồi mọi refresh token cũ. App phải xoá session và yêu cầu đăng nhập lại.
 
-### 4.3 ⚠️ Việc cần backend hỗ trợ: cookie và client native
+### 4.3 Chế độ client native (`X-Client-Type: mobile`)
 
-Ba luồng hiện **chỉ** hoạt động qua cookie `HttpOnly; Secure; SameSite=Strict` kèm header CSRF, vốn được thiết kế cho trình duyệt:
+Trình duyệt dùng cookie `HttpOnly; Secure` cho refresh token và reset token. App không dùng được cookie này: cờ `Secure` chặn cookie qua `http://` khi dev. Vì vậy backend có chế độ native, bật bằng header `X-Client-Type: mobile` (nhánh `feature/mobile-auth-session` của backend, mô tả ở `docs/AUTHENTICATION.md` mục 2.1):
 
-| Luồng | Cookie |
+| Endpoint | Khác với trình duyệt |
 |---|---|
-| Refresh, logout | `__Secure-ts_rt` (path `/identity/api/auth`) |
-| Đặt lại mật khẩu | `__Secure-ts_pr` (path `/identity/api/v1/auth/password-reset`) |
+| `login`, `refresh` | Body trả thêm `refreshToken`, `refreshTokenExpiresAt`; không đặt cookie |
+| `refresh`, `logout` | Đọc `{ "refreshToken": "..." }` trong body |
+| `password-reset/verify` | Body trả thêm `resetToken`; không đặt cookie |
+| `password-reset/confirm` | Đọc `resetToken` trong body |
 
-Hệ quả cho mobile:
-
-1. Cookie có cờ `Secure` nên OkHttp không gửi nó qua `http://`. Khi dev trên emulator với backend local, refresh và đặt lại mật khẩu **sẽ không hoạt động**.
-2. App phải tự viết `CookieJar` lưu cookie đã mã hoá và tự quản lý đúng path của từng cookie.
-
-**Đề xuất gửi team backend:** thêm chế độ client native qua header `X-Client-Type: mobile`. Khi có header này:
-
-- `login` và `refresh` trả `refreshToken` trong body; `refresh` và `logout` nhận `refreshToken` trong body.
-- `password-reset/verify` trả `resetToken` trong body; `password-reset/confirm` nhận `resetToken` trong body.
-- Bỏ kiểm tra CSRF, vì client native không có cookie bị gửi tự động.
-
-**Tạm thời,** trước khi backend hỗ trợ: dùng `CookieJar` lưu trong bộ nhớ, và chỉ test các luồng trên với backend chạy HTTPS (staging hoặc reverse proxy local có chứng chỉ).
+- `ClientHeadersInterceptor` gắn `X-Client-Type: mobile` và `X-CSRF-Protection: 1` cho mọi request.
+- Ở chế độ native, server không đọc hay ghi cookie, nên app không cần `CookieJar`.
+- Nếu đăng nhập trả về mà thiếu `refreshToken` (backend chưa có chế độ native), app coi là lỗi, vì session sẽ không sống qua lần mở app sau.
 
 ## 5. Đăng nhập bằng Google
 
@@ -175,11 +177,14 @@ Quy ước: mọi dữ liệu giả nằm trong `feature/<x>/data/fake/`. Hilt c
 
 ```text
 OkHttpClient
-├── AuthInterceptor          gắn Bearer token, bỏ qua các endpoint auth công khai
-├── CsrfHeaderInterceptor    thêm X-CSRF-Protection: 1 cho refresh, logout, password-reset
-├── HttpLoggingInterceptor   chỉ ở debug, redactHeader("Authorization")
+├── AuthInterceptor          gắn Bearer token; refresh trước nếu token thiếu hoặc sắp hết hạn
+├── ClientHeadersInterceptor X-Client-Type: mobile, X-CSRF-Protection: 1
+├── HttpLoggingInterceptor   chỉ ở debug, mức BASIC (không log body), redactHeader("Authorization")
 └── TokenAuthenticator       nhận 401 → refresh (Mutex) → gửi lại request một lần
 ```
+
+- Endpoint công khai (đăng nhập, đăng ký, OTP) được đánh dấu `@PublicEndpoint`: không gắn token và không kích hoạt refresh.
+- `SessionApiService` (refresh, logout) dùng client riêng không có `AuthInterceptor`, để refresh không gọi lại chính nó.
 
 JSON dùng `kotlinx.serialization` với `ignoreUnknownKeys = true` và `explicitNulls = false`.
 
@@ -187,19 +192,20 @@ JSON dùng `kotlinx.serialization` với `ignoreUnknownKeys = true` và `explici
 
 | HTTP / `code` | `AppError` | String key |
 |---|---|---|
-| Không có mạng, timeout | `Network` | `common_error_network` |
+| Máy không có mạng (`ConnectivityInterceptor` chặn trước khi gửi) | `Network` | `common_error_network` |
+| Có mạng nhưng máy chủ không phản hồi: bị từ chối, timeout, lỗi DNS | `ServerUnreachable` | `common_error_server_unreachable` |
 | 400 `VALIDATION_ERROR` | `Validation(fields)` | Hiện lỗi ngay dưới từng field |
 | 401 / 400 `AUTH_INVALID_CREDENTIALS` | `Server` | `auth_error_invalid_credentials` |
-| `AUTH_EMAIL_NOT_VERIFIED` | `Server` | Chuyển sang màn Verify email |
+| 403 `AUTH_EMAIL_NOT_VERIFIED` | `Server` | Gọi `resend-verification` lấy `challengeId` mới, rồi mở màn Verify email |
 | `AUTH_ACCOUNT_LOCKED` | `Server` | `auth_error_account_locked` |
 | `AUTH_LOGIN_TEMPORARILY_LOCKED`, 429 | `Server` | `auth_error_login_temporarily_locked` |
 | `AUTH_PASSWORD_SAME_AS_OLD` | `Server` | `auth_error_password_same_as_old` |
 | `OTP_INVALID_OR_EXPIRED` | `Server` | `auth_error_otp_invalid` |
 | `OTP_RATE_LIMIT_EXCEEDED` | `Server` | `auth_error_otp_rate_limited` |
-| `USER_EMAIL_ALREADY_EXISTS` / `USER_PHONE_ALREADY_EXISTS` | `Server` | `auth_error_email_exists` / `auth_error_phone_exists` |
+| 409 `REGISTRATION_COULD_NOT_BE_COMPLETED` (email hoặc số điện thoại đã được dùng; backend cố ý không nói rõ) | `Server` | `auth_error_registration_failed` |
 | `OAUTH_ALREADY_LINKED` / `OAUTH_EMAIL_MISMATCH` | `Server` | `auth_error_google_already_linked` / `auth_error_google_email_mismatch` |
 | `TOKEN_*` khi refresh | `Unauthorized` | Xoá session, quay về Sign in |
-| `TOKEN_INVALID` khi đặt lại mật khẩu | `Server` | `auth_error_reset_session_expired`, quay lại bước nhập email |
+| `TOKEN_*` khi đặt lại mật khẩu | `Server` | `auth_error_reset_session_expired`, quay lại bước nhập email |
 | 5xx | `Server` | `common_error_server` |
 
 Timer của Mock Test **không** dừng khi mất mạng. Câu trả lời được lưu local và đồng bộ khi có mạng trở lại.

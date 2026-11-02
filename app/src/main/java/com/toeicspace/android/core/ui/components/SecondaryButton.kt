@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,12 +64,15 @@ fun SecondaryButton(
             Spacer(modifier = Modifier.width(Spacing.sm))
         }
 
+        // Wraps to a second line instead of cutting the label at large font scales.
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge,
             color = SecondaryButtonContent,
-            maxLines = 1,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
         )
 
         if (!isLoading && trailingIcon != null) {

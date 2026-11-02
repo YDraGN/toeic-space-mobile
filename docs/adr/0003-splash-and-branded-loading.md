@@ -16,7 +16,7 @@ Trên Android 11 trở xuống (máy test API 29), không có system splash. Tha
    - `windowSplashScreenAnimatedIcon` là logo hoặc mascot của brand;
    - `postSplashScreenTheme` là `Theme.ToeicSpace`.
 2. Gọi `installSplashScreen()` trong `MainActivity` và **không** giữ system splash lâu. Màn Loading thương hiệu hiện ngay sau đó với cùng màu nền, nên người dùng thấy liền một mạch.
-3. Màn Loading kết thúc khi `SessionState` sẵn sàng. Không có `delay` cố định. Nếu chỉ đọc dữ liệu local, giữ tối thiểu khoảng 600–800 ms để animation không bị cắt ngang.
+3. Màn Loading kết thúc khi `SessionState` sẵn sàng **và** đã hiển thị tối thiểu 3 giây (`MIN_SPLASH_MILLIS`), để người dùng kịp thấy mascot và slogan. Nếu `SessionState` cần lâu hơn thì chờ thêm. *(Sửa đổi 2026-11-01: trước đây tối thiểu 600–800 ms, theo phản hồi của product owner nâng lên 3 giây.)*
 4. Không chặn người dùng khi offline. Mất mạng chỉ hiện banner, vì app có chế độ khách và cache local.
 
 ## Hệ quả

@@ -123,6 +123,8 @@ private fun GuestLink(
     ) {
         Text(
             text = stringResource(id = R.string.onboarding_action_continue_as_guest),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f, fill = false),
             style =
                 MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.Medium,

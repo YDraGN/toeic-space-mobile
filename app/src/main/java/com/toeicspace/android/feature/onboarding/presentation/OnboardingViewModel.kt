@@ -37,7 +37,11 @@ class OnboardingViewModel
             _uiState.update { it.copy(isCompleting = true) }
             viewModelScope.launch {
                 // Persist first so the user never sees onboarding again after navigating away.
-                sessionRepository.completeOnboarding()
+                if (nextStep == OnboardingNextStep.GUEST) {
+                    sessionRepository.continueAsGuest()
+                } else {
+                    sessionRepository.completeOnboarding()
+                }
                 _uiState.update { it.copy(isCompleting = false, nextStep = nextStep) }
             }
         }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds may reach a local API Gateway over plain HTTP (emulator or LAN). -->
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <!-- Debug only: the release config in src/main keeps cleartext disabled. -->
+    <base-config
+        cleartextTrafficPermitted="true"
+        tools:ignore="InsecureBaseConfiguration" />
+</network-security-config>
