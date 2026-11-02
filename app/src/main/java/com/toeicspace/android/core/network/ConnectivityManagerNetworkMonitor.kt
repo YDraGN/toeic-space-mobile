@@ -49,6 +49,9 @@ internal class ConnectivityManagerNetworkMonitor
             }.distinctUntilChanged()
                 .conflate()
 
+        override fun isCurrentlyOnline(): Boolean =
+            context.getSystemService<ConnectivityManager>()?.isCurrentlyOnline() ?: false
+
         private fun ConnectivityManager.isCurrentlyOnline(): Boolean =
             getNetworkCapabilities(activeNetwork)?.hasInternet() ?: false
 
