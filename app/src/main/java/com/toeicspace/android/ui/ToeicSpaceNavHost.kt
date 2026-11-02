@@ -36,6 +36,14 @@ fun ToeicSpaceNavHost(
             launchSingleTop = true
         }
 
+    // Entering the app, or losing the session, starts a fresh back stack. Built on demand because
+    // the graph id is only known once the NavHost has set the graph.
+    fun clearAll() =
+        navOptions {
+            popUpTo(navController.graph.id) { inclusive = true }
+            launchSingleTop = true
+        }
+
     NavHost(
         navController = navController,
         startDestination = SplashDestination,
@@ -43,14 +51,21 @@ fun ToeicSpaceNavHost(
     ) {
         splashScreen(
             onNavigateToOnboarding = { navController.navigateToOnboarding(clearSplash) },
+            onNavigateToSignIn = { navController.navigateToSignIn(navOptions = clearSplash) },
             onNavigateToHome = { navController.navigateToHome(clearSplash) },
         )
         onboardingScreen(
             onNavigateToSignUp = { navController.navigateToSignUp(clearOnboarding) },
-            onNavigateToSignIn = { navController.navigateToSignIn(clearOnboarding) },
+            onNavigateToSignIn = { navController.navigateToSignIn(navOptions = clearOnboarding) },
             onContinueAsGuest = { navController.navigateToHome(clearOnboarding) },
         )
-        authScreens()
-        homeScreen()
+        authScreens(
+            navController = navController,
+            onEnterApp = { navController.navigateToHome(clearAll()) },
+        )
+        homeScreen(
+            onNavigateToSignIn = { navController.navigateToSignIn() },
+            onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
+        )
     }
 }

@@ -10,6 +10,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private val KEY_ONBOARDING_COMPLETED = booleanPreferencesKey("pref_onboarding_completed")
+private val KEY_GUEST_MODE = booleanPreferencesKey("pref_guest_mode")
+
+data class UserPreferences(
+    val isOnboardingCompleted: Boolean,
+    val isGuest: Boolean,
+)
 
 /** Local, non-sensitive user preferences backed by Preferences DataStore. */
 @Singleton
@@ -18,10 +24,19 @@ class UserPreferencesDataSource
     constructor(
         private val dataStore: DataStore<Preferences>,
     ) {
-        val isOnboardingCompleted: Flow<Boolean> =
-            dataStore.data.map { prefs -> prefs[KEY_ONBOARDING_COMPLETED] ?: false }
+        val userPreferences: Flow<UserPreferences> =
+            dataStore.data.map { prefs ->
+                UserPreferences(
+                    isOnboardingCompleted = prefs[KEY_ONBOARDING_COMPLETED] ?: false,
+                    isGuest = prefs[KEY_GUEST_MODE] ?: false,
+                )
+            }
 
         suspend fun setOnboardingCompleted(completed: Boolean) {
             dataStore.edit { prefs -> prefs[KEY_ONBOARDING_COMPLETED] = completed }
+        }
+
+        suspend fun setGuest(isGuest: Boolean) {
+            dataStore.edit { prefs -> prefs[KEY_GUEST_MODE] = isGuest }
         }
     }

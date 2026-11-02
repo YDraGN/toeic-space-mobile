@@ -47,6 +47,7 @@ class OnboardingViewModelTest {
             viewModel.onContinueAsGuestClick()
 
             assertTrue(sessionRepository.currentOnboardingCompleted)
+            assertTrue(sessionRepository.current.isGuest)
             assertEquals(OnboardingNextStep.GUEST, viewModel.uiState.value.nextStep)
         }
 
