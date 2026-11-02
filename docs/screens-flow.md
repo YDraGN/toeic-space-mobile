@@ -32,8 +32,9 @@ flowchart TD
 ## 2. Loading
 
 - Nền và icon trùng với system splash. Hiển thị mascot, logo, slogan và indicator ngọc trai.
-- Thời gian hiển thị theo [ADR-0003](adr/0003-splash-and-branded-loading.md): kết thúc khi `SessionState` sẵn sàng, không chờ cố định.
-- Mất mạng: **không chặn** người dùng. Vẫn vào app và hiện banner offline. Thanh "Prototype test" và các ghi chú kỹ thuật trong mockup **không** đưa vào app.
+- Thời gian hiển thị theo [ADR-0003](adr/0003-splash-and-branded-loading.md): **tối thiểu 3 giây** (`MIN_SPLASH_MILLIS`), và chờ thêm nếu `SessionState` chưa sẵn sàng. Hai việc chạy song song, cái nào xong sau thì quyết định lúc chuyển màn.
+- Màn hình tiếp theo được chọn **chỉ từ dữ liệu local**: cờ onboarding, chế độ khách và user đã cache. Splash không gọi mạng, nên mở app khi offline vẫn vào thẳng Home.
+- Mất mạng: **không chặn** người dùng. Phiên được kiểm tra với backend ở request cần đăng nhập đầu tiên. Thanh "Prototype test" và các ghi chú kỹ thuật trong mockup **không** đưa vào app.
 
 ## 3. Onboarding
 
@@ -53,6 +54,16 @@ flowchart TD
 | Forgot password | Email → OTP → mật khẩu mới (3 bước trên cùng một màn) | `password-reset/otp`, `/verify`, `/confirm` |
 
 Mã lỗi backend được map sang chuỗi theo [api-integration.md](api-integration.md#10-bảng-mã-lỗi).
+
+Quy tắc chung của các màn Auth, nhằm giảm tải cho backend:
+
+- Mọi field được kiểm tra trên máy trước khi gửi. Form sai không tạo request nào.
+- Nút gửi bị khoá khi đang chờ phản hồi, nên bấm nhiều lần cũng chỉ có một request.
+- Ô OTP chỉ nhận 6 chữ số và tự gửi khi đủ 6 số. Nút "Gửi lại mã" có đếm ngược theo `cooldownSeconds` (mặc định 60 giây).
+- Đăng nhập khi email chưa xác thực: app tự gửi lại OTP rồi mở màn Verify email.
+- Xác thực email hoặc đặt lại mật khẩu xong: quay về Sign in với email điền sẵn và thông báo, back stack được xoá.
+- "Dùng thử không cần tài khoản" chỉ lưu cờ khách trên máy, không gọi backend.
+- Đăng xuất xoá session trên máy ngay (chạy được khi offline), rồi gọi `logout` ở nền nếu có mạng.
 
 ## 5. Home shell
 

@@ -85,7 +85,8 @@ sealed interface SessionState {
     data object Loading : SessionState
     data class Ready(
         val isOnboardingCompleted: Boolean,
-        val user: AuthUser?, // null = khách
+        val user: AuthUser?, // null = khách hoặc chưa đăng nhập
+        val isGuest: Boolean, // phân biệt khách với người đã đăng xuất
     ) : SessionState
 }
 
@@ -99,6 +100,7 @@ data class AuthUser(
 interface SessionRepository {
     val session: Flow<SessionState>
     suspend fun completeOnboarding()
+    suspend fun continueAsGuest()
     suspend fun signOut()
 }
 ```
