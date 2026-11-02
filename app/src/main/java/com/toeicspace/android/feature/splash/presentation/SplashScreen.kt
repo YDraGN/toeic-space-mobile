@@ -8,7 +8,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -23,10 +22,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -52,7 +46,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.MascotView
-import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.theme.CoralBadge
 import com.toeicspace.android.core.ui.theme.DancingScript
 import com.toeicspace.android.core.ui.theme.OceanicInk
@@ -78,6 +71,7 @@ private val ProgressBarBrush =
 @Composable
 internal fun SplashRoute(
     onNavigateToOnboarding: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
     onNavigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
@@ -88,25 +82,16 @@ internal fun SplashRoute(
         val readyState = uiState as? SplashUiState.Ready ?: return@LaunchedEffect
         when (readyState.startDestination) {
             StartDestination.ONBOARDING -> onNavigateToOnboarding()
+            StartDestination.SIGN_IN -> onNavigateToSignIn()
             StartDestination.HOME -> onNavigateToHome()
         }
     }
 
-    SplashScreen(
-        uiState = uiState,
-        onRetryClick = viewModel::onRetryClick,
-        modifier = modifier,
-    )
+    SplashScreen(modifier = modifier)
 }
 
 @Composable
-internal fun SplashScreen(
-    uiState: SplashUiState,
-    onRetryClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val isNetworkError = uiState is SplashUiState.NetworkError
-
+internal fun SplashScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.img_splash_background),
@@ -127,16 +112,12 @@ internal fun SplashScreen(
             BrandHeader()
             Spacer(modifier = Modifier.height(Spacing.space22))
             MascotView(
-                mascotResId = if (isNetworkError) R.drawable.oy2_offline else R.drawable.oy2_base,
+                mascotResId = R.drawable.oy2_base,
                 size = 180.dp,
                 backgroundBrush = MascotGlowBrush,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            if (isNetworkError) {
-                NetworkErrorCard(onRetryClick = onRetryClick)
-            } else {
-                PearlLoadingIndicator()
-            }
+            PearlLoadingIndicator()
             Spacer(modifier = Modifier.weight(1.35f))
         }
     }
@@ -248,67 +229,11 @@ private fun SmoothLinearProgressBar(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-private fun NetworkErrorCard(
-    onRetryClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val shape = RoundedCornerShape(Spacing.lg)
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = shape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-    ) {
-        Column(
-            modifier = Modifier.padding(Spacing.lg),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-        ) {
-            Text(
-                text = stringResource(id = R.string.splash_title_network_error),
-                style = MaterialTheme.typography.headlineSmall,
-                color = OceanicInk,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = stringResource(id = R.string.splash_body_network_error),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            PrimaryButton(
-                text = stringResource(id = R.string.common_action_retry),
-                onClick = onRetryClick,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = Spacing.smd),
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_refresh),
-                        contentDescription = null,
-                        tint = Color.White,
-                    )
-                },
-            )
-        }
-    }
-}
-
 @Preview(name = "Splash - Loading", showBackground = true)
 @PreviewScreenSizes
 @Composable
 private fun SplashScreenLoadingPreview() {
     ToeicSpaceTheme {
-        SplashScreen(uiState = SplashUiState.Loading, onRetryClick = {})
-    }
-}
-
-@Preview(name = "Splash - Network error", showBackground = true)
-@Composable
-private fun SplashScreenNetworkErrorPreview() {
-    ToeicSpaceTheme {
-        SplashScreen(uiState = SplashUiState.NetworkError, onRetryClick = {})
+        SplashScreen()
     }
 }
