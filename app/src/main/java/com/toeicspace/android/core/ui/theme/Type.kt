@@ -52,6 +52,20 @@ val ToeicSpaceTypography =
                 fontSize = 18.sp,
                 lineHeight = 26.sp,
             ),
+        titleMedium =
+            TextStyle(
+                fontFamily = Quicksand,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+            ),
+        titleSmall =
+            TextStyle(
+                fontFamily = Quicksand,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+            ),
         bodyLarge =
             TextStyle(
                 fontFamily = BeVietnamPro,
@@ -79,6 +93,20 @@ val ToeicSpaceTypography =
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp,
                 lineHeight = 24.sp,
+            ),
+        labelMedium =
+            TextStyle(
+                fontFamily = BeVietnamPro,
+                fontWeight = FontWeight.Medium,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+            ),
+        labelSmall =
+            TextStyle(
+                fontFamily = BeVietnamPro,
+                fontWeight = FontWeight.Medium,
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
             ),
     )
 
