@@ -71,30 +71,39 @@ Quy tắc chung của các màn Auth, nhằm giảm tải cho backend:
 
 | Thành phần | Spec |
 |---|---|
-| Top bar | Avatar kèm badge streak, lời chào theo buổi trong ngày, tên người dùng, nút tìm kiếm, nút thông báo. Khách thấy nút "Đăng nhập" thay cho chuông |
-| Bottom bar | 5 tab: **Trang chủ · Khám phá · Luyện tập · Từ vựng · Cá nhân**. Màn ≥600dp dùng NavigationRail |
-| Nội dung | Cuộn được trong `Scaffold`. Top bar và bottom bar cố định, không vẽ lại khi đổi tab |
+| Top bar | Avatar, lời chào theo buổi (5–11 giờ sáng, 12–17 giờ chiều, còn lại tối, giống web), tên người dùng, nút tìm kiếm, nút thông báo. Khách thấy "Chào bạn!" và nút "Đăng nhập" thay cho chuông |
+| Bottom bar | 5 tab: **Trang chủ · Khám phá · Luyện tập · Từ vựng · Cá nhân**. Cửa sổ ≥600dp dùng NavigationRail, nội dung rộng tối đa 600dp |
+| Nội dung | `MainDestination` trong root graph chứa `Scaffold`; các tab nằm trong graph lồng `MainGraph`, mỗi tab một destination. Top bar và bottom bar cố định khi đổi tab |
+| Tab mặc định | Đã đăng nhập: **Trang chủ**. Khách: **Khám phá** |
+| Đổi tab | Mỗi tab giữ state riêng (`saveState` / `restoreState`). Back quay về tab mặc định rồi mới thoát app |
+| Offline | Biến thể và thông tin người dùng lấy từ `SessionState` trên máy, không cần mạng |
+
+Tìm kiếm, thông báo, đổi mật khẩu và bấm vào trung tâm hiện snackbar "Tính năng đang được phát triển" cho tới khi có chức năng thật.
 
 ### 5.2 Ba biến thể của tab Trang chủ
 
-Biến thể được suy ra từ `SessionState` và dữ liệu người dùng, không phải từ một cờ cứng:
+Biến thể được suy ra từ `SessionState` (qua `Viewer` trong `MainViewModel`), không phải từ một cờ cứng:
 
-| Biến thể | Điều kiện | Nội dung | Có backend? |
+| Biến thể | Điều kiện | Nội dung | Trạng thái |
 |---|---|---|---|
-| **Guest** | `user == null` | Hero chào mừng kèm mascot, 3 lợi ích khi đăng ký, nút Đăng ký / Đăng nhập, link "Khám phá ngay" | ✅ không cần API |
-| **Registered** | Đã đăng nhập, chưa ghi danh lớp nào | Card bài kiểm tra đầu vào, card "Lớp học chính thức" (trống), "Tài nguyên miễn phí hôm nay" | ⚠️ Tài nguyên lấy từ practice-sets; placement test và nhập mã lớp chưa có API |
+| **Guest** | `user == null`, `isGuest` | Hero chào mừng (`oy2_hello`, nút "Bắt đầu ngay" → Đăng ký), hàng 4 lợi ích cuộn ngang, card "Trang chủ đang chờ bạn!" với nút Đăng ký / Đã có tài khoản và link "Khám phá trước đã" | ✅ Đã làm |
+| **Registered** | Đã đăng nhập, chưa ghi danh lớp nào | Card chuỗi ngày học (`PearlStreakCard`, 0 ngày, chỉ đánh dấu hôm nay), "Trang sổ hôm nay" liệt kê bài kiểm tra đầu vào, lớp học chính thức, tài nguyên miễn phí, cả card gắn nhãn "Sắp ra mắt" | ✅ Khung đã làm, chờ API streak, placement test, lớp học, practice-sets |
 | **Enrolled** | Đã đăng nhập, có ít nhất một lớp | Streak, Tiếp tục học, Khoá học của tôi, Nhiệm vụ hằng ngày, banner Deadline | ❌ Chưa có API cho học viên |
 
-Bảng chi tiết phần nào làm thật, phần nào dùng `FakeRepository` nằm ở [api-integration.md](api-integration.md#8-mockup-cần-gì-backend-có-gì). Ở bản release, các section chưa có backend sẽ bị ẩn hoặc hiện "Sắp ra mắt", không hiện số liệu giả.
+Bảng chi tiết phần nào làm thật, phần nào dùng dữ liệu mẫu nằm ở [api-integration.md](api-integration.md#8-mockup-cần-gì-backend-có-gì). Section chưa có backend hiện "Sắp ra mắt", không hiện số liệu giả.
 
 ### 5.3 Các tab khác
 
+Khách chỉ dùng được tab **Khám phá**. Các tab còn lại hiện lời mời đăng ký / đăng nhập (`SignInRequiredState`, mascot `oy2_locked`), không chuyển màn tự động.
+
 | Tab | Khách | Đã đăng nhập |
 |---|---|---|
-| Khám phá | Xem đề thi, practice set công khai | Như khách, thêm gợi ý theo `targetScore` |
-| Luyện tập | Làm practice set, kết quả lưu local | Đồng bộ kết quả khi backend có API nộp bài |
-| Từ vựng | Flashcard lưu local | Đồng bộ khi Content service có API |
-| Cá nhân | Lời mời đăng nhập, cài đặt ngôn ngữ | Hồ sơ, avatar, đổi mật khẩu, đăng xuất |
+| Khám phá | Card chuỗi ngày học (tuần T2–CN, nút "Bắt đầu chuỗi ngày học" → Đăng ký), "Trung tâm nổi bật", "Gói học" kèm nút Đăng ký | Như khách, card gói "Tự học miễn phí" ghi "Gói bạn đang dùng" |
+| Luyện tập | Lời mời đăng nhập | `ComingSoonState` |
+| Từ vựng | Lời mời đăng nhập | `ComingSoonState` |
+| Cá nhân | Lời mời tạo tài khoản | Avatar, tên, email, "Đổi mật khẩu" (sắp có), Đăng xuất |
+
+Trung tâm trong tab Khám phá là **dữ liệu mẫu** (`SampleExploreRepository`, có nhãn "Dữ liệu mẫu" trên UI). Khi backend có API danh sách trung tâm, chỉ cần đổi binding trong `ExploreDataModule`. Chuỗi ngày học chưa tô ngày nào cho tới khi có API streak.
 
 ## 6. Trạng thái dùng chung
 
@@ -104,5 +113,5 @@ Bảng chi tiết phần nào làm thật, phần nào dùng `FakeRepository` n�
 | Lỗi mạng | `ErrorState` | `oy2_offline` |
 | Lỗi server | `ErrorState` | `oy2_error` |
 | Không có dữ liệu | `EmptyState` | `oy2_empty` |
-| Khách mở chức năng cần tài khoản | `ErrorState` kèm nút Đăng nhập | `oy2_locked` |
+| Khách mở chức năng cần tài khoản | `SignInRequiredState` (Đăng ký + Đăng nhập) | `oy2_locked` |
 | Chức năng chưa có backend | `ComingSoonState` | `oy2_maintenance` |
