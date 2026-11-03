@@ -9,15 +9,15 @@ import androidx.navigation.navOptions
 import com.toeicspace.android.feature.auth.navigation.authScreens
 import com.toeicspace.android.feature.auth.navigation.navigateToSignIn
 import com.toeicspace.android.feature.auth.navigation.navigateToSignUp
-import com.toeicspace.android.feature.home.navigation.homeScreen
-import com.toeicspace.android.feature.home.navigation.navigateToHome
+import com.toeicspace.android.feature.main.navigation.mainScreen
+import com.toeicspace.android.feature.main.navigation.navigateToMain
 import com.toeicspace.android.feature.onboarding.navigation.OnboardingDestination
 import com.toeicspace.android.feature.onboarding.navigation.navigateToOnboarding
 import com.toeicspace.android.feature.onboarding.navigation.onboardingScreen
 import com.toeicspace.android.feature.splash.navigation.SplashDestination
 import com.toeicspace.android.feature.splash.navigation.splashScreen
 
-/** Root navigation graph: Splash → Onboarding → Auth / Home. */
+/** Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs). */
 @Composable
 fun ToeicSpaceNavHost(
     modifier: Modifier = Modifier,
@@ -52,19 +52,20 @@ fun ToeicSpaceNavHost(
         splashScreen(
             onNavigateToOnboarding = { navController.navigateToOnboarding(clearSplash) },
             onNavigateToSignIn = { navController.navigateToSignIn(navOptions = clearSplash) },
-            onNavigateToHome = { navController.navigateToHome(clearSplash) },
+            onNavigateToHome = { navController.navigateToMain(clearSplash) },
         )
         onboardingScreen(
             onNavigateToSignUp = { navController.navigateToSignUp(clearOnboarding) },
             onNavigateToSignIn = { navController.navigateToSignIn(navOptions = clearOnboarding) },
-            onContinueAsGuest = { navController.navigateToHome(clearOnboarding) },
+            onContinueAsGuest = { navController.navigateToMain(clearOnboarding) },
         )
         authScreens(
             navController = navController,
-            onEnterApp = { navController.navigateToHome(clearAll()) },
+            onEnterApp = { navController.navigateToMain(clearAll()) },
         )
-        homeScreen(
+        mainScreen(
             onNavigateToSignIn = { navController.navigateToSignIn() },
+            onNavigateToSignUp = { navController.navigateToSignUp() },
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
         )
     }
