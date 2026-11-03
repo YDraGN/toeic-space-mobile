@@ -3,6 +3,8 @@ package com.toeicspace.android.feature.auth.presentation.signup
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.ToeicTextField
+import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.feature.auth.domain.FieldError
 import com.toeicspace.android.feature.auth.presentation.common.AuthMessageBanner
@@ -107,11 +110,17 @@ internal fun SignUpScreen(
             )
         }
 
+        Text(
+            text = stringResource(id = R.string.auth_note_required),
+            style = AppTextStyles.Caption,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         ToeicTextField(
             value = uiState.fullName,
             onValueChange = onFullNameChange,
             label = stringResource(id = R.string.auth_label_full_name),
             enabled = enabled,
+            isRequired = true,
             errorText = errorFor(uiState.fullNameError, "fullName"),
         )
         ToeicTextField(
@@ -119,6 +128,7 @@ internal fun SignUpScreen(
             onValueChange = onEmailChange,
             label = stringResource(id = R.string.auth_label_email),
             enabled = enabled,
+            isRequired = true,
             errorText = errorFor(uiState.emailError, "email"),
             keyboardType = KeyboardType.Email,
         )
@@ -128,7 +138,6 @@ internal fun SignUpScreen(
             label = stringResource(id = R.string.auth_label_phone),
             enabled = enabled,
             errorText = errorFor(uiState.phoneError, "phone"),
-            supportingText = stringResource(id = R.string.auth_hint_optional),
             keyboardType = KeyboardType.Phone,
         )
         ToeicTextField(
@@ -136,6 +145,7 @@ internal fun SignUpScreen(
             onValueChange = onPasswordChange,
             label = stringResource(id = R.string.auth_label_password),
             enabled = enabled,
+            isRequired = true,
             errorText = errorFor(uiState.passwordError, "password"),
             supportingText = stringResource(id = R.string.auth_hint_password_rules),
             isPassword = true,
@@ -145,6 +155,7 @@ internal fun SignUpScreen(
             onValueChange = onConfirmPasswordChange,
             label = stringResource(id = R.string.auth_label_confirm_password),
             enabled = enabled,
+            isRequired = true,
             errorText = errorFor(uiState.confirmPasswordError, "confirmPassword"),
             isPassword = true,
             imeAction = ImeAction.Done,
