@@ -25,6 +25,33 @@ val PearlPaper = Color(0xFFFFF8E8)
 /** Deep navy with a violet cast: the dark corner of hero cards, where white text sits. */
 val NightSea = Color(0xFF15307A)
 
+/** Text, lines and dots on the dark hero gradient. */
+val OnHero = Color.White
+
+/** Brighter than [SunlitGold], so the streak count and today's ring stay readable on the hero. */
+val SunlitOnHero = Color(0xFFF5D85A)
+
+/** Navy film behind the streak week: keeps its labels readable where the hero turns light. */
+val HeroWeekTint = NightSea.copy(alpha = 0.45f)
+
+/** The script tagline on the hero: the brand script is too thin to read in plain white. */
+val TaglineCream = Color(0xFFFFF1C2)
+
+/** Light coral behind icons; the pink sibling of [PastelSky] and [Pearl]. */
+val BlushTint = Color(0xFFFFD3D6)
+
+/** Hint under a form field: cooler than [InkSoft] so it never reads as the placeholder. */
+val HintText = Color(0xFF4F6E96)
+
+/** Floating bars: almost opaque, so content scrolling underneath shows only faintly. */
+val BarSurface = Color.White.copy(alpha = 0.96f)
+
+/** Rows on a [PearlPaper] card: white, softened so the paper still shows at the edges. */
+val PaperRow = Color.White.copy(alpha = 0.9f)
+
+/** Wave bands drawn over the shell gradient. */
+val WaveFoam = Color.White
+
 val PrimaryGradientStart = Color(0xFF1467C2)
 val PrimaryGradientCenter = Color(0xFF2087E6)
 val PrimaryGradientEnd = Color(0xFFFF9092)

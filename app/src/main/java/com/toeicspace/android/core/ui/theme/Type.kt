@@ -136,4 +136,32 @@ object AppTextStyles {
             lineHeight = 18.sp,
             letterSpacing = 0.01.em,
         )
+
+    /** Hint or error under a form field: a step below the 13sp floating label, as in Material. */
+    val HelperText =
+        TextStyle(
+            fontFamily = BeVietnamPro,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            letterSpacing = 0.01.em,
+        )
+
+    /** Brand tagline in script; only for short lines, never body copy. */
+    val HeroTagline =
+        TextStyle(
+            fontFamily = DancingScript,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            lineHeight = 26.sp,
+        )
+
+    /** The big day count on streak cards. */
+    val StreakCount =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 46.sp,
+            lineHeight = 50.sp,
+        )
 }

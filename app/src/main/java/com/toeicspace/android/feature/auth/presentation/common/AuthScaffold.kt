@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -141,7 +140,7 @@ internal fun AuthScaffold(
                     Surface(
                         modifier = Modifier.fillMaxWidth().softShadow(ToeicSpaceShapes.large),
                         shape = ToeicSpaceShapes.large,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface,
                         border = BorderStroke(1.dp, CardBorder),
                     ) {
                         // 16dp sides and 12dp between fields, close to Google and Material sign-in

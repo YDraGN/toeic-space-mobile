@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.tooling.preview.Preview
 import com.toeicspace.android.core.ui.theme.ShellGradientBrush
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
+import com.toeicspace.android.core.ui.theme.WaveFoam
 
 /** Where each wave crest sits, as a fraction of the height, and how strongly it shows. */
 private val Waves = listOf(0.36f to 0.32f, 0.6f to 0.2f, 0.82f to 0.14f)
@@ -53,7 +54,7 @@ private fun DrawScope.drawWave(
         path = path,
         brush =
             Brush.verticalGradient(
-                colors = listOf(Color.White.copy(alpha = alpha), Color.Transparent),
+                colors = listOf(WaveFoam.copy(alpha = alpha), Color.Transparent),
                 startY = top - amplitude,
                 endY = bottom,
             ),
