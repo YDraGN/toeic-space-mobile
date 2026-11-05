@@ -72,13 +72,14 @@ Quy tắc chung của các màn Auth, nhằm giảm tải cho backend:
 | Thành phần | Spec |
 |---|---|
 | Top bar | Avatar, lời chào theo buổi (5–11 giờ sáng, 12–17 giờ chiều, còn lại tối, giống web), tên người dùng, nút tìm kiếm, nút thông báo. Khách thấy "Chào bạn!" và nút "Đăng nhập" thay cho chuông |
-| Bottom bar | 5 tab: **Trang chủ · Khám phá · Luyện tập · Từ vựng · Cá nhân**. Cửa sổ ≥600dp dùng NavigationRail, nội dung rộng tối đa 600dp |
+| Bottom bar | 5 tab: **Trang chủ · Khám phá · Luyện tập · Từ vựng · Cá nhân** trên cửa sổ dưới 600dp |
+| Navigation rail | Cửa sổ ≥600dp (`WindowWidth` trong `core/ui`). Nút ☰ nằm đầu top bar (icon trơn, căn thẳng cột rail), lời chào ngay bên phải, avatar chuyển xuống chân rail. Rail thu gọn rộng 88dp: icon kèm nhãn bên dưới cho Trang chủ, Khám phá, Luyện tập, Từ vựng. Bấm ☰ để mở rộng 248dp: nhãn nằm bên phải icon, chân rail hiện tên và email. 600–840dp: rail mở rộng nổi trên nội dung, nền đặc, kèm lớp mờ; chạm ra ngoài hoặc Back để thu lại. ≥840dp: rail mở rộng đẩy nội dung. Nội dung rộng tối đa 840dp |
 | Nội dung | `MainDestination` trong root graph chứa `Scaffold`; các tab nằm trong graph lồng `MainGraph`, mỗi tab một destination. Top bar và bottom bar cố định khi đổi tab |
 | Tab mặc định | Đã đăng nhập: **Trang chủ**. Khách: **Khám phá** |
 | Đổi tab | Mỗi tab giữ state riêng (`saveState` / `restoreState`). Back quay về tab mặc định rồi mới thoát app |
 | Offline | Biến thể và thông tin người dùng lấy từ `SessionState` trên máy, không cần mạng |
 
-Tìm kiếm, thông báo, đổi mật khẩu và bấm vào trung tâm hiện snackbar "Tính năng đang được phát triển" cho tới khi có chức năng thật.
+Tìm kiếm, thông báo, đổi mật khẩu, bộ lọc nâng cao, bấm vào trung tâm, đổi ảnh đại diện, lưu họ tên và xóa tài khoản hiện snackbar "Tính năng đang được phát triển" (`rememberComingSoonAction`) cho tới khi có API.
 
 ### 5.2 Ba biến thể của tab Trang chủ
 
@@ -101,9 +102,22 @@ Khách chỉ dùng được tab **Khám phá**. Các tab còn lại hiện lời
 | Khám phá | Card chuỗi ngày học (tuần T2–CN, nút "Bắt đầu chuỗi ngày học" → Đăng ký), "Trung tâm nổi bật", "Gói học" kèm nút Đăng ký | Như khách, card gói "Tự học miễn phí" ghi "Gói bạn đang dùng" |
 | Luyện tập | Lời mời đăng nhập | `ComingSoonState` |
 | Từ vựng | Lời mời đăng nhập | `ComingSoonState` |
-| Cá nhân | Lời mời tạo tài khoản | Avatar, tên, email, "Đổi mật khẩu" (sắp có), Đăng xuất |
+| Cá nhân | Card mời đăng ký / đăng nhập, nhóm Ứng dụng và Hỗ trợ | Card hồ sơ (avatar có nút máy ảnh, tên, email, chip mục tiêu và trình độ), nhóm Tài khoản (Thông tin tài khoản, Đổi mật khẩu), Ứng dụng (Thông báo), Hỗ trợ (Điều khoản, Chính sách, Phiên bản), Đăng xuất, Xoá tài khoản |
+
+Tab Khám phá có hàng lọc: nút bộ lọc và các chip Tất cả · Online · Offline (lọc thật theo `StudyMode` trong `ExploreViewModel`). Card trung tâm không gắn mục tiêu điểm vì trung tâm nào cũng dạy đủ các band; chip hình thức học có màu cố định (Online xanh, Offline hồng). Cửa sổ ≥600dp xếp card thành 2 hàng, vẫn cuộn ngang.
 
 Trung tâm trong tab Khám phá là **dữ liệu mẫu** (`SampleExploreRepository`, có nhãn "Dữ liệu mẫu" trên UI). Khi backend có API danh sách trung tâm, chỉ cần đổi binding trong `ExploreDataModule`. Chuỗi ngày học chưa tô ngày nào cho tới khi có API streak.
+
+### 5.4 Thông tin tài khoản
+
+Màn full-screen trong root graph (`feature/profile/navigation`), mở từ dòng "Thông tin tài khoản" ở tab Cá nhân. Chưa có màn Cài đặt riêng: khi có Giao diện, Ngôn ngữ (cần story) thì tách lại.
+
+| Chế độ | Nội dung |
+|---|---|
+| Xem | Avatar có nút máy ảnh, nhãn "Dữ liệu mẫu". Nhóm Thông tin cá nhân: Họ và tên, Email, Số điện thoại, Ngày sinh, Giới tính, Giới thiệu bản thân. Nhóm Mục tiêu học: Mục tiêu điểm, Trình độ hiện tại. Trường trống hiện "Chưa cập nhật" |
+| Sửa (nút ✏️) | Một form cho mọi trường, gửi một lần vì `PUT /users/me` thay toàn bộ hồ sơ. Email chỉ xem. Ngày sinh chọn bằng lịch (chỉ ngày trong quá khứ). Giới tính, Mục tiêu điểm, Trình độ chọn bằng chip. Kiểm tra giống `UpdateProfileValidator` (họ tên ≤100 ký tự, số di động Việt Nam, giới thiệu ≤300 ký tự). Back hoặc Huỷ đóng form |
+
+Dữ liệu tạm lấy từ `SampleProfileRepository` (họ tên, email thật từ session, các trường khác là mẫu). Khi nối API chỉ cần đổi binding trong `ProfileDataModule`. Avatar đi luồng riêng: chọn ảnh → `POST /users/me/avatar` lấy link upload → upload → `PUT /users/me` với `avatarUrl` mới. Backend chưa trả URL công khai của ảnh sau khi upload, cần thống nhất với backend.
 
 ## 6. Trạng thái dùng chung
 
