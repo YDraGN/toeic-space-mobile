@@ -13,7 +13,15 @@
     <string name="common_label_tab_explore">Khám phá</string>
     <string name="common_label_tab_practice">Luyện tập</string>
     <string name="common_label_tab_vocabulary">Từ vựng</string>
-    <string name="common_label_tab_account">Tài khoản</string>
+    <string name="common_label_tab_profile">Cá nhân</string>
+    <string name="common_cd_search">Tìm kiếm</string>
+    <string name="common_cd_open_navigation">Mở rộng thanh điều hướng</string>
+    <string name="common_cd_close_navigation">Thu gọn thanh điều hướng</string>
+    <string name="common_cd_change_avatar">Đổi ảnh đại diện</string>
+    <string name="common_label_coming_soon">Sắp ra mắt</string>
+    <string name="common_label_sample_data">Dữ liệu mẫu</string>
+    <string name="common_action_sign_up_free">ĐĂNG KÝ MIỄN PHÍ</string>
+    <string name="common_action_have_account">Tôi đã có tài khoản</string>
     <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
     <string name="common_error_network">Không có kết nối mạng. Bạn kiểm tra Wi-Fi hoặc 4G rồi thử lại nhé.</string>
     <string name="common_error_server_unreachable">Chưa kết nối được tới máy chủ TOEICSpace. Bạn thử lại sau ít phút nhé.</string>
@@ -24,19 +32,123 @@
     <string name="splash_subtitle_tagline">Mở sổ tay — Luyện từng lớp xà cừ</string>
     <string name="splash_msg_loading">Đang chuẩn bị không gian học cho bạn…</string>
 
-    <!-- Home (placeholder until the Home shell is built) -->
-    <string name="home_title_placeholder">Trang chủ</string>
-    <string name="home_greeting_user">Xin chào, %1$s!</string>
-    <string name="home_greeting_guest">Bạn đang dùng thử với tư cách khách</string>
-    <string name="home_action_sign_out">Đăng xuất</string>
-    <string name="home_action_sign_in">Đăng nhập để lưu tiến trình</string>
+    <!-- Main shell -->
+    <string name="main_greeting_morning">Chào buổi sáng,</string>
+    <string name="main_greeting_afternoon">Chào buổi chiều,</string>
+    <string name="main_greeting_evening">Chào buổi tối,</string>
+    <string name="main_greeting_guest">Chào bạn!</string>
+    <string name="main_subtitle_guest">TOEICSpace</string>
+    <string name="main_title_practice_locked">Đăng nhập để luyện tập</string>
+    <string name="main_body_practice_locked">Tạo tài khoản miễn phí để lưu kết quả từng Part và theo dõi tiến bộ của bạn.</string>
+    <string name="main_title_vocabulary_locked">Đăng nhập để học từ vựng</string>
+    <string name="main_body_vocabulary_locked">Tạo tài khoản miễn phí để lưu flashcard và ôn lại đúng lúc sắp quên.</string>
+
+    <!-- Home tab -->
+    <string name="home_title_guest">Trang chủ đang chờ bạn!</string>
+    <string name="home_body_guest">Tạo tài khoản để Oysteic lưu chuỗi ngày học, lộ trình cá nhân và sổ tay từ vựng của riêng bạn.</string>
+    <string name="home_benefit_streak">Chuỗi ngày học</string>
+    <string name="home_benefit_roadmap">Lộ trình cá nhân</string>
+    <string name="home_benefit_vocabulary">Sổ tay từ vựng</string>
+    <string name="home_action_explore_first">Khám phá trước đã</string>
+    <string name="home_title_placement">Bạn đã biết trình độ TOEIC hiện tại chưa?</string>
+    <string name="home_body_placement">Bài kiểm tra đầu vào giúp Oysteic gợi ý lộ trình vừa sức với bạn.</string>
+    <string name="home_title_classes">Lớp học chính thức</string>
+    <string name="home_body_classes">Khi trung tâm thêm bạn vào lớp, lớp học và bài tập sẽ hiện ở đây.</string>
+    <string name="home_title_free_resources">Tài nguyên miễn phí hôm nay</string>
+    <string name="home_body_free_resources">Bộ đề và flashcard miễn phí mỗi ngày sẽ xuất hiện tại đây.</string>
+    <string name="home_hero_tagline">Từng buổi nhỏ, ngọc lớn dần</string>
+    <string name="home_hero_title">Luyện TOEIC nhẹ nhàng, đều đặn mỗi ngày</string>
+    <string name="home_action_start">Bắt đầu ngay</string>
+    <string name="home_title_benefits">TOEICSpace có gì?</string>
+    <string name="home_benefit_practice">Luyện theo Part</string>
+    <string name="home_benefit_practice_body">Nghe Part 1–4, Đọc Part 5–7</string>
+    <string name="home_benefit_streak_body">Giữ nhịp học đều mỗi ngày</string>
+    <string name="home_benefit_roadmap_body">Đặt mục tiêu, đi từng bước</string>
+    <string name="home_benefit_vocabulary_body">Gom lại từ bạn đã học</string>
+    <string name="home_title_streak">Chuỗi ngày học</string>
+    <string name="home_label_days">ngày</string>
+    <string name="home_body_streak">Mỗi buổi học thêm một lớp xà cừ. Học hôm nay để giữ chuỗi nhé!</string>
+    <string name="home_cd_streak_week">Tuần này: %1$d trên 7 ngày đã học</string>
+    <string name="home_title_today">Trang sổ hôm nay</string>
+
+    <!-- Explore tab -->
+    <string name="explore_body_streak_guest">Học mỗi ngày một chút để giữ lửa. Đăng ký để Oysteic đếm chuỗi giúp bạn.</string>
+    <string name="explore_action_start_streak">BẮT ĐẦU CHUỖI NGÀY HỌC</string>
+    <string-array name="explore_week_days">
+        <item>T2</item>
+        <item>T3</item>
+        <item>T4</item>
+        <item>T5</item>
+        <item>T6</item>
+        <item>T7</item>
+        <item>CN</item>
+    </string-array>
+    <string name="explore_title_centers">Trung tâm nổi bật</string>
+    <string name="explore_cd_center_cover">Ảnh trung tâm %1$s</string>
+    <string name="explore_label_online">Online</string>
+    <string name="explore_label_offline">Offline</string>
+    <string name="explore_label_all">Tất cả</string>
+    <string name="explore_cd_filter">Bộ lọc trung tâm</string>
+    <string name="explore_title_plans">Gói học</string>
+    <string name="explore_title_plan_free">Tự học miễn phí</string>
+    <string-array name="explore_plan_free_features">
+        <item>Luyện đề và bộ câu hỏi công khai</item>
+        <item>Flashcard từ vựng TOEIC</item>
+        <item>Chuỗi ngày học và tiến trình cá nhân</item>
+    </string-array>
+    <string name="explore_title_plan_center">Học cùng trung tâm</string>
+    <string-array name="explore_plan_center_features">
+        <item>Lớp học chính thức từ trung tâm đối tác</item>
+        <item>Bài tập và nhận xét của giáo viên</item>
+        <item>Báo cáo tiến độ chi tiết</item>
+    </string-array>
+    <string name="explore_plan_feature_item">✓ %1$s</string>
+    <string name="explore_label_current_plan">Gói bạn đang dùng</string>
+
+    <!-- Profile tab -->
+    <string name="profile_title_guest">Tạo tài khoản để lưu tiến trình</string>
+    <string name="profile_body_guest">Bạn đang dùng thử với tư cách khách. Đăng ký để giữ lại kết quả học trên mọi thiết bị.</string>
+    <string name="profile_action_change_password">Đổi mật khẩu</string>
+    <string name="profile_action_sign_out">Đăng xuất</string>
+    <string name="profile_action_account_info">Thông tin tài khoản</string>
+    <string name="profile_section_account">Tài khoản</string>
+    <string name="profile_section_app">Ứng dụng</string>
+    <string name="profile_section_support">Hỗ trợ</string>
+    <string name="profile_label_notifications">Thông báo</string>
+    <string name="profile_body_notifications">Nhắc học và giữ chuỗi ngày học</string>
+    <string name="profile_label_terms">Điều khoản sử dụng</string>
+    <string name="profile_label_privacy">Chính sách bảo mật</string>
+    <string name="profile_label_version">Phiên bản</string>
+    <string name="profile_action_delete_account">Xoá tài khoản</string>
+    <string name="account_info_hint_avatar">Chạm vào máy ảnh để chọn ảnh mới</string>
+    <string name="account_info_hint_email">Email dùng để đăng nhập nên không đổi được.</string>
+    <string name="account_info_action_save">LƯU THAY ĐỔI</string>
+    <string name="account_info_cd_edit">Chỉnh sửa thông tin</string>
+    <string name="account_info_action_cancel">Huỷ</string>
+    <string name="account_info_action_pick_date">Chọn</string>
+    <string name="account_info_section_personal">Thông tin cá nhân</string>
+    <string name="account_info_section_goal">Mục tiêu học</string>
+    <string name="account_info_label_date_of_birth">Ngày sinh</string>
+    <string name="account_info_label_gender">Giới tính</string>
+    <string name="account_info_label_biography">Giới thiệu bản thân</string>
+    <string name="account_info_hint_biography">Tối đa 300 ký tự</string>
+    <string name="account_info_label_target_score">Mục tiêu điểm</string>
+    <string name="account_info_label_level">Trình độ hiện tại</string>
+    <string name="account_info_value_target_score">%1$d+</string>
+    <string name="account_info_value_empty">Chưa cập nhật</string>
+    <string name="account_info_gender_male">Nam</string>
+    <string name="account_info_gender_female">Nữ</string>
+    <string name="account_info_gender_other">Khác</string>
+    <string name="account_info_level_beginner">Mới bắt đầu</string>
+    <string name="account_info_level_intermediate">Trung cấp</string>
+    <string name="account_info_level_advanced">Nâng cao</string>
 
     <!-- Auth: fields -->
     <string name="auth_label_email">Email</string>
     <string name="auth_label_password">Mật khẩu</string>
     <string name="auth_label_full_name">Họ và tên</string>
     <string name="auth_label_phone">Số điện thoại</string>
-    <string name="auth_hint_optional">Không bắt buộc</string>
+    <string name="auth_note_required">* Thông tin bắt buộc</string>
     <string name="auth_label_confirm_password">Nhập lại mật khẩu</string>
     <string name="auth_label_new_password">Mật khẩu mới</string>
     <string name="auth_label_otp">Mã xác thực (6 số)</string>

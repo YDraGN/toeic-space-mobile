@@ -1,6 +1,7 @@
 package com.toeicspace.android.feature.auth.presentation.common
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,17 +42,22 @@ import com.toeicspace.android.core.ui.components.AppTopBar
 import com.toeicspace.android.core.ui.components.BrandLogo
 import com.toeicspace.android.core.ui.components.MascotView
 import com.toeicspace.android.core.ui.components.ToeicIconButton
+import com.toeicspace.android.core.ui.theme.AppTextStyles
+import com.toeicspace.android.core.ui.theme.CardBorder
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.PrimaryBorder
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceShapes
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
+import com.toeicspace.android.core.ui.theme.softShadow
 
 // Forms stay readable on tablets and in landscape.
 private val MaxContentWidth = 480.dp
 
 /** Shared layout of the auth screens: brand top bar, mascot, title and a white form card. */
+private val FormVerticalPadding = Spacing.md + Spacing.xs
+
 @Composable
 internal fun AuthScaffold(
     title: String,
@@ -104,7 +109,7 @@ internal fun AuthScaffold(
                         .fillMaxWidth()
                         .weight(1f)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp, vertical = Spacing.sm),
+                        .padding(horizontal = Spacing.md, vertical = Spacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Column(
@@ -133,14 +138,20 @@ internal fun AuthScaffold(
                     }
                     Spacer(modifier = Modifier.height(Spacing.md))
                     Surface(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().softShadow(ToeicSpaceShapes.large),
                         shape = ToeicSpaceShapes.large,
-                        color = Color.White,
-                        shadowElevation = 8.dp,
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(1.dp, CardBorder),
                     ) {
+                        // 16dp sides and 12dp between fields, close to Google and Material sign-in
+                        // forms; a helper line adds its own 4dp on top.
                         Column(
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = Spacing.md),
-                            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = Spacing.md,
+                                    vertical = FormVerticalPadding,
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.smd),
                             content = content,
                         )
                     }
@@ -165,7 +176,7 @@ internal fun AuthMessageBanner(
     val contentColor = if (isError) colors.onErrorContainer else colors.onSecondaryContainer
     Text(
         text = text,
-        style = MaterialTheme.typography.bodySmall,
+        style = AppTextStyles.Caption,
         color = contentColor,
         modifier =
             modifier

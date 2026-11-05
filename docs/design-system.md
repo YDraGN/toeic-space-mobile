@@ -214,8 +214,8 @@ Chính sách ở [ADR-0003](adr/0003-splash-and-branded-loading.md): `core-splas
 |---|---|---|
 | Khung iPhone 390×844, có dynamic island | Không phải kích thước Android phổ biến | Thiết kế và test ở 360×800 và 412×915 dp |
 | Thanh "Prototype test", ghi chú code, `Duration ~1.8s` | Chú thích của mockup | Bỏ |
-| Tab "Cá nhân", nhưng code cũ ghi "Tài khoản" | Không nhất quán | Dùng **"Cá nhân"** (`home_label_tab_profile`) |
-| Nhãn bottom bar 10sp, code cũ 9sp | Dưới mức tối thiểu | `labelSmall` 11sp |
+| Tab "Cá nhân", nhưng code cũ ghi "Tài khoản" | Không nhất quán | Dùng **"Cá nhân"** (`common_label_tab_profile`) |
+| Nhãn bottom bar 10sp, code cũ 9sp | Dưới mức tối thiểu | `labelSmall` 11sp (đã áp dụng) |
 | Top bar 56dp (spec) nhưng code cũ 64dp | Lệch | `Dimens.topBarHeight = 56.dp` |
 | Ba kiểu gradient cho nút primary | Không nhất quán | Một `brandGradient` (mục 2.2) |
 | Ảnh mascot trỏ tới `googleusercontent.com` | Link tạm của Stitch | Dùng `res/drawable/oy2_*` có sẵn |

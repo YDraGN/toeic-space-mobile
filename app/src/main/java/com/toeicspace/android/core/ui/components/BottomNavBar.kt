@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,8 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,16 +40,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.BarSurface
+import com.toeicspace.android.core.ui.theme.CardBorder
+import com.toeicspace.android.core.ui.theme.InkSoft
 import com.toeicspace.android.core.ui.theme.NavDropletBorder
-import com.toeicspace.android.core.ui.theme.NavDropletGradientEnd
-import com.toeicspace.android.core.ui.theme.NavDropletGradientStart
-import com.toeicspace.android.core.ui.theme.OceanicInk
-import com.toeicspace.android.core.ui.theme.PrimaryGradientCenter
+import com.toeicspace.android.core.ui.theme.PillShape
+import com.toeicspace.android.core.ui.theme.PrimaryGradientStart
 import com.toeicspace.android.core.ui.theme.Spacing
-import com.toeicspace.android.core.ui.theme.ToeicSpaceShapes
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
+import com.toeicspace.android.core.ui.theme.softShadow
+
+internal val BarShape = RoundedCornerShape(28.dp)
 
 enum class BottomNavTab(
     @get:StringRes val labelRes: Int,
@@ -59,7 +61,7 @@ enum class BottomNavTab(
     EXPLORE(R.string.common_label_tab_explore, R.drawable.ic_explore),
     PRACTICE(R.string.common_label_tab_practice, R.drawable.ic_practice),
     VOCABULARY(R.string.common_label_tab_vocabulary, R.drawable.ic_vocabulary),
-    ACCOUNT(R.string.common_label_tab_account, R.drawable.ic_account),
+    PROFILE(R.string.common_label_tab_profile, R.drawable.ic_account),
 }
 
 @Composable
@@ -73,11 +75,11 @@ fun BottomNavBar(
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.smd, vertical = Spacing.sm)
-                .height(64.dp),
-        shape = ToeicSpaceShapes.large,
-        color = Color.White.copy(alpha = 0.95f),
-        shadowElevation = 8.dp,
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f)),
+                .softShadow(BarShape)
+                .height(68.dp),
+        shape = BarShape,
+        color = BarSurface,
+        border = BorderStroke(1.dp, CardBorder),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = Spacing.smd),
@@ -95,8 +97,9 @@ fun BottomNavBar(
     }
 }
 
+/** Icon over label, the item of the bottom bar and of the collapsed rail. */
 @Composable
-private fun TabItem(
+internal fun TabItem(
     tab: BottomNavTab,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -121,7 +124,7 @@ private fun TabItem(
         label = "DropletScale",
     )
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) PrimaryGradientCenter else OceanicInk.copy(alpha = 0.5f),
+        targetValue = if (isSelected) PrimaryGradientStart else InkSoft,
         animationSpec = tween(durationMillis = 200),
         label = "TabContentColor",
     )
@@ -146,24 +149,17 @@ private fun TabItem(
                 Box(
                     modifier =
                         Modifier
-                            .size(width = 48.dp, height = 32.dp)
+                            .size(width = 52.dp, height = 30.dp)
                             .graphicsLayer {
                                 scaleX = dropletScale
                                 scaleY = dropletScale
                             }.background(
-                                brush =
-                                    Brush.verticalGradient(
-                                        colors =
-                                            listOf(
-                                                NavDropletGradientStart,
-                                                NavDropletGradientEnd,
-                                            ),
-                                    ),
-                                shape = ToeicSpaceShapes.small,
+                                brush = SelectedItemBrush,
+                                shape = PillShape,
                             ).border(
                                 width = 1.dp,
                                 color = NavDropletBorder,
-                                shape = ToeicSpaceShapes.small,
+                                shape = PillShape,
                             ),
                 )
             }
@@ -185,7 +181,6 @@ private fun TabItem(
         Text(
             text = stringResource(id = tab.labelRes),
             color = contentColor,
-            fontSize = 9.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,

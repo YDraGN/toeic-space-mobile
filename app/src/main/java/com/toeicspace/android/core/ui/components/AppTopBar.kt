@@ -2,8 +2,9 @@ package com.toeicspace.android.core.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -24,16 +25,16 @@ import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 @Composable
 fun AppTopBar(
-    leadingContent: @Composable () -> Unit,
+    leadingContent: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
-    trailingContent: @Composable () -> Unit = {},
+    trailingContent: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .height(64.dp)
+                .heightIn(min = 64.dp)
                 .padding(horizontal = Spacing.gutter, vertical = Spacing.smd),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

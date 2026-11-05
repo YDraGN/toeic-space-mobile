@@ -52,6 +52,20 @@ val ToeicSpaceTypography =
                 fontSize = 18.sp,
                 lineHeight = 26.sp,
             ),
+        titleMedium =
+            TextStyle(
+                fontFamily = Quicksand,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+            ),
+        titleSmall =
+            TextStyle(
+                fontFamily = Quicksand,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+            ),
         bodyLarge =
             TextStyle(
                 fontFamily = BeVietnamPro,
@@ -80,6 +94,20 @@ val ToeicSpaceTypography =
                 fontSize = 15.sp,
                 lineHeight = 24.sp,
             ),
+        labelMedium =
+            TextStyle(
+                fontFamily = BeVietnamPro,
+                fontWeight = FontWeight.Medium,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+            ),
+        labelSmall =
+            TextStyle(
+                fontFamily = BeVietnamPro,
+                fontWeight = FontWeight.Medium,
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
+            ),
     )
 
 // Style riêng ngoài 6 slot chuẩn M3 — dùng trực tiếp qua AppTextStyles.xxx khi cần
@@ -107,5 +135,33 @@ object AppTextStyles {
             fontSize = 13.sp,
             lineHeight = 18.sp,
             letterSpacing = 0.01.em,
+        )
+
+    /** Hint or error under a form field: a step below the 13sp floating label, as in Material. */
+    val HelperText =
+        TextStyle(
+            fontFamily = BeVietnamPro,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            letterSpacing = 0.01.em,
+        )
+
+    /** Brand tagline in script; only for short lines, never body copy. */
+    val HeroTagline =
+        TextStyle(
+            fontFamily = DancingScript,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            lineHeight = 26.sp,
+        )
+
+    /** The big day count on streak cards. */
+    val StreakCount =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 46.sp,
+            lineHeight = 50.sp,
         )
 }
