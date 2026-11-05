@@ -88,7 +88,7 @@ Biến thể được suy ra từ `SessionState` (qua `Viewer` trong `MainViewMo
 | Biến thể | Điều kiện | Nội dung | Trạng thái |
 |---|---|---|---|
 | **Guest** | `user == null`, `isGuest` | Hero chào mừng (`oy2_hello`, nút "Bắt đầu ngay" → Đăng ký), hàng 4 lợi ích cuộn ngang, card "Trang chủ đang chờ bạn!" với nút Đăng ký / Đã có tài khoản và link "Khám phá trước đã" | ✅ Đã làm |
-| **Registered** | Đã đăng nhập, chưa ghi danh lớp nào | Card chuỗi ngày học (`PearlStreakCard`, 0 ngày, chỉ đánh dấu hôm nay), "Trang sổ hôm nay" liệt kê bài kiểm tra đầu vào, lớp học chính thức, tài nguyên miễn phí, cả card gắn nhãn "Sắp ra mắt" | ✅ Khung đã làm, chờ API streak, placement test, lớp học, practice-sets |
+| **Registered** | Đã đăng nhập, chưa ghi danh lớp nào | Card chuỗi ngày học (`PearlStreakCard`, chuỗi mẫu `SAMPLE_STREAK_DAYS` = 2 ngày: ngày đã học hiện mascot, hôm nay là vòng vàng), "Trang sổ hôm nay" liệt kê bài kiểm tra đầu vào, lớp học chính thức, tài nguyên miễn phí, cả card gắn nhãn "Sắp ra mắt" | ✅ Khung đã làm, chờ API streak, placement test, lớp học, practice-sets |
 | **Enrolled** | Đã đăng nhập, có ít nhất một lớp | Streak, Tiếp tục học, Khoá học của tôi, Nhiệm vụ hằng ngày, banner Deadline | ❌ Chưa có API cho học viên |
 
 Bảng chi tiết phần nào làm thật, phần nào dùng dữ liệu mẫu nằm ở [api-integration.md](api-integration.md#8-mockup-cần-gì-backend-có-gì). Section chưa có backend hiện "Sắp ra mắt", không hiện số liệu giả.
@@ -106,7 +106,7 @@ Khách chỉ dùng được tab **Khám phá**. Các tab còn lại hiện lời
 
 Tab Khám phá có hàng lọc: nút bộ lọc và các chip Tất cả · Online · Offline (lọc thật theo `StudyMode` trong `ExploreViewModel`). Card trung tâm không gắn mục tiêu điểm vì trung tâm nào cũng dạy đủ các band; chip hình thức học có màu cố định (Online xanh, Offline hồng). Cửa sổ ≥600dp xếp card thành 2 hàng, vẫn cuộn ngang.
 
-Trung tâm trong tab Khám phá là **dữ liệu mẫu** (`SampleExploreRepository`, có nhãn "Dữ liệu mẫu" trên UI). Khi backend có API danh sách trung tâm, chỉ cần đổi binding trong `ExploreDataModule`. Chuỗi ngày học chưa tô ngày nào cho tới khi có API streak.
+Trung tâm trong tab Khám phá là **dữ liệu mẫu** (`SampleExploreRepository`, có nhãn "Dữ liệu mẫu" trên UI). Khi backend có API danh sách trung tâm, chỉ cần đổi binding trong `ExploreDataModule`. Chuỗi ngày học của thành viên là chuỗi mẫu 2 ngày (`streakWeek`), khách luôn là 0 ngày; khi có API streak chỉ cần bỏ `SAMPLE_STREAK_DAYS`.
 
 ### 5.4 Thông tin tài khoản
 
