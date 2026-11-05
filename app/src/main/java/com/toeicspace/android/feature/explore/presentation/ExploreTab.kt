@@ -1,6 +1,7 @@
 package com.toeicspace.android.feature.explore.presentation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,10 +35,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.PearlStreakCard
 import com.toeicspace.android.core.ui.components.PrimaryButton
+import com.toeicspace.android.core.ui.components.SAMPLE_STREAK_DAYS
 import com.toeicspace.android.core.ui.components.ToeicCard
 import com.toeicspace.android.core.ui.components.ToeicChip
 import com.toeicspace.android.core.ui.components.ToeicChipStyle
-import com.toeicspace.android.core.ui.components.weekWithOnlyToday
+import com.toeicspace.android.core.ui.components.ToeicFilterChip
+import com.toeicspace.android.core.ui.components.ToeicIconButton
+import com.toeicspace.android.core.ui.components.streakWeek
+import com.toeicspace.android.core.ui.currentWindowWidth
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
@@ -60,13 +67,18 @@ internal fun ExploreTab(
     viewModel: ExploreViewModel = hiltViewModel(),
 ) {
     val centers by viewModel.featuredCenters.collectAsStateWithLifecycle()
+    val studyModeFilter by viewModel.studyModeFilter.collectAsStateWithLifecycle()
 
     ExploreContent(
         viewer = viewer,
         centers = centers,
+        studyModeFilter = studyModeFilter,
+        onStudyModeFilterChange = viewModel::onStudyModeFilterChange,
+        onMoreFiltersClick = onComingSoon,
         onSignUpClick = onSignUpClick,
         onCenterClick = { onComingSoon() },
         modifier = modifier,
+        centerRows = if (currentWindowWidth().isAtLeastMedium) 2 else 1,
     )
 }
 
@@ -74,9 +86,13 @@ internal fun ExploreTab(
 internal fun ExploreContent(
     viewer: Viewer,
     centers: List<LearningCenter>,
+    studyModeFilter: StudyMode?,
+    onStudyModeFilterChange: (StudyMode?) -> Unit,
+    onMoreFiltersClick: () -> Unit,
     onSignUpClick: () -> Unit,
     onCenterClick: (LearningCenter) -> Unit,
     modifier: Modifier = Modifier,
+    centerRows: Int = 1,
 ) {
     val isGuest = viewer is Viewer.Guest
     // Side padding goes on each item instead of the list, so the center row can scroll edge to edge.
@@ -93,17 +109,32 @@ internal fun ExploreContent(
         item(key = "centers-header") {
             SectionHeader(
                 title = stringResource(id = R.string.explore_title_centers),
-                badge = stringResource(id = R.string.explore_label_sample_data),
+                badge = stringResource(id = R.string.common_label_sample_data),
                 modifier = itemModifier,
             )
         }
+        item(key = "centers-filter") {
+            CenterFilterRow(
+                selected = studyModeFilter,
+                onSelect = onStudyModeFilterChange,
+                onMoreFiltersClick = onMoreFiltersClick,
+            )
+        }
         item(key = "centers") {
+            // Wide windows stack the cards two high and still scroll sideways, so the section keeps
+            // its carousel feel without leaving half the screen empty.
             LazyRow(
                 contentPadding = PaddingValues(horizontal = Spacing.md),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
             ) {
-                items(items = centers, key = { it.id }) { center ->
-                    CenterCard(center = center, onClick = { onCenterClick(center) })
+                items(items = centers.chunked(centerRows), key = { column ->
+                    column.first().id
+                }) { column ->
+                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.smd)) {
+                        column.forEach { center ->
+                            CenterCard(center = center, onClick = { onCenterClick(center) })
+                        }
+                    }
                 }
             }
         }
@@ -158,9 +189,11 @@ private fun StreakCard(
     modifier: Modifier = Modifier,
 ) {
     val today = remember { LocalDate.now() }
+    // No streak API yet: members see the same sample streak as the home tab, guests start at 0.
+    val days = if (isGuest) 0 else SAMPLE_STREAK_DAYS
     PearlStreakCard(
-        days = 0,
-        week = remember(today) { weekWithOnlyToday(today) },
+        days = days,
+        week = remember(today, days) { streakWeek(today, days) },
         body =
             if (isGuest) {
                 stringResource(id = R.string.explore_body_streak_guest)
@@ -198,6 +231,44 @@ private fun SectionHeader(
         )
         if (badge != null) {
             ToeicChip(text = badge, style = ToeicChipStyle.NOTICE)
+        }
+    }
+}
+
+/** The filter button and the study-mode chips share one row, scrolling sideways if it gets long. */
+@Composable
+private fun CenterFilterRow(
+    selected: StudyMode?,
+    onSelect: (StudyMode?) -> Unit,
+    onMoreFiltersClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.md),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ToeicIconButton(
+            onClick = onMoreFiltersClick,
+            contentDescription = stringResource(id = R.string.explore_cd_filter),
+        ) {
+            Icon(painter = painterResource(id = R.drawable.ic_filter), contentDescription = null)
+        }
+        ToeicFilterChip(
+            text = stringResource(id = R.string.explore_label_all),
+            selected = selected == null,
+            onClick = { onSelect(null) },
+        )
+        StudyMode.entries.forEach { mode ->
+            ToeicFilterChip(
+                text = stringResource(id = mode.labelRes),
+                selected = selected == mode,
+                onClick = { onSelect(mode) },
+            )
         }
     }
 }
@@ -260,16 +331,8 @@ private fun CenterCard(
                 modifier = Modifier.padding(top = Spacing.xs),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
-                ToeicChip(
-                    text =
-                        stringResource(
-                            id = R.string.explore_label_target_score,
-                            center.targetScore,
-                        ),
-                    style = ToeicChipStyle.NOTICE,
-                )
                 StudyMode.entries.filter { it in center.modes }.forEach { mode ->
-                    ToeicChip(text = stringResource(id = mode.labelRes))
+                    ToeicChip(text = stringResource(id = mode.labelRes), style = mode.chipStyle)
                 }
             }
         }
@@ -303,6 +366,14 @@ private fun PlanCard(
     }
 }
 
+/** One color per study mode, the same on every card. */
+private val StudyMode.chipStyle: ToeicChipStyle
+    get() =
+        when (this) {
+            StudyMode.ONLINE -> ToeicChipStyle.SKY
+            StudyMode.OFFLINE -> ToeicChipStyle.BLUSH
+        }
+
 private val StudyMode.labelRes: Int
     get() =
         when (this) {
@@ -316,7 +387,6 @@ private val PreviewCenters =
             "1",
             "Anh ngữ Biển Xanh",
             "Hải Châu, Đà Nẵng",
-            650,
             setOf(StudyMode.ONLINE, StudyMode.OFFLINE),
             "Lớp nhỏ 8 bạn, luyện đề sát đề thật mỗi tuần.",
         ),
@@ -324,7 +394,6 @@ private val PreviewCenters =
             "2",
             "Ngọc Trai English",
             "Cầu Giấy, Hà Nội",
-            750,
             setOf(StudyMode.OFFLINE),
             "Lộ trình từ mất gốc, kèm phát âm 1–1.",
         ),
@@ -337,6 +406,9 @@ private fun ExploreContentGuestPreview() {
         ExploreContent(
             viewer = Viewer.Guest,
             centers = PreviewCenters,
+            studyModeFilter = null,
+            onStudyModeFilterChange = {},
+            onMoreFiltersClick = {},
             onSignUpClick = {},
             onCenterClick = {},
         )
@@ -350,6 +422,9 @@ private fun ExploreContentMemberPreview() {
         ExploreContent(
             viewer = Viewer.Member(fullName = "Minh Anh", email = "minhanh@example.com"),
             centers = PreviewCenters,
+            studyModeFilter = null,
+            onStudyModeFilterChange = {},
+            onMoreFiltersClick = {},
             onSignUpClick = {},
             onCenterClick = {},
         )

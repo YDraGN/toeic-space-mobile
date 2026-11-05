@@ -43,25 +43,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.MascotView
 import com.toeicspace.android.core.ui.components.PearlStreakCard
 import com.toeicspace.android.core.ui.components.PrimaryButton
+import com.toeicspace.android.core.ui.components.SAMPLE_STREAK_DAYS
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.ToeicCard
 import com.toeicspace.android.core.ui.components.ToeicChip
 import com.toeicspace.android.core.ui.components.ToeicChipStyle
-import com.toeicspace.android.core.ui.components.weekWithOnlyToday
+import com.toeicspace.android.core.ui.components.streakWeek
 import com.toeicspace.android.core.ui.theme.AppTextStyles
+import com.toeicspace.android.core.ui.theme.BlushTint
 import com.toeicspace.android.core.ui.theme.CardBorder
-import com.toeicspace.android.core.ui.theme.DancingScript
 import com.toeicspace.android.core.ui.theme.HeroGradientBrush
+import com.toeicspace.android.core.ui.theme.OnHero
+import com.toeicspace.android.core.ui.theme.PaperRow
+import com.toeicspace.android.core.ui.theme.PastelSky
 import com.toeicspace.android.core.ui.theme.Pearl
 import com.toeicspace.android.core.ui.theme.PearlPaper
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.PrimaryGradientStart
 import com.toeicspace.android.core.ui.theme.Spacing
+import com.toeicspace.android.core.ui.theme.TaglineCream
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.core.ui.theme.softShadow
 import com.toeicspace.android.feature.main.presentation.Viewer
@@ -79,11 +83,6 @@ private val CheckboxSize = 22.dp
 private val WashiWidth = 96.dp
 private val WashiHeight = 19.dp
 private val SectionGap = Spacing.md + Spacing.xs
-
-/** Cream on the dark corner of the hero; the brand script is too thin for white at 20sp. */
-private val TaglineCream = Color(0xFFFFF1C2)
-private val BlushTint = Color(0xFFFFD3D6)
-private val SkyTint = Color(0xFFBBE2FF)
 
 private val VietnameseDate = DateTimeFormatter.ofPattern("EEEE, dd/MM", Locale.forLanguageTag("vi"))
 
@@ -167,20 +166,18 @@ private fun WelcomeHero(
         ) {
             Text(
                 text = stringResource(id = R.string.home_hero_tagline),
-                fontFamily = DancingScript,
-                fontSize = 20.sp,
-                lineHeight = 26.sp,
+                style = AppTextStyles.HeroTagline,
                 color = TaglineCream,
             )
             Text(
                 text = stringResource(id = R.string.home_hero_title),
                 style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
+                color = OnHero,
             )
             Surface(
                 onClick = onStartClick,
                 shape = PillShape,
-                color = Color.White,
+                color = OnHero,
                 contentColor = PrimaryGradientStart,
                 modifier = Modifier.padding(top = Spacing.xs),
             ) {
@@ -219,7 +216,7 @@ private val Benefits =
         Benefit(
             R.drawable.ic_practice,
             PrimaryGradientStart,
-            SkyTint,
+            PastelSky,
             R.string.home_benefit_practice,
             R.string.home_benefit_practice_body,
         ),
@@ -241,7 +238,7 @@ private val Benefits =
         Benefit(
             R.drawable.ic_vocabulary,
             PrimaryGradientStart,
-            SkyTint,
+            PastelSky,
             R.string.home_benefit_vocabulary,
             R.string.home_benefit_vocabulary_body,
         ),
@@ -380,8 +377,8 @@ private fun SignUpCard(
 @Composable
 private fun RegisteredHome(modifier: Modifier = Modifier) {
     val today = remember { LocalDate.now() }
-    // No streak API yet: nothing is filled, only today is marked.
-    val week = remember(today) { weekWithOnlyToday(today) }
+    // No streak API yet: a sample streak, so the studied-day marks show.
+    val week = remember(today) { streakWeek(today, SAMPLE_STREAK_DAYS) }
 
     Column(
         modifier =
@@ -393,7 +390,7 @@ private fun RegisteredHome(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(SectionGap),
     ) {
         PearlStreakCard(
-            days = 0,
+            days = SAMPLE_STREAK_DAYS,
             week = week,
             body = stringResource(id = R.string.home_body_streak),
         )
@@ -483,7 +480,7 @@ private fun TodayRow(
             modifier
                 .fillMaxWidth()
                 .clip(TodayRowShape)
-                .background(Color.White.copy(alpha = 0.9f))
+                .background(PaperRow)
                 .border(1.dp, CardBorder, TodayRowShape)
                 .padding(horizontal = Spacing.smd, vertical = Spacing.smd),
         horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
