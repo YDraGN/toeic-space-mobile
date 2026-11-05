@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,8 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,18 +41,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.BarSurface
 import com.toeicspace.android.core.ui.theme.CardBorder
 import com.toeicspace.android.core.ui.theme.InkSoft
 import com.toeicspace.android.core.ui.theme.NavDropletBorder
-import com.toeicspace.android.core.ui.theme.NavDropletGradientEnd
-import com.toeicspace.android.core.ui.theme.NavDropletGradientStart
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.PrimaryGradientStart
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.core.ui.theme.softShadow
 
-private val BarShape = RoundedCornerShape(28.dp)
+internal val BarShape = RoundedCornerShape(28.dp)
 
 enum class BottomNavTab(
     @get:StringRes val labelRes: Int,
@@ -82,7 +78,7 @@ fun BottomNavBar(
                 .softShadow(BarShape)
                 .height(68.dp),
         shape = BarShape,
-        color = Color.White.copy(alpha = 0.96f),
+        color = BarSurface,
         border = BorderStroke(1.dp, CardBorder),
     ) {
         Row(
@@ -101,42 +97,9 @@ fun BottomNavBar(
     }
 }
 
-/** Side navigation for windows at least 600dp wide; same tabs and look as [BottomNavBar]. */
+/** Icon over label, the item of the bottom bar and of the collapsed rail. */
 @Composable
-fun ToeicNavigationRail(
-    selectedTab: BottomNavTab,
-    onTabSelected: (BottomNavTab) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier =
-            modifier
-                .fillMaxHeight()
-                .padding(horizontal = Spacing.sm, vertical = Spacing.smd)
-                .softShadow(BarShape)
-                .width(80.dp),
-        shape = BarShape,
-        color = Color.White.copy(alpha = 0.96f),
-        border = BorderStroke(1.dp, CardBorder),
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = Spacing.md),
-            verticalArrangement = Arrangement.spacedBy(Spacing.lg, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            BottomNavTab.entries.forEach { tab ->
-                TabItem(
-                    tab = tab,
-                    isSelected = tab == selectedTab,
-                    onClick = { onTabSelected(tab) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TabItem(
+internal fun TabItem(
     tab: BottomNavTab,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -191,14 +154,7 @@ private fun TabItem(
                                 scaleX = dropletScale
                                 scaleY = dropletScale
                             }.background(
-                                brush =
-                                    Brush.horizontalGradient(
-                                        colors =
-                                            listOf(
-                                                NavDropletGradientStart,
-                                                NavDropletGradientEnd,
-                                            ),
-                                    ),
+                                brush = SelectedItemBrush,
                                 shape = PillShape,
                             ).border(
                                 width = 1.dp,

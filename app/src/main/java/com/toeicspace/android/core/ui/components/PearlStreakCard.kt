@@ -1,5 +1,6 @@
 package com.toeicspace.android.core.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,9 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -28,15 +28,14 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.HeroGradientBrush
-import com.toeicspace.android.core.ui.theme.NightSea
+import com.toeicspace.android.core.ui.theme.HeroWeekTint
+import com.toeicspace.android.core.ui.theme.OnHero
 import com.toeicspace.android.core.ui.theme.Pearl
-import com.toeicspace.android.core.ui.theme.Quicksand
 import com.toeicspace.android.core.ui.theme.Spacing
-import com.toeicspace.android.core.ui.theme.SunlitGold
+import com.toeicspace.android.core.ui.theme.SunlitOnHero
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.core.ui.theme.softShadow
 import java.time.DayOfWeek
@@ -44,33 +43,55 @@ import java.time.LocalDate
 
 private val HeroShape = RoundedCornerShape(28.dp)
 private val WeekShape = RoundedCornerShape(18.dp)
-private val PearlSize = 22.dp
+private val DaySlotSize = 32.dp
+private val TodayRingSize = 24.dp
 private val UpcomingDotSize = 8.dp
 private val StreakMascotSize = 104.dp
 
-/** Brighter than [SunlitGold] so the count and today's label pass contrast on the dark corner. */
-private val SunlitOnDark = Color(0xFFF5D85A)
+private const val TITLE_ALPHA = 0.9f
+private const val LABEL_ALPHA = 0.85f
+private const val WEEK_BORDER_ALPHA = 0.25f
+private const val TODAY_FILL_ALPHA = 0.15f
+private const val UPCOMING_DOT_ALPHA = 0.45f
 
 enum class StreakDay {
-    /** Studied that day: a glowing pearl. */
+    /** Studied that day: Oysteic sits in the day's circle. */
     DONE,
 
-    /** Today, not studied yet: a gold ring. */
+    /** Today, not studied yet: a gold ring waiting to be filled. */
     TODAY,
 
     /** Later this week, or a missed day: a faint dot. */
     UPCOMING,
 }
 
-/** Monday to Sunday with only [today] marked: what every streak card shows until the streak API exists. */
-fun weekWithOnlyToday(today: LocalDate): List<StreakDay> =
-    List(DayOfWeek.entries.size) { index ->
-        if (index == today.dayOfWeek.value - 1) StreakDay.TODAY else StreakDay.UPCOMING
-    }
+/**
+ * Sample streak shown to members until the streak API exists, so the mascot day marks can be seen.
+ * Guests always see 0.
+ */
+const val SAMPLE_STREAK_DAYS = 2
 
 /**
- * Streak hero: the day count in sunlit gold beside Oysteic, then the week as a string of pearls.
- * Dark at the top-left (see [HeroGradientBrush]) so the white text there stays readable.
+ * Monday to Sunday for a streak of [streakDays] that ended yesterday: those days before [today] are
+ * done, today waits to be filled. Days of the streak that fall in last week are not drawn.
+ */
+fun streakWeek(
+    today: LocalDate,
+    streakDays: Int = 0,
+): List<StreakDay> {
+    val todayIndex = today.dayOfWeek.value - 1
+    return List(DayOfWeek.entries.size) { index ->
+        when {
+            index == todayIndex -> StreakDay.TODAY
+            index in (todayIndex - streakDays) until todayIndex -> StreakDay.DONE
+            else -> StreakDay.UPCOMING
+        }
+    }
+}
+
+/**
+ * Streak hero: the day count in sunlit gold beside Oysteic, then the week, where every studied day
+ * shows the mascot. Dark at the top-left (see [HeroGradientBrush]) so the white text stays readable.
  */
 @Composable
 fun PearlStreakCard(
@@ -102,7 +123,7 @@ fun PearlStreakCard(
                 Text(
                     text = stringResource(id = R.string.home_title_streak),
                     style = MaterialTheme.typography.titleSmall,
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = OnHero.copy(alpha = TITLE_ALPHA),
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.xs + Spacing.space2),
@@ -110,24 +131,17 @@ fun PearlStreakCard(
                 ) {
                     Text(
                         text = days.toString(),
-                        fontFamily = Quicksand,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 46.sp,
-                        lineHeight = 50.sp,
-                        color = SunlitOnDark,
+                        style = AppTextStyles.StreakCount,
+                        color = SunlitOnHero,
                     )
                     Text(
                         text = stringResource(id = R.string.home_label_days),
                         style = MaterialTheme.typography.headlineMedium,
-                        color = SunlitOnDark,
+                        color = SunlitOnHero,
                         modifier = Modifier.padding(bottom = Spacing.xs + Spacing.space2),
                     )
                 }
-                Text(
-                    text = body,
-                    style = AppTextStyles.Caption,
-                    color = Color.White,
-                )
+                Text(text = body, style = AppTextStyles.Caption, color = OnHero)
             }
             MascotView(
                 mascotResId = R.drawable.oy2_streak,
@@ -135,13 +149,13 @@ fun PearlStreakCard(
                 isFloating = false,
             )
         }
-        PearlWeek(week = week)
+        StreakWeek(week = week)
         footer()
     }
 }
 
 @Composable
-private fun PearlWeek(
+private fun StreakWeek(
     week: List<StreakDay>,
     modifier: Modifier = Modifier,
 ) {
@@ -154,38 +168,29 @@ private fun PearlWeek(
             modifier
                 .fillMaxWidth()
                 .clip(WeekShape)
-                // Navy tint, not white: the card turns light toward the bottom-right, and the day
+                // Navy film, not white: the card turns light toward the bottom-right, and the day
                 // labels there still need contrast.
-                .background(NightSea.copy(alpha = 0.45f))
-                .border(1.dp, Color.White.copy(alpha = 0.25f), WeekShape)
-                .padding(horizontal = Spacing.smd, vertical = Spacing.smd)
-                // Seven dots mean nothing to a screen reader; one sentence does.
+                .background(HeroWeekTint)
+                .border(1.dp, OnHero.copy(alpha = WEEK_BORDER_ALPHA), WeekShape)
+                .padding(Spacing.smd)
+                // Seven marks mean nothing to a screen reader; one sentence does.
                 .clearAndSetSemantics { contentDescription = summary },
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         week.forEachIndexed { index, day ->
+            val isToday = day == StreakDay.TODAY
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs + Spacing.space2),
             ) {
-                Box(
-                    modifier = Modifier.size(PearlSize + Spacing.xs),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    DayPearl(day = day)
+                Box(modifier = Modifier.size(DaySlotSize), contentAlignment = Alignment.Center) {
+                    DayMark(day = day)
                 }
                 Text(
                     text = labels.getOrElse(index) { "" },
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color =
-                        if (day ==
-                            StreakDay.TODAY
-                        ) {
-                            SunlitOnDark
-                        } else {
-                            Color.White.copy(alpha = 0.85f)
-                        },
+                    fontWeight = if (isToday) FontWeight.Bold else FontWeight.SemiBold,
+                    color = if (isToday) SunlitOnHero else OnHero.copy(alpha = LABEL_ALPHA),
                 )
             }
         }
@@ -193,37 +198,34 @@ private fun PearlWeek(
 }
 
 @Composable
-private fun DayPearl(day: StreakDay) {
+private fun DayMark(day: StreakDay) {
     when (day) {
         StreakDay.DONE ->
-            Box(
+            Image(
+                painter = painterResource(id = R.drawable.oy2_joy),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier =
                     Modifier
-                        .size(PearlSize)
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = CircleShape,
-                            ambientColor = SunlitGold,
-                            spotColor = SunlitGold,
-                        ).background(
-                            Brush.radialGradient(listOf(Color.White, Pearl, SunlitGold)),
-                            CircleShape,
-                        ),
+                        .size(DaySlotSize)
+                        .clip(CircleShape)
+                        .background(Pearl)
+                        .border(1.5.dp, SunlitOnHero, CircleShape),
             )
         StreakDay.TODAY ->
             Box(
                 modifier =
                     Modifier
-                        .size(PearlSize)
-                        .background(Color.White.copy(alpha = 0.15f), CircleShape)
-                        .border(2.5.dp, SunlitOnDark, CircleShape),
+                        .size(TodayRingSize)
+                        .background(OnHero.copy(alpha = TODAY_FILL_ALPHA), CircleShape)
+                        .border(2.5.dp, SunlitOnHero, CircleShape),
             )
         StreakDay.UPCOMING ->
             Box(
                 modifier =
                     Modifier
                         .size(UpcomingDotSize)
-                        .background(Color.White.copy(alpha = 0.45f), CircleShape),
+                        .background(OnHero.copy(alpha = UPCOMING_DOT_ALPHA), CircleShape),
             )
     }
 }
@@ -233,11 +235,9 @@ private fun DayPearl(day: StreakDay) {
 private fun PearlStreakCardPreview() {
     ToeicSpaceTheme {
         PearlStreakCard(
-            days = 3,
-            week =
-                listOf(StreakDay.DONE, StreakDay.DONE, StreakDay.DONE, StreakDay.TODAY) +
-                    List(3) { StreakDay.UPCOMING },
-            body = "Viên ngọc của bạn đã có 3 lớp xà cừ.",
+            days = SAMPLE_STREAK_DAYS,
+            week = streakWeek(LocalDate.of(2026, 11, 4), SAMPLE_STREAK_DAYS),
+            body = "Mỗi buổi học thêm một lớp xà cừ.",
             modifier = Modifier.padding(Spacing.md),
         )
     }

@@ -15,7 +15,11 @@
     <string name="common_label_tab_vocabulary">Từ vựng</string>
     <string name="common_label_tab_profile">Cá nhân</string>
     <string name="common_cd_search">Tìm kiếm</string>
+    <string name="common_cd_open_navigation">Mở rộng thanh điều hướng</string>
+    <string name="common_cd_close_navigation">Thu gọn thanh điều hướng</string>
+    <string name="common_cd_change_avatar">Đổi ảnh đại diện</string>
     <string name="common_label_coming_soon">Sắp ra mắt</string>
+    <string name="common_label_sample_data">Dữ liệu mẫu</string>
     <string name="common_action_sign_up_free">ĐĂNG KÝ MIỄN PHÍ</string>
     <string name="common_action_have_account">Tôi đã có tài khoản</string>
     <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
@@ -63,7 +67,7 @@
     <string name="home_benefit_vocabulary_body">Gom lại từ bạn đã học</string>
     <string name="home_title_streak">Chuỗi ngày học</string>
     <string name="home_label_days">ngày</string>
-    <string name="home_body_streak">Mỗi buổi học thêm một lớp xà cừ. Chuỗi ngày sẽ bắt đầu đếm khi tính năng ra mắt.</string>
+    <string name="home_body_streak">Mỗi buổi học thêm một lớp xà cừ. Học hôm nay để giữ chuỗi nhé!</string>
     <string name="home_cd_streak_week">Tuần này: %1$d trên 7 ngày đã học</string>
     <string name="home_title_today">Trang sổ hôm nay</string>
 
@@ -80,11 +84,11 @@
         <item>CN</item>
     </string-array>
     <string name="explore_title_centers">Trung tâm nổi bật</string>
-    <string name="explore_label_sample_data">Dữ liệu mẫu</string>
     <string name="explore_cd_center_cover">Ảnh trung tâm %1$s</string>
-    <string name="explore_label_target_score">Mục tiêu %1$d+</string>
     <string name="explore_label_online">Online</string>
     <string name="explore_label_offline">Offline</string>
+    <string name="explore_label_all">Tất cả</string>
+    <string name="explore_cd_filter">Bộ lọc trung tâm</string>
     <string name="explore_title_plans">Gói học</string>
     <string name="explore_title_plan_free">Tự học miễn phí</string>
     <string-array name="explore_plan_free_features">
@@ -106,6 +110,38 @@
     <string name="profile_body_guest">Bạn đang dùng thử với tư cách khách. Đăng ký để giữ lại kết quả học trên mọi thiết bị.</string>
     <string name="profile_action_change_password">Đổi mật khẩu</string>
     <string name="profile_action_sign_out">Đăng xuất</string>
+    <string name="profile_action_account_info">Thông tin tài khoản</string>
+    <string name="profile_section_account">Tài khoản</string>
+    <string name="profile_section_app">Ứng dụng</string>
+    <string name="profile_section_support">Hỗ trợ</string>
+    <string name="profile_label_notifications">Thông báo</string>
+    <string name="profile_body_notifications">Nhắc học và giữ chuỗi ngày học</string>
+    <string name="profile_label_terms">Điều khoản sử dụng</string>
+    <string name="profile_label_privacy">Chính sách bảo mật</string>
+    <string name="profile_label_version">Phiên bản</string>
+    <string name="profile_action_delete_account">Xoá tài khoản</string>
+    <string name="account_info_hint_avatar">Chạm vào máy ảnh để chọn ảnh mới</string>
+    <string name="account_info_hint_email">Email dùng để đăng nhập nên không đổi được.</string>
+    <string name="account_info_action_save">LƯU THAY ĐỔI</string>
+    <string name="account_info_cd_edit">Chỉnh sửa thông tin</string>
+    <string name="account_info_action_cancel">Huỷ</string>
+    <string name="account_info_action_pick_date">Chọn</string>
+    <string name="account_info_section_personal">Thông tin cá nhân</string>
+    <string name="account_info_section_goal">Mục tiêu học</string>
+    <string name="account_info_label_date_of_birth">Ngày sinh</string>
+    <string name="account_info_label_gender">Giới tính</string>
+    <string name="account_info_label_biography">Giới thiệu bản thân</string>
+    <string name="account_info_hint_biography">Tối đa 300 ký tự</string>
+    <string name="account_info_label_target_score">Mục tiêu điểm</string>
+    <string name="account_info_label_level">Trình độ hiện tại</string>
+    <string name="account_info_value_target_score">%1$d+</string>
+    <string name="account_info_value_empty">Chưa cập nhật</string>
+    <string name="account_info_gender_male">Nam</string>
+    <string name="account_info_gender_female">Nữ</string>
+    <string name="account_info_gender_other">Khác</string>
+    <string name="account_info_level_beginner">Mới bắt đầu</string>
+    <string name="account_info_level_intermediate">Trung cấp</string>
+    <string name="account_info_level_advanced">Nâng cao</string>
 
     <!-- Auth: fields -->
     <string name="auth_label_email">Email</string>

@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -32,9 +31,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.theme.AppTextStyles
+import com.toeicspace.android.core.ui.theme.HintText
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PrimaryBorder
 import com.toeicspace.android.core.ui.theme.Spacing
@@ -42,13 +41,13 @@ import com.toeicspace.android.core.ui.theme.SubtleBorder
 import com.toeicspace.android.core.ui.theme.ToeicSpaceShapes
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
-/** Hint under a field: italic and a cooler blue, so it never reads as the field's own placeholder. */
-private val HintColor = Color(0xFF4F6E96)
+private const val MULTI_LINE_MIN_LINES = 3
 
 /**
  * Outlined text field with the app styling. [errorText] replaces [supportingText] when set.
- * With [isPassword] the value is masked and a show/hide toggle is added. [isRequired] adds a red
- * asterisk to the label; forms that use it should say what the asterisk means.
+ * With [isPassword] the value is masked and a show/hide toggle is added. [singleLine] false gives a
+ * box of a few lines for longer text such as a short bio. [isRequired] adds a red asterisk to the
+ * label; forms that use it should say what the asterisk means.
  */
 @Composable
 fun ToeicTextField(
@@ -61,6 +60,7 @@ fun ToeicTextField(
     errorText: String? = null,
     supportingText: String? = null,
     isPassword: Boolean = false,
+    singleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -94,6 +94,7 @@ fun ToeicTextField(
                 enabled = enabled,
                 isError = errorText != null,
                 isPassword = isPassword,
+                singleLine = singleLine,
                 isPasswordVisible = isPasswordVisible,
                 onTogglePasswordVisibility = { isPasswordVisible = !isPasswordVisible },
                 keyboardType = keyboardType,
@@ -105,17 +106,14 @@ fun ToeicTextField(
             // Starts at the field's edge, like Google and Material forms, not indented to the text.
             Text(
                 text = helperText,
-                style = HelperTextStyle,
+                style = AppTextStyles.HelperText,
                 fontStyle = if (errorText != null) FontStyle.Normal else FontStyle.Italic,
-                color = if (errorText != null) errorColor else HintColor,
+                color = if (errorText != null) errorColor else HintText,
                 modifier = Modifier.padding(start = Spacing.xs, top = Spacing.xs, end = Spacing.xs),
             )
         }
     }
 }
-
-/** 12sp, as in Material's supporting text: a step below the 13sp floating label. */
-private val HelperTextStyle = AppTextStyles.Caption.copy(fontSize = 12.sp, lineHeight = 16.sp)
 
 @Composable
 private fun ToeicOutlinedTextField(
@@ -125,6 +123,7 @@ private fun ToeicOutlinedTextField(
     enabled: Boolean,
     isError: Boolean,
     isPassword: Boolean,
+    singleLine: Boolean,
     isPasswordVisible: Boolean,
     onTogglePasswordVisibility: () -> Unit,
     keyboardType: KeyboardType,
@@ -139,7 +138,8 @@ private fun ToeicOutlinedTextField(
         textStyle = MaterialTheme.typography.bodyLarge,
         label = { Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         isError = isError,
-        singleLine = true,
+        singleLine = singleLine,
+        minLines = if (singleLine) 1 else MULTI_LINE_MIN_LINES,
         shape = ToeicSpaceShapes.small,
         visualTransformation =
             if (isPassword && !isPasswordVisible) {
