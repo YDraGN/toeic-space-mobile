@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -18,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.AppTopBar
+import com.toeicspace.android.core.ui.components.NavigationMenuButton
 import com.toeicspace.android.core.ui.components.PillButton
 import com.toeicspace.android.core.ui.components.ToeicIconButton
 import com.toeicspace.android.core.ui.components.UserAvatar
@@ -27,7 +27,11 @@ import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
 private val TopBarAvatarSize = 40.dp
 
-/** Fixed header of the shell: avatar, greeting and actions. Guests get "Sign in" instead of the bell. */
+/**
+ * Fixed header of the shell: avatar, greeting and actions. Guests get "Sign in" instead of the bell.
+ * With a navigation rail the avatar lives at the foot of the rail, so [navigationMenu] (the ☰
+ * button) takes its place, with the greeting right beside it.
+ */
 @Composable
 internal fun MainTopBar(
     viewer: Viewer,
@@ -37,6 +41,7 @@ internal fun MainTopBar(
     onNotificationsClick: () -> Unit,
     onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
+    navigationMenu: (@Composable () -> Unit)? = null,
 ) {
     AppTopBar(
         modifier = modifier,
@@ -46,35 +51,20 @@ internal fun MainTopBar(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                UserAvatar(
-                    onClick = onAvatarClick,
-                    isGuest = viewer is Viewer.Guest,
-                    size = TopBarAvatarSize,
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text =
-                            when (viewer) {
-                                Viewer.Guest -> stringResource(id = R.string.main_greeting_guest)
-                                is Viewer.Member -> stringResource(id = timeOfDay.greetingRes)
-                            },
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text =
-                            when (viewer) {
-                                Viewer.Guest -> stringResource(id = R.string.main_subtitle_guest)
-                                is Viewer.Member -> viewer.fullName
-                            },
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                if (navigationMenu != null) {
+                    navigationMenu()
+                } else {
+                    UserAvatar(
+                        onClick = onAvatarClick,
+                        isGuest = viewer is Viewer.Guest,
+                        size = TopBarAvatarSize,
                     )
                 }
+                ViewerGreeting(
+                    viewer = viewer,
+                    timeOfDay = timeOfDay,
+                    modifier = Modifier.weight(1f),
+                )
             }
         },
         trailingContent = {
@@ -94,7 +84,7 @@ internal fun MainTopBar(
                             text = stringResource(id = R.string.auth_action_go_to_sign_in),
                             onClick = onSignInClick,
                             backgroundBrush = BrandGradientBrush,
-                            contentColor = Color.White,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
                         )
                     is Viewer.Member ->
                         ToeicIconButton(
@@ -115,6 +105,39 @@ internal fun MainTopBar(
     )
 }
 
+/** "Chào buổi sáng," over the member's name, or the guest greeting over the app name. */
+@Composable
+private fun ViewerGreeting(
+    viewer: Viewer,
+    timeOfDay: TimeOfDay,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text(
+            text =
+                when (viewer) {
+                    Viewer.Guest -> stringResource(id = R.string.main_greeting_guest)
+                    is Viewer.Member -> stringResource(id = timeOfDay.greetingRes)
+                },
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text =
+                when (viewer) {
+                    Viewer.Guest -> stringResource(id = R.string.main_subtitle_guest)
+                    is Viewer.Member -> viewer.fullName
+                },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
 @get:StringRes
 private val TimeOfDay.greetingRes: Int
     get() =
@@ -124,7 +147,7 @@ private val TimeOfDay.greetingRes: Int
             TimeOfDay.EVENING -> R.string.main_greeting_evening
         }
 
-@Preview(showBackground = true, backgroundColor = 0xFFFAF9FF)
+@Preview(showBackground = true, backgroundColor = 0xFFE7FAFF)
 @Composable
 private fun MainTopBarMemberPreview() {
     ToeicSpaceTheme {
@@ -139,9 +162,9 @@ private fun MainTopBarMemberPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFFAF9FF)
+@Preview(showBackground = true, backgroundColor = 0xFFE7FAFF)
 @Composable
-private fun MainTopBarGuestPreview() {
+private fun MainTopBarGuestWidePreview() {
     ToeicSpaceTheme {
         MainTopBar(
             viewer = Viewer.Guest,
@@ -150,6 +173,7 @@ private fun MainTopBarGuestPreview() {
             onSearchClick = {},
             onNotificationsClick = {},
             onSignInClick = {},
+            navigationMenu = { NavigationMenuButton(expanded = false, onClick = {}) },
         )
     }
 }

@@ -14,10 +14,12 @@ import com.toeicspace.android.feature.main.navigation.navigateToMain
 import com.toeicspace.android.feature.onboarding.navigation.OnboardingDestination
 import com.toeicspace.android.feature.onboarding.navigation.navigateToOnboarding
 import com.toeicspace.android.feature.onboarding.navigation.onboardingScreen
+import com.toeicspace.android.feature.profile.navigation.accountInfoScreen
+import com.toeicspace.android.feature.profile.navigation.navigateToAccountInfo
 import com.toeicspace.android.feature.splash.navigation.SplashDestination
 import com.toeicspace.android.feature.splash.navigation.splashScreen
 
-/** Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs). */
+/** Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info. */
 @Composable
 fun ToeicSpaceNavHost(
     modifier: Modifier = Modifier,
@@ -66,7 +68,9 @@ fun ToeicSpaceNavHost(
         mainScreen(
             onNavigateToSignIn = { navController.navigateToSignIn() },
             onNavigateToSignUp = { navController.navigateToSignUp() },
+            onNavigateToAccountInfo = { navController.navigateToAccountInfo() },
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
         )
+        accountInfoScreen(onBack = { navController.popBackStack() })
     }
 }

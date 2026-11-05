@@ -41,12 +41,14 @@ fun NavController.navigateToMain(navOptions: NavOptions? = null) =
 fun NavGraphBuilder.mainScreen(
     onNavigateToSignIn: () -> Unit,
     onNavigateToSignUp: () -> Unit,
+    onNavigateToAccountInfo: () -> Unit,
     onSessionEnded: () -> Unit,
 ) {
     composable<MainDestination> {
         MainRoute(
             onNavigateToSignIn = onNavigateToSignIn,
             onNavigateToSignUp = onNavigateToSignUp,
+            onNavigateToAccountInfo = onNavigateToAccountInfo,
             onSessionEnded = onSessionEnded,
         )
     }
