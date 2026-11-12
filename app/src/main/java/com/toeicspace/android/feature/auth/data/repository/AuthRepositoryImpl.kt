@@ -11,10 +11,12 @@ import com.toeicspace.android.core.network.model.toAuthUser
 import com.toeicspace.android.core.network.model.toSessionTokens
 import com.toeicspace.android.core.network.safeApiCall
 import com.toeicspace.android.feature.auth.data.remote.AuthApiService
+import com.toeicspace.android.feature.auth.data.remote.ChangePasswordRequestDto
 import com.toeicspace.android.feature.auth.data.remote.ConfirmPasswordResetRequestDto
 import com.toeicspace.android.feature.auth.data.remote.EmailRequestDto
 import com.toeicspace.android.feature.auth.data.remote.LoginRequestDto
 import com.toeicspace.android.feature.auth.data.remote.RegisterRequestDto
+import com.toeicspace.android.feature.auth.data.remote.RequestChangePasswordOtpRequestDto
 import com.toeicspace.android.feature.auth.data.remote.VerifyEmailRequestDto
 import com.toeicspace.android.feature.auth.data.remote.VerifyPasswordResetRequestDto
 import com.toeicspace.android.feature.auth.domain.AuthRepository
@@ -121,6 +123,35 @@ internal class AuthRepositoryImpl
                     )
                 }
             // A new password revokes every refresh token of the account, including this device's.
+            if (result is AppResult.Success) sessionTokenStore.clear()
+            return result
+        }
+
+        override suspend fun requestChangePasswordOtp(currentPassword: String): AppResult<Int> =
+            safeApiCall(json) {
+                authApiService.requestChangePasswordOtp(
+                    RequestChangePasswordOtpRequestDto(currentPassword),
+                )
+            }.map { it.cooldownSeconds }
+
+        override suspend fun changePassword(
+            currentPassword: String,
+            newPassword: String,
+            confirmPassword: String,
+            otp: String,
+        ): AppResult<Unit> {
+            val result =
+                safeApiCall(json) {
+                    authApiService.changePassword(
+                        ChangePasswordRequestDto(
+                            currentPassword,
+                            newPassword,
+                            confirmPassword,
+                            otp,
+                        ),
+                    )
+                }
+            // The backend revokes every refresh token of the account, so this device signs in again.
             if (result is AppResult.Success) sessionTokenStore.clear()
             return result
         }

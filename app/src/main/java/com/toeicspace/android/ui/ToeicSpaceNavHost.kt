@@ -6,7 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.toeicspace.android.feature.auth.navigation.SignInDestination
 import com.toeicspace.android.feature.auth.navigation.authScreens
+import com.toeicspace.android.feature.auth.navigation.changePasswordScreen
+import com.toeicspace.android.feature.auth.navigation.navigateToChangePassword
 import com.toeicspace.android.feature.auth.navigation.navigateToSignIn
 import com.toeicspace.android.feature.auth.navigation.navigateToSignUp
 import com.toeicspace.android.feature.main.navigation.mainScreen
@@ -19,7 +22,7 @@ import com.toeicspace.android.feature.profile.navigation.navigateToAccountInfo
 import com.toeicspace.android.feature.splash.navigation.SplashDestination
 import com.toeicspace.android.feature.splash.navigation.splashScreen
 
-/** Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info. */
+/** Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info, Change password. */
 @Composable
 fun ToeicSpaceNavHost(
     modifier: Modifier = Modifier,
@@ -69,8 +72,19 @@ fun ToeicSpaceNavHost(
             onNavigateToSignIn = { navController.navigateToSignIn() },
             onNavigateToSignUp = { navController.navigateToSignUp() },
             onNavigateToAccountInfo = { navController.navigateToAccountInfo() },
+            onNavigateToChangePassword = { navController.navigateToChangePassword() },
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
         )
         accountInfoScreen(onBack = { navController.popBackStack() })
+        changePasswordScreen(
+            onBack = { navController.popBackStack() },
+            onPasswordChanged = { email ->
+                navController.navigateToSignIn(
+                    destination = SignInDestination(email = email, showPasswordReset = true),
+                    navOptions = clearAll(),
+                )
+            },
+            onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
+        )
     }
 }

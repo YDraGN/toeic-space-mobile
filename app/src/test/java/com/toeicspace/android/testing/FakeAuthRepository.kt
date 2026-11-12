@@ -23,6 +23,8 @@ class FakeAuthRepository : AuthRepository {
     var requestPasswordResetResult: AppResult<Int> = AppResult.Success(60)
     var verifyPasswordResetResult: AppResult<String> = AppResult.Success("reset-token")
     var confirmPasswordResetResult: AppResult<Unit> = AppResult.Success(Unit)
+    var requestChangePasswordOtpResult: AppResult<Int> = AppResult.Success(60)
+    var changePasswordResult: AppResult<Unit> = AppResult.Success(Unit)
 
     val calls = mutableListOf<String>()
     var lastRegistration: RegistrationForm? = null
@@ -78,5 +80,20 @@ class FakeAuthRepository : AuthRepository {
         calls += "confirmPasswordReset"
         lastResetToken = resetToken
         return confirmPasswordResetResult
+    }
+
+    override suspend fun requestChangePasswordOtp(currentPassword: String): AppResult<Int> {
+        calls += "requestChangePasswordOtp"
+        return requestChangePasswordOtpResult
+    }
+
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmPassword: String,
+        otp: String,
+    ): AppResult<Unit> {
+        calls += "changePassword:$currentPassword:$newPassword:$confirmPassword:$otp"
+        return changePasswordResult
     }
 }

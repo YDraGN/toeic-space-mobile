@@ -79,7 +79,7 @@ Quy tắc chung của các màn Auth, nhằm giảm tải cho backend:
 | Đổi tab | Mỗi tab giữ state riêng (`saveState` / `restoreState`). Back quay về tab mặc định rồi mới thoát app |
 | Offline | Biến thể và thông tin người dùng lấy từ `SessionState` trên máy, không cần mạng |
 
-Tìm kiếm, thông báo, đổi mật khẩu, bộ lọc nâng cao, bấm vào trung tâm, đổi ảnh đại diện, lưu họ tên và xóa tài khoản hiện snackbar "Tính năng đang được phát triển" (`rememberComingSoonAction`) cho tới khi có API.
+Tìm kiếm, thông báo, bộ lọc nâng cao, bấm vào trung tâm, đổi ảnh đại diện, lưu họ tên và xóa tài khoản hiện snackbar "Tính năng đang được phát triển" (`rememberComingSoonAction`) cho tới khi có API.
 
 ### 5.2 Ba biến thể của tab Trang chủ
 
@@ -118,6 +118,17 @@ Màn full-screen trong root graph (`feature/profile/navigation`), mở từ dòn
 | Sửa (nút ✏️) | Một form cho mọi trường, gửi một lần vì `PUT /users/me` thay toàn bộ hồ sơ. Email chỉ xem. Ngày sinh chọn bằng lịch (chỉ ngày trong quá khứ). Giới tính, Mục tiêu điểm, Trình độ chọn bằng chip. Kiểm tra giống `UpdateProfileValidator` (họ tên ≤100 ký tự, số di động Việt Nam, giới thiệu ≤300 ký tự). Back hoặc Huỷ đóng form |
 
 Dữ liệu tạm lấy từ `SampleProfileRepository` (họ tên, email thật từ session, các trường khác là mẫu). Khi nối API chỉ cần đổi binding trong `ProfileDataModule`. Avatar đi luồng riêng: chọn ảnh → `POST /users/me/avatar` lấy link upload → upload → `PUT /users/me` với `avatarUrl` mới. Backend chưa trả URL công khai của ảnh sau khi upload, cần thống nhất với backend.
+
+### 5.5 Đổi mật khẩu
+
+Màn full-screen trong root graph (`feature/auth/navigation/ChangePasswordNavigation.kt`), mở từ dòng "Đổi mật khẩu" ở tab Cá nhân, chỉ thành viên thấy. Thứ tự bước giống web vì backend kiểm tra mật khẩu hiện tại trước khi gửi OTP, và chỉ kiểm tra OTP ở request cuối:
+
+| Bước | Nội dung | API |
+|---|---|---|
+| Mật khẩu | Mật khẩu hiện tại, mật khẩu mới, nhập lại. Kiểm tra trên máy trước (quy tắc đặt lại mật khẩu, mật khẩu mới phải khác mật khẩu hiện tại). Nút "Gửi mã" | `POST change-password/otp` → `cooldownSeconds` |
+| OTP | Mã 6 số gửi tới email của tài khoản, tự gửi khi đủ 6 số. "Gửi lại mã" đếm ngược theo `cooldownSeconds`. "Sửa lại mật khẩu" (hoặc Back) quay về bước trước, giữ nội dung đã nhập; nếu mã cũ còn trong thời gian chờ thì không xin mã mới | `PUT change-password` |
+
+Lỗi: `AUTH_INVALID_CREDENTIALS` quay về bước Mật khẩu với "Mật khẩu hiện tại chưa đúng"; `AUTH_PASSWORD_SAME_AS_OLD` báo dưới ô mật khẩu mới; `OTP_INVALID_OR_EXPIRED` xoá ô OTP và báo lỗi; 401 (phiên hết hạn) đưa về Đăng nhập. Thành công: backend thu hồi mọi refresh token, app xoá session trên máy và mở Đăng nhập (xoá back stack) với email điền sẵn và thông báo "Đã đổi mật khẩu". Mật khẩu và OTP chỉ nằm trong bộ nhớ, rời màn là làm lại từ đầu.
 
 ## 6. Trạng thái dùng chung
 

@@ -16,6 +16,7 @@ fun FieldError.messageRes(): Int =
         FieldError.PasswordMissingDigit -> R.string.auth_error_password_digit
         FieldError.PasswordMissingSpecial -> R.string.auth_error_password_special
         FieldError.PasswordsDoNotMatch -> R.string.auth_error_password_mismatch
+        FieldError.PasswordSameAsOld -> R.string.auth_error_password_same_as_old
         FieldError.InvalidPhone -> R.string.auth_error_phone_invalid
         FieldError.InvalidOtp -> R.string.auth_error_otp_format
     }

@@ -221,6 +221,12 @@
     <string name="auth_action_save_password">LƯU MẬT KHẨU MỚI</string>
     <string name="auth_action_change_email">Đổi email</string>
 
+    <!-- Auth: change password (signed in) -->
+    <string name="auth_body_change_password">Nhập mật khẩu hiện tại và mật khẩu mới. Oysteic sẽ gửi mã xác thực tới email của bạn để xác nhận.</string>
+    <string name="auth_label_current_password">Mật khẩu hiện tại</string>
+    <string name="auth_action_edit_passwords">Sửa lại mật khẩu</string>
+    <string name="auth_error_current_password_incorrect">Mật khẩu hiện tại chưa đúng</string>
+
     <!-- Onboarding -->
     <string name="onboarding_action_get_started">BẮT ĐẦU</string>
     <string name="onboarding_subtitle_choose_method">Chọn phương thức để bắt đầu</string>

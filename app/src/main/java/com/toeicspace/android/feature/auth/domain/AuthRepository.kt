@@ -43,4 +43,18 @@ interface AuthRepository {
         newPassword: String,
         confirmPassword: String,
     ): AppResult<Unit>
+
+    /**
+     * Signed-in only: checks [currentPassword] and emails an OTP. Returns how many seconds to wait
+     * before another OTP can be requested.
+     */
+    suspend fun requestChangePasswordOtp(currentPassword: String): AppResult<Int>
+
+    /** Signed-in only. On success every session of the account ends, this device's included. */
+    suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmPassword: String,
+        otp: String,
+    ): AppResult<Unit>
 }

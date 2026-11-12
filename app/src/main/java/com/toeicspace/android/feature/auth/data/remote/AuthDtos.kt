@@ -57,3 +57,16 @@ data class ConfirmPasswordResetRequestDto(
     val confirmPassword: String,
     val resetToken: String,
 )
+
+@Serializable
+data class RequestChangePasswordOtpRequestDto(
+    val currentPassword: String,
+)
+
+@Serializable
+data class ChangePasswordRequestDto(
+    val currentPassword: String,
+    val newPassword: String,
+    val confirmPassword: String,
+    val otp: String,
+)

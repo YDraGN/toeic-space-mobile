@@ -70,6 +70,7 @@ internal fun MainRoute(
     onNavigateToSignIn: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onNavigateToAccountInfo: () -> Unit,
+    onNavigateToChangePassword: () -> Unit,
     onSessionEnded: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
@@ -88,6 +89,7 @@ internal fun MainRoute(
                 onSignUpClick = onNavigateToSignUp,
                 onSignOutClick = viewModel::onSignOutClick,
                 onAccountInfoClick = onNavigateToAccountInfo,
+                onChangePasswordClick = onNavigateToChangePassword,
                 modifier = modifier,
             )
         // The session is read from local storage, so this lasts a frame or two.
@@ -106,6 +108,7 @@ internal fun MainShell(
     onSignUpClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
+    onChangePasswordClick: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -211,6 +214,7 @@ internal fun MainShell(
                         onSignUpClick = onSignUpClick,
                         onSignInClick = onSignInClick,
                         onAccountInfoClick = onAccountInfoClick,
+                        onChangePasswordClick = onChangePasswordClick,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
                         modifier = Modifier.widthIn(max = ContentMaxWidth).fillMaxSize(),
@@ -247,6 +251,7 @@ private fun MainTabsNavHost(
     onSignUpClick: () -> Unit,
     onSignInClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
+    onChangePasswordClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
     modifier: Modifier = Modifier,
@@ -294,6 +299,7 @@ private fun MainTabsNavHost(
                 onSignUpClick = onSignUpClick,
                 onSignInClick = onSignInClick,
                 onAccountInfoClick = onAccountInfoClick,
+                onChangePasswordClick = onChangePasswordClick,
                 onComingSoon = onComingSoon,
                 onSignOutClick = onSignOutClick,
             )

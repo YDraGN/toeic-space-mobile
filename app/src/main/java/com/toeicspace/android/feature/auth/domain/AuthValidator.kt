@@ -13,6 +13,7 @@ enum class FieldError {
     PasswordMissingDigit,
     PasswordMissingSpecial,
     PasswordsDoNotMatch,
+    PasswordSameAsOld,
     InvalidPhone,
     InvalidOtp,
 }

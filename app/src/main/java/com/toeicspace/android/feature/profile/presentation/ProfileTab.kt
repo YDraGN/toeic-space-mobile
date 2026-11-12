@@ -61,6 +61,7 @@ internal fun ProfileTab(
     onSignUpClick: () -> Unit,
     onSignInClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
+    onChangePasswordClick: () -> Unit,
     onComingSoon: () -> Unit,
     onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -75,6 +76,7 @@ internal fun ProfileTab(
         onSignUpClick = onSignUpClick,
         onSignInClick = onSignInClick,
         onAccountInfoClick = onAccountInfoClick,
+        onChangePasswordClick = onChangePasswordClick,
         onComingSoon = onComingSoon,
         onSignOutClick = onSignOutClick,
         modifier = modifier,
@@ -89,6 +91,7 @@ internal fun ProfileContent(
     onSignUpClick: () -> Unit,
     onSignInClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
+    onChangePasswordClick: () -> Unit,
     onComingSoon: () -> Unit,
     onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -117,7 +120,7 @@ internal fun ProfileContent(
                         iconRes = R.drawable.ic_key,
                         label = stringResource(id = R.string.profile_action_change_password),
                         iconBackground = Pearl,
-                        onClick = onComingSoon,
+                        onClick = onChangePasswordClick,
                     )
                 }
             }
@@ -296,6 +299,7 @@ private fun ProfileContentMemberPreview() {
             onSignUpClick = {},
             onSignInClick = {},
             onAccountInfoClick = {},
+            onChangePasswordClick = {},
             onComingSoon = {},
             onSignOutClick = {},
         )
@@ -313,6 +317,7 @@ private fun ProfileContentGuestPreview() {
             onSignUpClick = {},
             onSignInClick = {},
             onAccountInfoClick = {},
+            onChangePasswordClick = {},
             onComingSoon = {},
             onSignOutClick = {},
         )
