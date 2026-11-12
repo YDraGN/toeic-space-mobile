@@ -42,6 +42,7 @@ fun NavGraphBuilder.mainScreen(
     onNavigateToSignIn: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onNavigateToAccountInfo: () -> Unit,
+    onNavigateToChangePassword: () -> Unit,
     onSessionEnded: () -> Unit,
 ) {
     composable<MainDestination> {
@@ -49,6 +50,7 @@ fun NavGraphBuilder.mainScreen(
             onNavigateToSignIn = onNavigateToSignIn,
             onNavigateToSignUp = onNavigateToSignUp,
             onNavigateToAccountInfo = onNavigateToAccountInfo,
+            onNavigateToChangePassword = onNavigateToChangePassword,
             onSessionEnded = onSessionEnded,
         )
     }

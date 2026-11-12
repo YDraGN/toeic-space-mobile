@@ -4,8 +4,12 @@ import com.toeicspace.android.core.network.PublicEndpoint
 import com.toeicspace.android.core.network.model.AuthResponseDto
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
-/** Identity endpoints used before the user has a session. Paths include the gateway prefix. */
+/**
+ * Identity auth endpoints. Paths include the gateway prefix. Most are called before the user has a
+ * session ([PublicEndpoint]); change password needs the signed-in user's access token.
+ */
 interface AuthApiService {
     @PublicEndpoint
     @POST("identity/api/auth/login")
@@ -47,5 +51,16 @@ interface AuthApiService {
     @POST("identity/api/v1/auth/password-reset/confirm")
     suspend fun confirmPasswordReset(
         @Body body: ConfirmPasswordResetRequestDto,
+    )
+
+    /** Checks the current password and emails an OTP to the signed-in account. */
+    @POST("identity/api/v1/auth/change-password/otp")
+    suspend fun requestChangePasswordOtp(
+        @Body body: RequestChangePasswordOtpRequestDto,
+    ): PasswordResetOtpResponseDto
+
+    @PUT("identity/api/v1/auth/change-password")
+    suspend fun changePassword(
+        @Body body: ChangePasswordRequestDto,
     )
 }
