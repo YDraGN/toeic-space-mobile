@@ -34,20 +34,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.TestTags
 import com.toeicspace.android.core.ui.components.DetailScaffold
 import com.toeicspace.android.core.ui.components.EditableAvatar
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.ToeicCard
-import com.toeicspace.android.core.ui.components.ToeicChip
-import com.toeicspace.android.core.ui.components.ToeicChipStyle
 import com.toeicspace.android.core.ui.components.ToeicFilterChip
 import com.toeicspace.android.core.ui.components.ToeicIconButton
 import com.toeicspace.android.core.ui.components.ToeicListDivider
 import com.toeicspace.android.core.ui.components.ToeicListRow
 import com.toeicspace.android.core.ui.components.ToeicListSection
 import com.toeicspace.android.core.ui.components.ToeicTextField
-import com.toeicspace.android.core.ui.components.rememberComingSoonAction
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.Pearl
 import com.toeicspace.android.core.ui.theme.Spacing
@@ -77,7 +75,9 @@ internal fun AccountInfoRoute(
     AccountInfoScreen(
         profile = profile,
         form = uiState.form,
-        isSaveRequested = uiState.isSaveRequested,
+        isSaving = uiState.isSaving,
+        message = uiState.message,
+        isUploadingAvatar = uiState.isUploadingAvatar,
         onBackClick = onBackClick,
         actions =
             AccountInfoActions(
@@ -91,7 +91,8 @@ internal fun AccountInfoRoute(
                 onTargetScoreChange = viewModel::onTargetScoreChange,
                 onLevelChange = viewModel::onLevelChange,
                 onSaveClick = viewModel::onSaveClick,
-                onSaveHandled = viewModel::onSaveHandled,
+                onMessageShown = viewModel::onMessageShown,
+                onAvatarPicked = viewModel::onAvatarPicked,
             ),
     )
 }
@@ -108,31 +109,34 @@ internal data class AccountInfoActions(
     val onTargetScoreChange: (Int) -> Unit = {},
     val onLevelChange: (EnglishLevel) -> Unit = {},
     val onSaveClick: () -> Unit = {},
-    val onSaveHandled: () -> Unit = {},
+    val onMessageShown: () -> Unit = {},
+    val onAvatarPicked: (String) -> Unit = {},
 )
 
 /**
  * Account details. Viewing shows every field of the profile; the pencil opens one form for all of
  * them, sent together because `PUT /users/me` replaces the whole profile. The avatar has its own
- * flow (pick, upload, save). Saving and uploading wait for the API, so both say "coming soon".
+ * flow: picking a photo uploads it at once and saves the new URL, independent of the form.
  */
 @Composable
 internal fun AccountInfoScreen(
     profile: UserProfile,
     form: ProfileForm?,
-    isSaveRequested: Boolean,
+    isSaving: Boolean,
+    message: ProfileMessage?,
     onBackClick: () -> Unit,
     actions: AccountInfoActions,
     modifier: Modifier = Modifier,
+    isUploadingAvatar: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val onComingSoon = rememberComingSoonAction(snackbarHostState)
     val isEditing = form != null
 
-    LaunchedEffect(isSaveRequested) {
-        if (isSaveRequested) {
-            onComingSoon()
-            actions.onSaveHandled()
+    val messageText = message?.let { stringResource(id = it.messageRes()) }
+    LaunchedEffect(message) {
+        if (messageText != null) {
+            snackbarHostState.showSnackbar(messageText)
+            actions.onMessageShown()
         }
     }
     BackHandler(enabled = isEditing, onBack = actions.onCancelEdit)
@@ -156,18 +160,29 @@ internal fun AccountInfoScreen(
             }
         },
     ) {
-        AvatarHeader(onPhotoPicked = onComingSoon)
+        AvatarHeader(
+            imageUrl = profile.avatarUrl,
+            isUploading = isUploadingAvatar,
+            onPhotoPicked = actions.onAvatarPicked,
+        )
         if (form == null) {
             ProfileDetails(profile = profile)
         } else {
-            ProfileEditForm(email = profile.email, form = form, actions = actions)
+            ProfileEditForm(
+                email = profile.email,
+                form = form,
+                isSaving = isSaving,
+                actions = actions,
+            )
         }
     }
 }
 
 @Composable
 private fun AvatarHeader(
-    onPhotoPicked: () -> Unit,
+    imageUrl: String?,
+    isUploading: Boolean,
+    onPhotoPicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -175,15 +190,15 @@ private fun AvatarHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        EditableAvatar(onPhotoPicked = { uri -> if (uri != null) onPhotoPicked() })
+        EditableAvatar(
+            onPhotoPicked = { uri -> if (uri != null) onPhotoPicked(uri.toString()) },
+            imageUrl = imageUrl,
+            isUploading = isUploading,
+        )
         Text(
             text = stringResource(id = R.string.account_info_hint_avatar),
             style = AppTextStyles.Caption,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        ToeicChip(
-            text = stringResource(id = R.string.common_label_sample_data),
-            style = ToeicChipStyle.NOTICE,
         )
     }
 }
@@ -252,6 +267,7 @@ private fun InfoRow(
 private fun ProfileEditForm(
     email: String,
     form: ProfileForm,
+    isSaving: Boolean,
     actions: AccountInfoActions,
 ) {
     var isPickingDate by rememberSaveable { mutableStateOf(false) }
@@ -263,6 +279,7 @@ private fun ProfileEditForm(
             label = stringResource(id = R.string.auth_label_full_name),
             isRequired = true,
             errorText = form.fullNameError?.let { stringResource(id = it.messageRes()) },
+            testTag = TestTags.PROFILE_FULL_NAME,
         )
         ToeicTextField(
             value = email,
@@ -277,6 +294,7 @@ private fun ProfileEditForm(
             label = stringResource(id = R.string.auth_label_phone),
             errorText = form.phoneError?.let { stringResource(id = it.messageRes()) },
             keyboardType = KeyboardType.Phone,
+            testTag = TestTags.PROFILE_PHONE,
         )
         ToeicTextField(
             value = form.biography,
@@ -287,6 +305,7 @@ private fun ProfileEditForm(
             singleLine = false,
             imeAction = ImeAction.Default,
             keyboardActions = KeyboardActions.Default,
+            testTag = TestTags.PROFILE_BIOGRAPHY,
         )
     }
 
@@ -337,11 +356,14 @@ private fun ProfileEditForm(
             text = stringResource(id = R.string.account_info_action_save),
             onClick = actions.onSaveClick,
             modifier = Modifier.fillMaxWidth(),
+            isLoading = isSaving,
+            loadingText = stringResource(id = R.string.account_info_action_saving),
         )
         SecondaryButton(
             text = stringResource(id = R.string.account_info_action_cancel),
             onClick = actions.onCancelEdit,
             modifier = Modifier.fillMaxWidth(),
+            enabled = !isSaving,
         )
     }
 
@@ -443,7 +465,8 @@ private fun AccountInfoViewPreview() {
         AccountInfoScreen(
             profile = PreviewProfile,
             form = null,
-            isSaveRequested = false,
+            isSaving = false,
+            message = null,
             onBackClick = {},
             actions = AccountInfoActions(),
         )
@@ -467,7 +490,8 @@ private fun AccountInfoEditPreview() {
                     currentLevel = EnglishLevel.INTERMEDIATE,
                     phoneError = FieldError.InvalidPhone,
                 ),
-            isSaveRequested = false,
+            isSaving = false,
+            message = null,
             onBackClick = {},
             actions = AccountInfoActions(),
         )

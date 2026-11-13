@@ -79,7 +79,7 @@ Quy tắc chung của các màn Auth, nhằm giảm tải cho backend:
 | Đổi tab | Mỗi tab giữ state riêng (`saveState` / `restoreState`). Back quay về tab mặc định rồi mới thoát app |
 | Offline | Biến thể và thông tin người dùng lấy từ `SessionState` trên máy, không cần mạng |
 
-Tìm kiếm, thông báo, bộ lọc nâng cao, bấm vào trung tâm, đổi ảnh đại diện, lưu họ tên và xóa tài khoản hiện snackbar "Tính năng đang được phát triển" (`rememberComingSoonAction`) cho tới khi có API.
+Tìm kiếm, thông báo, bộ lọc nâng cao, bấm vào trung tâm và xóa tài khoản hiện snackbar "Tính năng đang được phát triển" (`rememberComingSoonAction`) cho tới khi có API.
 
 ### 5.2 Ba biến thể của tab Trang chủ
 
@@ -114,10 +114,10 @@ Màn full-screen trong root graph (`feature/profile/navigation`), mở từ dòn
 
 | Chế độ | Nội dung |
 |---|---|
-| Xem | Avatar có nút máy ảnh, nhãn "Dữ liệu mẫu". Nhóm Thông tin cá nhân: Họ và tên, Email, Số điện thoại, Ngày sinh, Giới tính, Giới thiệu bản thân. Nhóm Mục tiêu học: Mục tiêu điểm, Trình độ hiện tại. Trường trống hiện "Chưa cập nhật" |
+| Xem | Avatar có nút máy ảnh: chọn ảnh là tải lên ngay (xem bên dưới). Nhóm Thông tin cá nhân: Họ và tên, Email, Số điện thoại, Ngày sinh, Giới tính, Giới thiệu bản thân. Nhóm Mục tiêu học: Mục tiêu điểm, Trình độ hiện tại. Trường trống hiện "Chưa cập nhật" |
 | Sửa (nút ✏️) | Một form cho mọi trường, gửi một lần vì `PUT /users/me` thay toàn bộ hồ sơ. Email chỉ xem. Ngày sinh chọn bằng lịch (chỉ ngày trong quá khứ). Giới tính, Mục tiêu điểm, Trình độ chọn bằng chip. Kiểm tra giống `UpdateProfileValidator` (họ tên ≤100 ký tự, số di động Việt Nam, giới thiệu ≤300 ký tự). Back hoặc Huỷ đóng form |
 
-Dữ liệu tạm lấy từ `SampleProfileRepository` (họ tên, email thật từ session, các trường khác là mẫu). Khi nối API chỉ cần đổi binding trong `ProfileDataModule`. Avatar đi luồng riêng: chọn ảnh → `POST /users/me/avatar` lấy link upload → upload → `PUT /users/me` với `avatarUrl` mới. Backend chưa trả URL công khai của ảnh sau khi upload, cần thống nhất với backend.
+Dữ liệu lấy từ `GET /users/me` mỗi lần mở tab Cá nhân hoặc màn này (`ProfileRepositoryImpl`, cache trong bộ nhớ). Trước khi tải xong hoặc khi offline, màn hình hiện họ tên và email lưu trong session. Lưu gửi `PUT /users/me`: thành công thì đóng form và báo "Đã lưu", lỗi thì giữ form để thử lại. Đổi họ tên cũng cập nhật tên trong session (top bar). Avatar đi luồng riêng, độc lập với form, mở từ nút máy ảnh ở tab Cá nhân hoặc ở màn này: chọn ảnh bằng Photo Picker (không cần quyền bộ nhớ) → cắt vuông, thu về tối đa 512px, nén WebP (`AndroidAvatarImageEncoder`) → `POST /users/me/avatar` với `contentType: image/webp` lấy link upload ký sẵn (15 phút, key cố định `avatars/user-{id}`) → `PUT` ảnh thẳng lên Cloudflare R2 bằng client không gắn token → `PUT /users/me` với `avatarUrl` mới và các trường còn lại. URL công khai ghép giống web: `AVATAR_CDN_URL` (trong `local.properties`, cùng giá trị `VITE_AVATAR_CDN_URL`) + key lấy từ link upload + `?v=<thời gian>` để ảnh cũ không bị cache. Trong lúc tải, avatar ở cả hai nơi hiện vòng xoay; xong thì snackbar "Đã cập nhật ảnh đại diện." hoặc lý do lỗi. Ảnh hiển thị bằng Coil, lỗi hoặc offline thì giữ icon mặc định.
 
 ### 5.5 Đổi mật khẩu
 

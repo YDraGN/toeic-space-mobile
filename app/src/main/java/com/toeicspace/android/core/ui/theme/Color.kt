@@ -60,6 +60,9 @@ val SubtleBorder = Color(0xFFD6E3FF)
 val PrimaryBorder = PrimaryGradientStart
 val HighlightBorder = SunlitGold
 
+/** Border and label of a field whose value passed its live check. */
+val ValidBorder = Color(0xFF1E9E63)
+
 val SecondaryButtonBackground = Color(0xFFF1F3FF)
 val SecondaryButtonContent = PrimaryBorder
 val SecondaryButtonBorder = PrimaryBorder.copy(alpha = 0.25f)

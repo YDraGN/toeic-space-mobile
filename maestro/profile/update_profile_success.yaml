@@ -1,0 +1,67 @@
+# TC-PRO-01 + TC-PRO-02: save every kind of field, then check it survives an app restart
+# (the restart drops the in-memory cache, so the values must come back from GET /users/me).
+appId: com.toeicspace.android
+name: Update profile - save and persist
+tags:
+  - profile
+---
+- runFlow: ../common/sign_in.yaml
+- runFlow: ../common/open_account_info.yaml
+# A new value on every run, so a pass cannot come from the previous run's data.
+- evalScript: ${output.suffix = String(Date.now()).slice(-6)}
+
+- tapOn: "Chỉnh sửa thông tin"
+- runFlow:
+    file: ../common/clear_field.yaml
+    env:
+      FIELD_ID: "profile_full_name"
+- inputText: "Maestro Tester ${output.suffix}"
+- runFlow:
+    file: ../common/clear_field.yaml
+    env:
+      FIELD_ID: "profile_phone"
+- inputText: "0905123456"
+- runFlow:
+    file: ../common/clear_field.yaml
+    env:
+      FIELD_ID: "profile_biography"
+- inputText: "Automation run ${output.suffix}"
+# No hideKeyboard: on Android it presses Back, which cancels the edit form once the
+# keyboard is already gone. scrollUntilVisible works with the keyboard open.
+- scrollUntilVisible:
+    element: "Nữ"
+- tapOn: "Nữ"
+- scrollUntilVisible:
+    element: '800\+'
+- tapOn: '800\+'
+- scrollUntilVisible:
+    element: "Nâng cao"
+- tapOn: "Nâng cao"
+- scrollUntilVisible:
+    element: "LƯU THAY ĐỔI"
+- tapOn: "LƯU THAY ĐỔI"
+
+- extendedWaitUntil:
+    visible: "Đã lưu thông tin tài khoản."
+    timeout: 15000
+# Back in view mode with the new values.
+- assertVisible: "Chỉnh sửa thông tin"
+- assertVisible: "Maestro Tester ${output.suffix}"
+- assertVisible: "0905123456"
+- scrollUntilVisible:
+    element: "Nâng cao"
+- assertVisible: "Nữ"
+- assertVisible: '800\+'
+
+# TC-PRO-02: restart without clearing data, the session stays and the profile reloads.
+- stopApp
+- launchApp
+- runFlow: ../common/open_account_info.yaml
+- extendedWaitUntil:
+    visible: "Maestro Tester ${output.suffix}"
+    timeout: 15000
+- assertVisible: "Automation run ${output.suffix}"
+- scrollUntilVisible:
+    element: "Nâng cao"
+- assertVisible: "Nữ"
+- assertVisible: '800\+'

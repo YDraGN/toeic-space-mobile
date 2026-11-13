@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.TestTags
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.ToeicTextField
 import com.toeicspace.android.core.ui.theme.AppTextStyles
@@ -122,6 +123,8 @@ internal fun SignUpScreen(
             enabled = enabled,
             isRequired = true,
             errorText = errorFor(uiState.fullNameError, "fullName"),
+            isValid = SignUpField.FULL_NAME in uiState.validFields,
+            testTag = TestTags.SIGN_UP_FULL_NAME,
         )
         ToeicTextField(
             value = uiState.email,
@@ -130,6 +133,8 @@ internal fun SignUpScreen(
             enabled = enabled,
             isRequired = true,
             errorText = errorFor(uiState.emailError, "email"),
+            isValid = SignUpField.EMAIL in uiState.validFields,
+            testTag = TestTags.SIGN_UP_EMAIL,
             keyboardType = KeyboardType.Email,
         )
         ToeicTextField(
@@ -138,6 +143,8 @@ internal fun SignUpScreen(
             label = stringResource(id = R.string.auth_label_phone),
             enabled = enabled,
             errorText = errorFor(uiState.phoneError, "phone"),
+            isValid = SignUpField.PHONE in uiState.validFields,
+            testTag = TestTags.SIGN_UP_PHONE,
             keyboardType = KeyboardType.Phone,
         )
         ToeicTextField(
@@ -147,6 +154,8 @@ internal fun SignUpScreen(
             enabled = enabled,
             isRequired = true,
             errorText = errorFor(uiState.passwordError, "password"),
+            isValid = SignUpField.PASSWORD in uiState.validFields,
+            testTag = TestTags.SIGN_UP_PASSWORD,
             supportingText = stringResource(id = R.string.auth_hint_password_rules),
             isPassword = true,
         )
@@ -157,6 +166,8 @@ internal fun SignUpScreen(
             enabled = enabled,
             isRequired = true,
             errorText = errorFor(uiState.confirmPasswordError, "confirmPassword"),
+            isValid = SignUpField.CONFIRM_PASSWORD in uiState.validFields,
+            testTag = TestTags.SIGN_UP_CONFIRM_PASSWORD,
             isPassword = true,
             imeAction = ImeAction.Done,
             keyboardActions =

@@ -33,6 +33,10 @@ android {
 
         val apiBaseUrl = localProperties.getProperty("API_BASE_URL") ?: "http://10.0.2.2:5050/"
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+
+        // Public base of the avatar bucket (same value as the web's VITE_AVATAR_CDN_URL).
+        val avatarCdnUrl = localProperties.getProperty("AVATAR_CDN_URL") ?: ""
+        buildConfigField("String", "AVATAR_CDN_URL", "\"$avatarCdnUrl\"")
     }
 
     buildTypes {
@@ -90,6 +94,10 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
+
+    // --- Images ---
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // --- Coroutines ---
     implementation(libs.kotlinx.coroutines.android)

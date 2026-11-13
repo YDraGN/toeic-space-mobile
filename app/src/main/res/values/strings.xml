@@ -123,6 +123,11 @@
     <string name="account_info_hint_avatar">Chạm vào máy ảnh để chọn ảnh mới</string>
     <string name="account_info_hint_email">Email dùng để đăng nhập nên không đổi được.</string>
     <string name="account_info_action_save">LƯU THAY ĐỔI</string>
+    <string name="account_info_action_saving">Đang lưu...</string>
+    <string name="account_info_message_saved">Đã lưu thông tin tài khoản.</string>
+    <string name="account_info_message_avatar_saved">Đã cập nhật ảnh đại diện.</string>
+    <string name="account_info_error_avatar_image">Không đọc được ảnh này. Bạn chọn ảnh khác nhé.</string>
+    <string name="common_cd_avatar_uploading">Đang tải ảnh đại diện lên</string>
     <string name="account_info_cd_edit">Chỉnh sửa thông tin</string>
     <string name="account_info_action_cancel">Huỷ</string>
     <string name="account_info_action_pick_date">Chọn</string>

@@ -2,6 +2,7 @@ package com.toeicspace.android.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.auth.domain.FieldError
 import com.toeicspace.android.feature.profile.domain.EnglishLevel
 import com.toeicspace.android.feature.profile.domain.Gender
@@ -36,15 +37,16 @@ data class AccountInfoUiState(
     val profile: UserProfile? = null,
     /** Non-null while the edit form is open. */
     val form: ProfileForm? = null,
-    /** A valid form was submitted; the screen tells the user saving is not available yet. */
-    val isSaveRequested: Boolean = false,
+    val isSaving: Boolean = false,
+    val isUploadingAvatar: Boolean = false,
+    val message: ProfileMessage? = null,
 )
 
 @HiltViewModel
 class AccountInfoViewModel
     @Inject
     constructor(
-        profileRepository: ProfileRepository,
+        private val profileRepository: ProfileRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(AccountInfoUiState())
         val uiState: StateFlow<AccountInfoUiState> = _uiState.asStateFlow()
@@ -55,6 +57,13 @@ class AccountInfoViewModel
                     _uiState.update { it.copy(isLoading = false, profile = profile) }
                 }
             }
+            viewModelScope.launch {
+                profileRepository.isUploadingAvatar.collect { uploading ->
+                    _uiState.update { it.copy(isUploadingAvatar = uploading) }
+                }
+            }
+            // A failed fetch keeps the cached name and email on screen; nothing to tell the user.
+            viewModelScope.launch { profileRepository.refresh() }
         }
 
         fun onEditClick() {
@@ -81,7 +90,10 @@ class AccountInfoViewModel
         fun onLevelChange(value: EnglishLevel) = editForm { copy(currentLevel = value) }
 
         fun onSaveClick() {
-            val form = _uiState.value.form ?: return
+            val state = _uiState.value
+            if (state.isSaving) return
+            val form = state.form ?: return
+            val profile = state.profile ?: return
             val checked =
                 form.copy(
                     fullNameError = ProfileFormValidator.validateFullName(form.fullName),
@@ -93,10 +105,56 @@ class AccountInfoViewModel
                     it ==
                         null
                 }
-            _uiState.update { it.copy(form = checked, isSaveRequested = isValid) }
+            _uiState.update { it.copy(form = checked, isSaving = isValid) }
+            if (!isValid) return
+
+            viewModelScope.launch {
+                when (val result = profileRepository.updateProfile(profile.withForm(checked))) {
+                    is AppResult.Success ->
+                        _uiState.update {
+                            it.copy(
+                                isSaving = false,
+                                form = null,
+                                message = ProfileMessage.Saved,
+                            )
+                        }
+                    // The form stays open with what the user typed, so they can retry.
+                    is AppResult.Failure ->
+                        _uiState.update {
+                            it.copy(
+                                isSaving = false,
+                                message = ProfileMessage.SaveFailed(result.error),
+                            )
+                        }
+                }
+            }
         }
 
-        fun onSaveHandled() = _uiState.update { it.copy(isSaveRequested = false) }
+        /** [imageUri] is the content URI the photo picker returned. */
+        fun onAvatarPicked(imageUri: String) {
+            if (_uiState.value.isUploadingAvatar) return
+            viewModelScope.launch {
+                val message =
+                    when (val result = profileRepository.updateAvatar(imageUri)) {
+                        is AppResult.Success -> ProfileMessage.AvatarSaved
+                        is AppResult.Failure -> ProfileMessage.AvatarFailed(result.error)
+                    }
+                _uiState.update { it.copy(message = message) }
+            }
+        }
+
+        fun onMessageShown() = _uiState.update { it.copy(message = null) }
+
+        private fun UserProfile.withForm(form: ProfileForm) =
+            copy(
+                fullName = form.fullName.trim(),
+                phone = form.phone.trim().ifEmpty { null },
+                dateOfBirth = form.dateOfBirth,
+                gender = form.gender,
+                biography = form.biography.trim().ifEmpty { null },
+                targetScore = form.targetScore,
+                currentLevel = form.currentLevel,
+            )
 
         private fun editForm(transform: ProfileForm.() -> ProfileForm) =
             _uiState.update { state -> state.copy(form = state.form?.transform()) }
