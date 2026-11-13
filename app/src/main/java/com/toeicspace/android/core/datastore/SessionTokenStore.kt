@@ -50,6 +50,9 @@ interface SessionTokenStore {
         user: AuthUser,
     )
 
+    /** Replaces the cached user (e.g. a new name from the profile) and keeps the tokens. */
+    suspend fun updateUser(user: AuthUser)
+
     suspend fun clear()
 }
 
@@ -110,6 +113,15 @@ class EncryptedSessionTokenStore
                 )
             val encrypted = cipher.encrypt(json.encodeToString(StoredSession.serializer(), stored))
             dataStore.edit { prefs -> prefs[KEY_SESSION] = encrypted }
+        }
+
+        override suspend fun updateUser(user: AuthUser) {
+            dataStore.edit { prefs ->
+                val stored = prefs[KEY_SESSION]?.let(::decode) ?: return@edit
+                val updated = stored.copy(user = user)
+                prefs[KEY_SESSION] =
+                    cipher.encrypt(json.encodeToString(StoredSession.serializer(), updated))
+            }
         }
 
         override suspend fun clear() {

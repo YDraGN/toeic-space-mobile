@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -75,7 +76,10 @@ fun DetailScaffold(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+                    .consumeWindowInsets(innerPadding)
+                    // The app draws edge to edge, so adjustResize does not shrink the window: without
+                    // this the end of a form (its buttons) stays behind the keyboard, out of reach.
+                    .imePadding(),
             contentAlignment = Alignment.TopCenter,
         ) {
             Column(

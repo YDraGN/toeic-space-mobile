@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.TestTags
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.ToeicTextField
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
@@ -119,6 +120,7 @@ internal fun SignInScreen(
             enabled = enabled,
             errorText = uiState.emailError?.let { stringResource(id = it.messageRes()) },
             keyboardType = KeyboardType.Email,
+            testTag = TestTags.SIGN_IN_EMAIL,
         )
         ToeicTextField(
             value = uiState.password,
@@ -127,6 +129,7 @@ internal fun SignInScreen(
             enabled = enabled,
             errorText = uiState.passwordError?.let { stringResource(id = it.messageRes()) },
             isPassword = true,
+            testTag = TestTags.SIGN_IN_PASSWORD,
             imeAction = ImeAction.Done,
             keyboardActions =
                 KeyboardActions(onDone = {

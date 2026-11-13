@@ -1,6 +1,7 @@
 package com.toeicspace.android.feature.profile.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -34,13 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.TestTags
 import com.toeicspace.android.core.ui.components.DetailScaffold
 import com.toeicspace.android.core.ui.components.EditableAvatar
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.ToeicCard
-import com.toeicspace.android.core.ui.components.ToeicChip
-import com.toeicspace.android.core.ui.components.ToeicChipStyle
 import com.toeicspace.android.core.ui.components.ToeicFilterChip
 import com.toeicspace.android.core.ui.components.ToeicIconButton
 import com.toeicspace.android.core.ui.components.ToeicListDivider
@@ -77,7 +77,8 @@ internal fun AccountInfoRoute(
     AccountInfoScreen(
         profile = profile,
         form = uiState.form,
-        isSaveRequested = uiState.isSaveRequested,
+        isSaving = uiState.isSaving,
+        message = uiState.message,
         onBackClick = onBackClick,
         actions =
             AccountInfoActions(
@@ -91,7 +92,7 @@ internal fun AccountInfoRoute(
                 onTargetScoreChange = viewModel::onTargetScoreChange,
                 onLevelChange = viewModel::onLevelChange,
                 onSaveClick = viewModel::onSaveClick,
-                onSaveHandled = viewModel::onSaveHandled,
+                onMessageShown = viewModel::onMessageShown,
             ),
     )
 }
@@ -108,19 +109,20 @@ internal data class AccountInfoActions(
     val onTargetScoreChange: (Int) -> Unit = {},
     val onLevelChange: (EnglishLevel) -> Unit = {},
     val onSaveClick: () -> Unit = {},
-    val onSaveHandled: () -> Unit = {},
+    val onMessageShown: () -> Unit = {},
 )
 
 /**
  * Account details. Viewing shows every field of the profile; the pencil opens one form for all of
  * them, sent together because `PUT /users/me` replaces the whole profile. The avatar has its own
- * flow (pick, upload, save). Saving and uploading wait for the API, so both say "coming soon".
+ * flow (pick, upload, save) that still waits for the backend, so it says "coming soon".
  */
 @Composable
 internal fun AccountInfoScreen(
     profile: UserProfile,
     form: ProfileForm?,
-    isSaveRequested: Boolean,
+    isSaving: Boolean,
+    message: AccountInfoMessage?,
     onBackClick: () -> Unit,
     actions: AccountInfoActions,
     modifier: Modifier = Modifier,
@@ -129,10 +131,11 @@ internal fun AccountInfoScreen(
     val onComingSoon = rememberComingSoonAction(snackbarHostState)
     val isEditing = form != null
 
-    LaunchedEffect(isSaveRequested) {
-        if (isSaveRequested) {
-            onComingSoon()
-            actions.onSaveHandled()
+    val messageText = message?.let { stringResource(id = it.messageRes()) }
+    LaunchedEffect(message) {
+        if (messageText != null) {
+            snackbarHostState.showSnackbar(messageText)
+            actions.onMessageShown()
         }
     }
     BackHandler(enabled = isEditing, onBack = actions.onCancelEdit)
@@ -160,7 +163,12 @@ internal fun AccountInfoScreen(
         if (form == null) {
             ProfileDetails(profile = profile)
         } else {
-            ProfileEditForm(email = profile.email, form = form, actions = actions)
+            ProfileEditForm(
+                email = profile.email,
+                form = form,
+                isSaving = isSaving,
+                actions = actions,
+            )
         }
     }
 }
@@ -180,10 +188,6 @@ private fun AvatarHeader(
             text = stringResource(id = R.string.account_info_hint_avatar),
             style = AppTextStyles.Caption,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        ToeicChip(
-            text = stringResource(id = R.string.common_label_sample_data),
-            style = ToeicChipStyle.NOTICE,
         )
     }
 }
@@ -252,6 +256,7 @@ private fun InfoRow(
 private fun ProfileEditForm(
     email: String,
     form: ProfileForm,
+    isSaving: Boolean,
     actions: AccountInfoActions,
 ) {
     var isPickingDate by rememberSaveable { mutableStateOf(false) }
@@ -263,6 +268,7 @@ private fun ProfileEditForm(
             label = stringResource(id = R.string.auth_label_full_name),
             isRequired = true,
             errorText = form.fullNameError?.let { stringResource(id = it.messageRes()) },
+            testTag = TestTags.PROFILE_FULL_NAME,
         )
         ToeicTextField(
             value = email,
@@ -277,6 +283,7 @@ private fun ProfileEditForm(
             label = stringResource(id = R.string.auth_label_phone),
             errorText = form.phoneError?.let { stringResource(id = it.messageRes()) },
             keyboardType = KeyboardType.Phone,
+            testTag = TestTags.PROFILE_PHONE,
         )
         ToeicTextField(
             value = form.biography,
@@ -287,6 +294,7 @@ private fun ProfileEditForm(
             singleLine = false,
             imeAction = ImeAction.Default,
             keyboardActions = KeyboardActions.Default,
+            testTag = TestTags.PROFILE_BIOGRAPHY,
         )
     }
 
@@ -337,11 +345,14 @@ private fun ProfileEditForm(
             text = stringResource(id = R.string.account_info_action_save),
             onClick = actions.onSaveClick,
             modifier = Modifier.fillMaxWidth(),
+            isLoading = isSaving,
+            loadingText = stringResource(id = R.string.account_info_action_saving),
         )
         SecondaryButton(
             text = stringResource(id = R.string.account_info_action_cancel),
             onClick = actions.onCancelEdit,
             modifier = Modifier.fillMaxWidth(),
+            enabled = !isSaving,
         )
     }
 
@@ -356,6 +367,13 @@ private fun ProfileEditForm(
         )
     }
 }
+
+@StringRes
+private fun AccountInfoMessage.messageRes(): Int =
+    when (this) {
+        AccountInfoMessage.Saved -> R.string.account_info_message_saved
+        is AccountInfoMessage.SaveFailed -> error.messageRes()
+    }
 
 /** A labelled row of chips for a field with a few fixed answers. */
 @OptIn(ExperimentalLayoutApi::class)
@@ -443,7 +461,8 @@ private fun AccountInfoViewPreview() {
         AccountInfoScreen(
             profile = PreviewProfile,
             form = null,
-            isSaveRequested = false,
+            isSaving = false,
+            message = null,
             onBackClick = {},
             actions = AccountInfoActions(),
         )
@@ -467,7 +486,8 @@ private fun AccountInfoEditPreview() {
                     currentLevel = EnglishLevel.INTERMEDIATE,
                     phoneError = FieldError.InvalidPhone,
                 ),
-            isSaveRequested = false,
+            isSaving = false,
+            message = null,
             onBackClick = {},
             actions = AccountInfoActions(),
         )

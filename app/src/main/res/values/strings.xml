@@ -123,6 +123,8 @@
     <string name="account_info_hint_avatar">Chạm vào máy ảnh để chọn ảnh mới</string>
     <string name="account_info_hint_email">Email dùng để đăng nhập nên không đổi được.</string>
     <string name="account_info_action_save">LƯU THAY ĐỔI</string>
+    <string name="account_info_action_saving">Đang lưu...</string>
+    <string name="account_info_message_saved">Đã lưu thông tin tài khoản.</string>
     <string name="account_info_cd_edit">Chỉnh sửa thông tin</string>
     <string name="account_info_action_cancel">Huỷ</string>
     <string name="account_info_action_pick_date">Chọn</string>

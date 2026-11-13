@@ -2,6 +2,8 @@ package com.toeicspace.android.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.toeicspace.android.core.common.AppError
+import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.auth.domain.FieldError
 import com.toeicspace.android.feature.profile.domain.EnglishLevel
 import com.toeicspace.android.feature.profile.domain.Gender
@@ -31,20 +33,29 @@ data class ProfileForm(
     val biographyError: FieldError? = null,
 )
 
+/** One-off snackbar for the screen; cleared with [AccountInfoViewModel.onMessageShown]. */
+sealed interface AccountInfoMessage {
+    data object Saved : AccountInfoMessage
+
+    data class SaveFailed(
+        val error: AppError,
+    ) : AccountInfoMessage
+}
+
 data class AccountInfoUiState(
     val isLoading: Boolean = true,
     val profile: UserProfile? = null,
     /** Non-null while the edit form is open. */
     val form: ProfileForm? = null,
-    /** A valid form was submitted; the screen tells the user saving is not available yet. */
-    val isSaveRequested: Boolean = false,
+    val isSaving: Boolean = false,
+    val message: AccountInfoMessage? = null,
 )
 
 @HiltViewModel
 class AccountInfoViewModel
     @Inject
     constructor(
-        profileRepository: ProfileRepository,
+        private val profileRepository: ProfileRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(AccountInfoUiState())
         val uiState: StateFlow<AccountInfoUiState> = _uiState.asStateFlow()
@@ -55,6 +66,8 @@ class AccountInfoViewModel
                     _uiState.update { it.copy(isLoading = false, profile = profile) }
                 }
             }
+            // A failed fetch keeps the cached name and email on screen; nothing to tell the user.
+            viewModelScope.launch { profileRepository.refresh() }
         }
 
         fun onEditClick() {
@@ -81,7 +94,10 @@ class AccountInfoViewModel
         fun onLevelChange(value: EnglishLevel) = editForm { copy(currentLevel = value) }
 
         fun onSaveClick() {
-            val form = _uiState.value.form ?: return
+            val state = _uiState.value
+            if (state.isSaving) return
+            val form = state.form ?: return
+            val profile = state.profile ?: return
             val checked =
                 form.copy(
                     fullNameError = ProfileFormValidator.validateFullName(form.fullName),
@@ -93,10 +109,43 @@ class AccountInfoViewModel
                     it ==
                         null
                 }
-            _uiState.update { it.copy(form = checked, isSaveRequested = isValid) }
+            _uiState.update { it.copy(form = checked, isSaving = isValid) }
+            if (!isValid) return
+
+            viewModelScope.launch {
+                when (val result = profileRepository.updateProfile(profile.withForm(checked))) {
+                    is AppResult.Success ->
+                        _uiState.update {
+                            it.copy(
+                                isSaving = false,
+                                form = null,
+                                message = AccountInfoMessage.Saved,
+                            )
+                        }
+                    // The form stays open with what the user typed, so they can retry.
+                    is AppResult.Failure ->
+                        _uiState.update {
+                            it.copy(
+                                isSaving = false,
+                                message = AccountInfoMessage.SaveFailed(result.error),
+                            )
+                        }
+                }
+            }
         }
 
-        fun onSaveHandled() = _uiState.update { it.copy(isSaveRequested = false) }
+        fun onMessageShown() = _uiState.update { it.copy(message = null) }
+
+        private fun UserProfile.withForm(form: ProfileForm) =
+            copy(
+                fullName = form.fullName.trim(),
+                phone = form.phone.trim().ifEmpty { null },
+                dateOfBirth = form.dateOfBirth,
+                gender = form.gender,
+                biography = form.biography.trim().ifEmpty { null },
+                targetScore = form.targetScore,
+                currentLevel = form.currentLevel,
+            )
 
         private fun editForm(transform: ProfileForm.() -> ProfileForm) =
             _uiState.update { state -> state.copy(form = state.form?.transform()) }

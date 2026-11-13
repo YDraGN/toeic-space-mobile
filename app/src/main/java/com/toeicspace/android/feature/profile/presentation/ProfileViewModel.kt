@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /** Profile details for the Profile tab header (target score, level). Null for guests. */
@@ -23,4 +24,9 @@ class ProfileViewModel
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = null,
             )
+
+        init {
+            // Target score and level only come from the API; offline the header shows name and email.
+            viewModelScope.launch { profileRepository.refresh() }
+        }
     }

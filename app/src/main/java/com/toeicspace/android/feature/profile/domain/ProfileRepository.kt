@@ -1,5 +1,6 @@
 package com.toeicspace.android.feature.profile.domain
 
+import com.toeicspace.android.core.common.AppResult
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -34,6 +35,15 @@ data class UserProfile(
 )
 
 interface ProfileRepository {
-    /** The signed-in learner's profile, or null for guests. */
+    /**
+     * The signed-in learner's profile, or null for guests. Until [refresh] succeeds it holds only the
+     * name and email cached with the session, so the screens work offline.
+     */
     val profile: Flow<UserProfile?>
+
+    /** Loads the full profile from `GET /users/me`. */
+    suspend fun refresh(): AppResult<Unit>
+
+    /** Sends every field to `PUT /users/me`, which replaces the whole profile. */
+    suspend fun updateProfile(profile: UserProfile): AppResult<UserProfile>
 }

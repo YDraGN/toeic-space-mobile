@@ -29,6 +29,10 @@ class FakeSessionTokenStore(
         currentUser.value = user
     }
 
+    override suspend fun updateUser(user: AuthUser) {
+        if (currentUser.value != null) currentUser.value = user
+    }
+
     override suspend fun clear() {
         tokens = null
         currentUser.value = null

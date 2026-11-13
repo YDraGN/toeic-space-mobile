@@ -1,17 +1,16 @@
 package com.toeicspace.android.feature.profile.presentation
 
+import com.toeicspace.android.core.common.AppError
+import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.auth.domain.FieldError
 import com.toeicspace.android.feature.profile.domain.EnglishLevel
-import com.toeicspace.android.feature.profile.domain.ProfileRepository
 import com.toeicspace.android.feature.profile.domain.UserProfile
+import com.toeicspace.android.testing.FakeProfileRepository
 import com.toeicspace.android.testing.MainDispatcherRule
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -28,12 +27,8 @@ class AccountInfoViewModelTest {
             currentLevel = EnglishLevel.INTERMEDIATE,
         )
 
-    private fun viewModel(profile: UserProfile? = this.profile) =
-        AccountInfoViewModel(
-            object : ProfileRepository {
-                override val profile: Flow<UserProfile?> = flowOf(profile)
-            },
-        )
+    private fun viewModel(repository: FakeProfileRepository = FakeProfileRepository(profile)) =
+        AccountInfoViewModel(repository)
 
     @Test
     fun `opens in view mode with the profile`() =
@@ -72,29 +67,71 @@ class AccountInfoViewModelTest {
             val state = viewModel.uiState.value
             assertEquals(FieldError.Required, state.form?.fullNameError)
             assertEquals(FieldError.InvalidPhone, state.form?.phoneError)
-            assertFalse(state.isSaveRequested)
+            assertFalse(state.isSaving)
+            assertNull(state.message)
         }
 
     @Test
-    fun `a valid form is handed over for saving and stays open`() =
+    fun `opening the screen fetches the full profile`() =
         runTest {
-            val viewModel = viewModel()
+            val repository = FakeProfileRepository(profile)
+
+            viewModel(repository)
+
+            assertEquals(1, repository.refreshCount)
+        }
+
+    @Test
+    fun `a valid form is saved, then the form closes and says so`() =
+        runTest {
+            val repository = FakeProfileRepository(profile)
+            val viewModel = viewModel(repository)
             viewModel.onEditClick()
+            viewModel.onFullNameChange("  Minh Anh Tran  ")
+            viewModel.onPhoneChange("")
             viewModel.onTargetScoreChange(800)
 
             viewModel.onSaveClick()
-            assertTrue(viewModel.uiState.value.isSaveRequested)
 
-            viewModel.onSaveHandled()
-            assertFalse(viewModel.uiState.value.isSaveRequested)
-            val form = viewModel.uiState.value.form
-            assertEquals(800, form?.targetScore)
+            val sent = repository.updatedProfile
+            assertEquals("Minh Anh Tran", sent?.fullName)
+            assertNull(sent?.phone)
+            assertEquals(800, sent?.targetScore)
+            assertEquals(profile.email, sent?.email)
+            val state = viewModel.uiState.value
+            assertNull(state.form)
+            assertFalse(state.isSaving)
+            assertEquals(AccountInfoMessage.Saved, state.message)
+            assertEquals(800, state.profile?.targetScore)
+
+            viewModel.onMessageShown()
+            assertNull(viewModel.uiState.value.message)
+        }
+
+    @Test
+    fun `a failed save keeps the form open with what was typed`() =
+        runTest {
+            val repository =
+                FakeProfileRepository(profile).apply {
+                    updateResult = AppResult.Failure(AppError.Network)
+                }
+            val viewModel = viewModel(repository)
+            viewModel.onEditClick()
+            viewModel.onTargetScoreChange(900)
+
+            viewModel.onSaveClick()
+
+            val state = viewModel.uiState.value
+            assertEquals(900, state.form?.targetScore)
+            assertFalse(state.isSaving)
+            assertEquals(AccountInfoMessage.SaveFailed(AppError.Network), state.message)
+            assertEquals(650, state.profile?.targetScore)
         }
 
     @Test
     fun `guests have no profile to show`() =
         runTest {
-            val state = viewModel(profile = null).uiState.value
+            val state = viewModel(FakeProfileRepository(null)).uiState.value
 
             assertFalse(state.isLoading)
             assertNull(state.profile)
