@@ -217,6 +217,7 @@ internal fun MainShell(
                         onChangePasswordClick = onChangePasswordClick,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
+                        snackbarHostState = snackbarHostState,
                         modifier = Modifier.widthIn(max = ContentMaxWidth).fillMaxSize(),
                     )
                 }
@@ -254,6 +255,7 @@ private fun MainTabsNavHost(
     onChangePasswordClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -302,6 +304,7 @@ private fun MainTabsNavHost(
                 onChangePasswordClick = onChangePasswordClick,
                 onComingSoon = onComingSoon,
                 onSignOutClick = onSignOutClick,
+                snackbarHostState = snackbarHostState,
             )
         }
     }

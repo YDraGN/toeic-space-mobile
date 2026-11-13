@@ -25,6 +25,28 @@ class FakeProfileRepository(
         return AppResult.Success(Unit)
     }
 
+    val uploadingAvatar = MutableStateFlow(false)
+    override val isUploadingAvatar: Flow<Boolean> = uploadingAvatar
+
+    var uploadedImageUri: String? = null
+        private set
+
+    /** Null means succeed and set a fixed avatar URL. */
+    var avatarResult: AppResult<UserProfile>? = null
+
+    override suspend fun updateAvatar(imageUri: String): AppResult<UserProfile> {
+        uploadedImageUri = imageUri
+        val result =
+            avatarResult
+                ?: AppResult.Success(
+                    requireNotNull(
+                        state.value,
+                    ).copy(avatarUrl = "https://cdn.test/avatars/user-1?v=1"),
+                )
+        if (result is AppResult.Success) state.value = result.data
+        return result
+    }
+
     override suspend fun updateProfile(profile: UserProfile): AppResult<UserProfile> {
         updatedProfile = profile
         val result = updateResult ?: AppResult.Success(profile)

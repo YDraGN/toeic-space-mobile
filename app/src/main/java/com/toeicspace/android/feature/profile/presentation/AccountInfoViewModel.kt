@@ -2,7 +2,6 @@ package com.toeicspace.android.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.auth.domain.FieldError
 import com.toeicspace.android.feature.profile.domain.EnglishLevel
@@ -33,22 +32,14 @@ data class ProfileForm(
     val biographyError: FieldError? = null,
 )
 
-/** One-off snackbar for the screen; cleared with [AccountInfoViewModel.onMessageShown]. */
-sealed interface AccountInfoMessage {
-    data object Saved : AccountInfoMessage
-
-    data class SaveFailed(
-        val error: AppError,
-    ) : AccountInfoMessage
-}
-
 data class AccountInfoUiState(
     val isLoading: Boolean = true,
     val profile: UserProfile? = null,
     /** Non-null while the edit form is open. */
     val form: ProfileForm? = null,
     val isSaving: Boolean = false,
-    val message: AccountInfoMessage? = null,
+    val isUploadingAvatar: Boolean = false,
+    val message: ProfileMessage? = null,
 )
 
 @HiltViewModel
@@ -64,6 +55,11 @@ class AccountInfoViewModel
             viewModelScope.launch {
                 profileRepository.profile.collect { profile ->
                     _uiState.update { it.copy(isLoading = false, profile = profile) }
+                }
+            }
+            viewModelScope.launch {
+                profileRepository.isUploadingAvatar.collect { uploading ->
+                    _uiState.update { it.copy(isUploadingAvatar = uploading) }
                 }
             }
             // A failed fetch keeps the cached name and email on screen; nothing to tell the user.
@@ -119,7 +115,7 @@ class AccountInfoViewModel
                             it.copy(
                                 isSaving = false,
                                 form = null,
-                                message = AccountInfoMessage.Saved,
+                                message = ProfileMessage.Saved,
                             )
                         }
                     // The form stays open with what the user typed, so they can retry.
@@ -127,10 +123,23 @@ class AccountInfoViewModel
                         _uiState.update {
                             it.copy(
                                 isSaving = false,
-                                message = AccountInfoMessage.SaveFailed(result.error),
+                                message = ProfileMessage.SaveFailed(result.error),
                             )
                         }
                 }
+            }
+        }
+
+        /** [imageUri] is the content URI the photo picker returned. */
+        fun onAvatarPicked(imageUri: String) {
+            if (_uiState.value.isUploadingAvatar) return
+            viewModelScope.launch {
+                val message =
+                    when (val result = profileRepository.updateAvatar(imageUri)) {
+                        is AppResult.Success -> ProfileMessage.AvatarSaved
+                        is AppResult.Failure -> ProfileMessage.AvatarFailed(result.error)
+                    }
+                _uiState.update { it.copy(message = message) }
             }
         }
 

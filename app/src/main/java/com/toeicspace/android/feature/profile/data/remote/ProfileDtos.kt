@@ -40,6 +40,17 @@ data class UpdateProfileRequestDto(
     val currentLevel: Int? = null,
 )
 
+/** `UploadAvatarCommand`. The content type is part of the URL's signature. */
+@Serializable
+data class AvatarUploadRequestDto(
+    val contentType: String,
+)
+
+@Serializable
+data class AvatarUploadResponseDto(
+    val uploadUrl: String,
+)
+
 internal fun UserProfileDto.toDomain() =
     UserProfile(
         fullName = fullName,

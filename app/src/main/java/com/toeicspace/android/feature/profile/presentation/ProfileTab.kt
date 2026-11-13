@@ -12,9 +12,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,10 +66,22 @@ internal fun ProfileTab(
     onChangePasswordClick: () -> Unit,
     onComingSoon: () -> Unit,
     onSignOutClick: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val profile by viewModel.profile.collectAsStateWithLifecycle()
+    val isUploadingAvatar by viewModel.isUploadingAvatar.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
+
+    val messageText = message?.let { stringResource(id = it.messageRes()) }
+    LaunchedEffect(message) {
+        if (messageText != null) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(messageText)
+            viewModel.onMessageShown()
+        }
+    }
 
     ProfileContent(
         viewer = viewer,
@@ -80,6 +94,8 @@ internal fun ProfileTab(
         onComingSoon = onComingSoon,
         onSignOutClick = onSignOutClick,
         modifier = modifier,
+        isUploadingAvatar = isUploadingAvatar,
+        onAvatarPicked = viewModel::onAvatarPicked,
     )
 }
 
@@ -95,6 +111,8 @@ internal fun ProfileContent(
     onComingSoon: () -> Unit,
     onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isUploadingAvatar: Boolean = false,
+    onAvatarPicked: (String) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -108,7 +126,12 @@ internal fun ProfileContent(
         when (viewer) {
             Viewer.Guest -> GuestCard(onSignUpClick = onSignUpClick, onSignInClick = onSignInClick)
             is Viewer.Member -> {
-                MemberHeader(member = viewer, profile = profile, onAvatarPicked = onComingSoon)
+                MemberHeader(
+                    member = viewer,
+                    profile = profile,
+                    isUploadingAvatar = isUploadingAvatar,
+                    onAvatarPicked = onAvatarPicked,
+                )
                 ToeicListSection(title = stringResource(id = R.string.profile_section_account)) {
                     ToeicListRow(
                         iconRes = R.drawable.ic_account,
@@ -189,7 +212,8 @@ internal fun ProfileContent(
 private fun MemberHeader(
     member: Viewer.Member,
     profile: UserProfile?,
-    onAvatarPicked: () -> Unit,
+    isUploadingAvatar: Boolean,
+    onAvatarPicked: (String) -> Unit,
 ) {
     ToeicCard(
         modifier = Modifier.fillMaxWidth(),
@@ -201,7 +225,11 @@ private fun MemberHeader(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Spacing.xs),
         ) {
-            EditableAvatar(onPhotoPicked = { uri -> if (uri != null) onAvatarPicked() })
+            EditableAvatar(
+                onPhotoPicked = { uri -> if (uri != null) onAvatarPicked(uri.toString()) },
+                imageUrl = profile?.avatarUrl,
+                isUploading = isUploadingAvatar,
+            )
             Text(
                 text = member.fullName,
                 style = MaterialTheme.typography.headlineSmall,

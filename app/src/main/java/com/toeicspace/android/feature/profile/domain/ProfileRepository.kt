@@ -46,4 +46,13 @@ interface ProfileRepository {
 
     /** Sends every field to `PUT /users/me`, which replaces the whole profile. */
     suspend fun updateProfile(profile: UserProfile): AppResult<UserProfile>
+
+    /** True while [updateAvatar] runs, from any screen, so every avatar can show progress. */
+    val isUploadingAvatar: Flow<Boolean>
+
+    /**
+     * Shrinks the picked image ([imageUri], a content URI), uploads it to storage and saves the new
+     * avatar URL on the profile.
+     */
+    suspend fun updateAvatar(imageUri: String): AppResult<UserProfile>
 }

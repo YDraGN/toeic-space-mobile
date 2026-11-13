@@ -1,5 +1,9 @@
 package com.toeicspace.android.feature.profile.data
 
+import com.toeicspace.android.BuildConfig
+import com.toeicspace.android.feature.profile.data.avatar.AndroidAvatarImageEncoder
+import com.toeicspace.android.feature.profile.data.avatar.AvatarImageEncoder
+import com.toeicspace.android.feature.profile.data.avatar.AvatarStorageConfig
 import com.toeicspace.android.feature.profile.data.remote.ProfileApiService
 import com.toeicspace.android.feature.profile.data.repository.ProfileRepositoryImpl
 import com.toeicspace.android.feature.profile.domain.ProfileRepository
@@ -18,7 +22,14 @@ internal abstract class ProfileDataModule {
     @Singleton
     abstract fun bindProfileRepository(impl: ProfileRepositoryImpl): ProfileRepository
 
+    @Binds
+    abstract fun bindAvatarImageEncoder(impl: AndroidAvatarImageEncoder): AvatarImageEncoder
+
     companion object {
+        @Provides
+        fun provideAvatarStorageConfig(): AvatarStorageConfig =
+            AvatarStorageConfig(BuildConfig.AVATAR_CDN_URL)
+
         @Provides
         @Singleton
         fun provideProfileApiService(retrofit: Retrofit): ProfileApiService =

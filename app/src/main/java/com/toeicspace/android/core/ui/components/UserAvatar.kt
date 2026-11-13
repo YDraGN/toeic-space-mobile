@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.theme.AvatarGuestBorder
 import com.toeicspace.android.core.ui.theme.AvatarStreakBorder
@@ -35,10 +36,15 @@ import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
+/**
+ * Round avatar. [imageUrl] is loaded with Coil over the default icon, so the icon stays visible
+ * while it loads and when it fails (offline, deleted file).
+ */
 @Composable
 fun UserAvatar(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    imageUrl: String? = null,
     avatarPainter: Painter? = null,
     streakCount: Int? = null,
     isGuest: Boolean = false,
@@ -78,10 +84,23 @@ fun UserAvatar(
                 } else {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_account),
-                        contentDescription = stringResource(id = R.string.common_cd_default_avatar),
+                        contentDescription =
+                            if (imageUrl == null) {
+                                stringResource(id = R.string.common_cd_default_avatar)
+                            } else {
+                                null
+                            },
                         tint = OceanicInk,
                         modifier = Modifier.size(size * 0.55f),
                     )
+                    if (imageUrl != null) {
+                        AsyncImage(
+                            model = imageUrl,
+                            contentDescription = stringResource(id = R.string.common_cd_avatar),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }

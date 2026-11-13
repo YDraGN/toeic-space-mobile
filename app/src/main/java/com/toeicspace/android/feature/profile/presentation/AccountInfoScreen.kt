@@ -1,7 +1,6 @@
 package com.toeicspace.android.feature.profile.presentation
 
 import androidx.activity.compose.BackHandler
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -47,7 +46,6 @@ import com.toeicspace.android.core.ui.components.ToeicListDivider
 import com.toeicspace.android.core.ui.components.ToeicListRow
 import com.toeicspace.android.core.ui.components.ToeicListSection
 import com.toeicspace.android.core.ui.components.ToeicTextField
-import com.toeicspace.android.core.ui.components.rememberComingSoonAction
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.Pearl
 import com.toeicspace.android.core.ui.theme.Spacing
@@ -79,6 +77,7 @@ internal fun AccountInfoRoute(
         form = uiState.form,
         isSaving = uiState.isSaving,
         message = uiState.message,
+        isUploadingAvatar = uiState.isUploadingAvatar,
         onBackClick = onBackClick,
         actions =
             AccountInfoActions(
@@ -93,6 +92,7 @@ internal fun AccountInfoRoute(
                 onLevelChange = viewModel::onLevelChange,
                 onSaveClick = viewModel::onSaveClick,
                 onMessageShown = viewModel::onMessageShown,
+                onAvatarPicked = viewModel::onAvatarPicked,
             ),
     )
 }
@@ -110,25 +110,26 @@ internal data class AccountInfoActions(
     val onLevelChange: (EnglishLevel) -> Unit = {},
     val onSaveClick: () -> Unit = {},
     val onMessageShown: () -> Unit = {},
+    val onAvatarPicked: (String) -> Unit = {},
 )
 
 /**
  * Account details. Viewing shows every field of the profile; the pencil opens one form for all of
  * them, sent together because `PUT /users/me` replaces the whole profile. The avatar has its own
- * flow (pick, upload, save) that still waits for the backend, so it says "coming soon".
+ * flow: picking a photo uploads it at once and saves the new URL, independent of the form.
  */
 @Composable
 internal fun AccountInfoScreen(
     profile: UserProfile,
     form: ProfileForm?,
     isSaving: Boolean,
-    message: AccountInfoMessage?,
+    message: ProfileMessage?,
     onBackClick: () -> Unit,
     actions: AccountInfoActions,
     modifier: Modifier = Modifier,
+    isUploadingAvatar: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val onComingSoon = rememberComingSoonAction(snackbarHostState)
     val isEditing = form != null
 
     val messageText = message?.let { stringResource(id = it.messageRes()) }
@@ -159,7 +160,11 @@ internal fun AccountInfoScreen(
             }
         },
     ) {
-        AvatarHeader(onPhotoPicked = onComingSoon)
+        AvatarHeader(
+            imageUrl = profile.avatarUrl,
+            isUploading = isUploadingAvatar,
+            onPhotoPicked = actions.onAvatarPicked,
+        )
         if (form == null) {
             ProfileDetails(profile = profile)
         } else {
@@ -175,7 +180,9 @@ internal fun AccountInfoScreen(
 
 @Composable
 private fun AvatarHeader(
-    onPhotoPicked: () -> Unit,
+    imageUrl: String?,
+    isUploading: Boolean,
+    onPhotoPicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -183,7 +190,11 @@ private fun AvatarHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        EditableAvatar(onPhotoPicked = { uri -> if (uri != null) onPhotoPicked() })
+        EditableAvatar(
+            onPhotoPicked = { uri -> if (uri != null) onPhotoPicked(uri.toString()) },
+            imageUrl = imageUrl,
+            isUploading = isUploading,
+        )
         Text(
             text = stringResource(id = R.string.account_info_hint_avatar),
             style = AppTextStyles.Caption,
@@ -367,13 +378,6 @@ private fun ProfileEditForm(
         )
     }
 }
-
-@StringRes
-private fun AccountInfoMessage.messageRes(): Int =
-    when (this) {
-        AccountInfoMessage.Saved -> R.string.account_info_message_saved
-        is AccountInfoMessage.SaveFailed -> error.messageRes()
-    }
 
 /** A labelled row of chips for a field with a few fixed answers. */
 @OptIn(ExperimentalLayoutApi::class)

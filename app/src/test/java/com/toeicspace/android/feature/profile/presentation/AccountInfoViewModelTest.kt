@@ -101,7 +101,7 @@ class AccountInfoViewModelTest {
             val state = viewModel.uiState.value
             assertNull(state.form)
             assertFalse(state.isSaving)
-            assertEquals(AccountInfoMessage.Saved, state.message)
+            assertEquals(ProfileMessage.Saved, state.message)
             assertEquals(800, state.profile?.targetScore)
 
             viewModel.onMessageShown()
@@ -124,8 +124,49 @@ class AccountInfoViewModelTest {
             val state = viewModel.uiState.value
             assertEquals(900, state.form?.targetScore)
             assertFalse(state.isSaving)
-            assertEquals(AccountInfoMessage.SaveFailed(AppError.Network), state.message)
+            assertEquals(ProfileMessage.SaveFailed(AppError.Network), state.message)
             assertEquals(650, state.profile?.targetScore)
+        }
+
+    @Test
+    fun `a picked photo is uploaded and the new avatar shown`() =
+        runTest {
+            val repository = FakeProfileRepository(profile)
+            val viewModel = viewModel(repository)
+
+            viewModel.onAvatarPicked("content://picked/1")
+
+            assertEquals("content://picked/1", repository.uploadedImageUri)
+            val state = viewModel.uiState.value
+            assertEquals(ProfileMessage.AvatarSaved, state.message)
+            assertEquals("https://cdn.test/avatars/user-1?v=1", state.profile?.avatarUrl)
+        }
+
+    @Test
+    fun `a failed avatar upload says why and keeps the old photo`() =
+        runTest {
+            val repository =
+                FakeProfileRepository(profile).apply {
+                    avatarResult = AppResult.Failure(AppError.Network)
+                }
+            val viewModel = viewModel(repository)
+
+            viewModel.onAvatarPicked("content://picked/1")
+
+            val state = viewModel.uiState.value
+            assertEquals(ProfileMessage.AvatarFailed(AppError.Network), state.message)
+            assertNull(state.profile?.avatarUrl)
+        }
+
+    @Test
+    fun `no second upload starts while one is running`() =
+        runTest {
+            val repository = FakeProfileRepository(profile).apply { uploadingAvatar.value = true }
+            val viewModel = viewModel(repository)
+
+            viewModel.onAvatarPicked("content://picked/1")
+
+            assertNull(repository.uploadedImageUri)
         }
 
     @Test
