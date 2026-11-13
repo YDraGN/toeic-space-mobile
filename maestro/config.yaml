@@ -1,0 +1,5 @@
+# Maestro workspace: `maestro test maestro/` runs every flow listed here.
+# Flows in common/ are building blocks called with runFlow, not tests of their own.
+flows:
+  - "auth/*"
+  - "profile/*"

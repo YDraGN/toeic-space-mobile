@@ -1,0 +1,23 @@
+# Fresh install -> onboarding -> sign in -> main shell.
+# Needs TEST_EMAIL and TEST_PASSWORD (a verified account on the local backend), passed with -e.
+appId: com.toeicspace.android
+---
+- launchApp:
+    clearState: true
+# clearState always lands on onboarding; wait out the splash before tapping.
+- extendedWaitUntil:
+    visible: "Bỏ qua"
+    timeout: 15000
+- tapOn: "Bỏ qua"
+- tapOn: "Tôi đã có tài khoản"
+- tapOn:
+    id: "sign_in_email"
+- inputText: ${TEST_EMAIL}
+- tapOn:
+    id: "sign_in_password"
+- inputText: ${TEST_PASSWORD}
+# The password field submits on Done, so the button text is not needed.
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: "Cá nhân"
+    timeout: 20000

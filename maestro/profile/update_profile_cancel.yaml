@@ -1,0 +1,22 @@
+# TC-PRO-05: cancelling the form throws the typed changes away.
+appId: com.toeicspace.android
+name: Update profile - cancel discards changes
+tags:
+  - profile
+---
+- runFlow: ../common/sign_in.yaml
+- runFlow: ../common/open_account_info.yaml
+- tapOn: "Chỉnh sửa thông tin"
+- runFlow:
+    file: ../common/clear_field.yaml
+    env:
+      FIELD_ID: "profile_full_name"
+- inputText: "Should Not Be Saved"
+# No hideKeyboard: on Android it presses Back, which cancels the edit form once the
+# keyboard is already gone. scrollUntilVisible works with the keyboard open.
+- scrollUntilVisible:
+    element: "Huỷ"
+- tapOn: "Huỷ"
+
+- assertVisible: "Chỉnh sửa thông tin"
+- assertNotVisible: "Should Not Be Saved"

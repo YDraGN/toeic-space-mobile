@@ -1,0 +1,8 @@
+# Profile tab -> Thông tin tài khoản, waiting until the profile has loaded.
+appId: com.toeicspace.android
+---
+- tapOn: "Cá nhân"
+- tapOn: "Thông tin tài khoản"
+- extendedWaitUntil:
+    visible: "Thông tin cá nhân"
+    timeout: 15000

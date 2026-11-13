@@ -1,0 +1,34 @@
+# TC-PRO-03 + TC-PRO-04: client-side checks block the save and keep the form open.
+appId: com.toeicspace.android
+name: Update profile - validation errors
+tags:
+  - profile
+---
+- runFlow: ../common/sign_in.yaml
+- runFlow: ../common/open_account_info.yaml
+- tapOn: "Chỉnh sửa thông tin"
+
+# Empty full name.
+- runFlow:
+    file: ../common/clear_field.yaml
+    env:
+      FIELD_ID: "profile_full_name"
+# Not a Vietnamese mobile number.
+- runFlow:
+    file: ../common/clear_field.yaml
+    env:
+      FIELD_ID: "profile_phone"
+- inputText: "12345"
+# No hideKeyboard: on Android it presses Back, which cancels the edit form once the
+# keyboard is already gone. scrollUntilVisible works with the keyboard open.
+- scrollUntilVisible:
+    element: "LƯU THAY ĐỔI"
+- tapOn: "LƯU THAY ĐỔI"
+
+- scrollUntilVisible:
+    element: "Vui lòng nhập thông tin này"
+    direction: UP
+- assertVisible: "Số di động Việt Nam chưa hợp lệ"
+# Still editing: nothing was sent.
+- assertNotVisible: "Đã lưu thông tin tài khoản."
+- assertNotVisible: "Chỉnh sửa thông tin"

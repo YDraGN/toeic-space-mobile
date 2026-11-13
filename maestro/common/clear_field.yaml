@@ -1,0 +1,16 @@
+# Empties the text field with id FIELD_ID.
+# eraseText only deletes what is before the cursor, and tapping a field puts the cursor where the
+# finger lands, which can be the middle of a long value. The second pass catches what was left
+# after the cursor: it is short, so the tap lands past its end.
+appId: com.toeicspace.android
+---
+- scrollUntilVisible:
+    element:
+      id: ${FIELD_ID}
+    centerElement: true
+- tapOn:
+    id: ${FIELD_ID}
+- eraseText: 300
+- tapOn:
+    id: ${FIELD_ID}
+- eraseText: 300
