@@ -84,6 +84,20 @@ val NavDropletGradientStart = Pearl
 val NavDropletGradientEnd = PastelSky
 val NavDropletBorder = BrandBorder.copy(alpha = 0.35f)
 
+/** Course prices: green like the web catalog, deep enough for large text on white (WCAG AA). */
+val PriceGreen = Color(0xFF12804A)
+
+/** Exam type badges: each exam has its own hue so a long list can be scanned by type. */
+val ExamListeningReadingContainer = PastelSky
+val ExamListeningReadingContent = SeaDeep
+val ExamSpeakingWritingContainer = BlushTint
+val ExamSpeakingWritingContent = Color(0xFFA8323D)
+val ExamFourSkillsContainer = Color(0xFFD3F4E8)
+val ExamFourSkillsContent = Color(0xFF0E6E52)
+
+/** Unlit dot of the level meter. */
+val LevelDotOff = SubtleBorder
+
 /** Outline of cards and bars: the brand border, softened so it reads as a hairline. */
 val CardBorder = BrandBorder.copy(alpha = 0.45f)
 

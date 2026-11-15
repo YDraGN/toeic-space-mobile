@@ -262,4 +262,19 @@
     <string name="onboarding_tag_3_1">Nghe Part 1–4</string>
     <string name="onboarding_tag_3_2">Đọc Part 5–7</string>
     <string name="onboarding_tag_3_3">Full Test 120p</string>
+
+    <!-- Courses -->
+    <string name="course_exam_listening_reading">Nghe &amp; Đọc</string>
+    <string name="course_exam_speaking_writing">Nói &amp; Viết</string>
+    <string name="course_exam_four_skills">4 kỹ năng</string>
+    <string name="course_level_beginner">Cơ bản</string>
+    <string name="course_level_intermediate">Trung cấp</string>
+    <string name="course_level_advanced">Nâng cao</string>
+    <string name="course_price_free">Miễn phí</string>
+    <!-- %1$s: amount with thousands separators, e.g. 499.000 -->
+    <string name="course_price_vnd">%1$sđ</string>
+    <!-- %1$s: amount, %2$s: ISO currency code -->
+    <string name="course_price_other">%1$s %2$s</string>
+    <string name="course_cd_original_price">Giá gốc %1$s</string>
+    <string name="course_cd_cover">Ảnh khoá học %1$s</string>
 </resources>

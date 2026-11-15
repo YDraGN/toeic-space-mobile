@@ -156,6 +156,24 @@ object AppTextStyles {
             lineHeight = 26.sp,
         )
 
+    /** A price on a course card: large and bold, the first number a learner looks for. */
+    val Price =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            lineHeight = 26.sp,
+        )
+
+    /** The price on the course detail enroll bar. */
+    val PriceLarge =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            lineHeight = 32.sp,
+        )
+
     /** The big day count on streak cards. */
     val StreakCount =
         TextStyle(
