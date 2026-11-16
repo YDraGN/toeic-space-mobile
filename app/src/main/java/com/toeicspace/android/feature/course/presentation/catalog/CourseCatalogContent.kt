@@ -74,6 +74,9 @@ data class CourseCatalogActions(
 )
 
 private val FilterPanelWidth = 280.dp
+
+/** Narrowest course card on wide windows; below this the cover crowds the title. */
+private val MinCardWidth = 340.dp
 private val StateMascotSize = 128.dp
 
 /** Start loading the next page when this many items or fewer are left below the screen. */
@@ -81,8 +84,8 @@ private const val LOAD_MORE_THRESHOLD = 4
 
 /**
  * Phones: one column with the search box and exam chips on top, level and score in a sheet.
- * Medium windows: the same, in two columns. Expanded windows: every filter in a side panel and a
- * two-column grid beside it.
+ * Wider windows: the same, in as many columns as fit (cards stay at least 340dp wide). Expanded
+ * windows: every filter in a side panel and the grid beside it.
  */
 @Composable
 internal fun CourseCatalogContent(
@@ -103,7 +106,9 @@ internal fun CourseCatalogContent(
                 modifier =
                     Modifier
                         .padding(start = Spacing.md, top = Spacing.smd, bottom = Spacing.smd)
-                        .width(FilterPanelWidth),
+                        .width(FilterPanelWidth)
+                        // Full height like a side sheet, so it stays put beside a long grid.
+                        .fillMaxHeight(),
             ) {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -126,7 +131,14 @@ internal fun CourseCatalogContent(
         CourseGrid(
             state = state,
             actions = actions,
-            columns = if (windowWidth.isAtLeastMedium) 2 else 1,
+            columns =
+                if (windowWidth.isAtLeastMedium) {
+                    GridCells.Adaptive(
+                        MinCardWidth,
+                    )
+                } else {
+                    GridCells.Fixed(1)
+                },
             showFilterRow = !sidePanel,
             onFilterClick = { showFilterSheet = true },
             modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -143,7 +155,7 @@ internal fun CourseCatalogContent(
 private fun CourseGrid(
     state: CourseCatalogUiState,
     actions: CourseCatalogActions,
-    columns: Int,
+    columns: GridCells,
     showFilterRow: Boolean,
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -166,7 +178,7 @@ private fun CourseGrid(
         modifier = modifier,
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(columns),
+            columns = columns,
             state = gridState,
             contentPadding = PaddingValues(horizontal = Spacing.md, vertical = Spacing.smd),
             horizontalArrangement = Arrangement.spacedBy(Spacing.smd),

@@ -2,12 +2,11 @@ package com.toeicspace.android.feature.course.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,6 +38,7 @@ import com.toeicspace.android.feature.course.domain.CourseSummary
 
 private val CoverSize = 88.dp
 private val MetaIconSize = 14.dp
+private val MetaRowHeight = 24.dp
 
 /**
  * A course in the catalog: square cover on the left, then exam, title, a two-line summary, level
@@ -68,23 +68,29 @@ fun CourseCard(
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 course.examType?.let { ExamTypeBadge(examType = it) }
+                // Every line keeps its height even when shorter or missing, so cards in a grid row
+                // line up instead of each ending at a different place.
                 Text(
                     text = course.title,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
+                    minLines = 2,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                course.shortDescription?.let {
-                    Text(
-                        text = it,
-                        style = AppTextStyles.Caption,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                CourseMetaRow(level = course.level, targetScore = course.targetScore)
+                Text(
+                    text = course.shortDescription.orEmpty(),
+                    style = AppTextStyles.Caption,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                CourseMetaRow(
+                    level = course.level,
+                    targetScore = course.targetScore,
+                    modifier = Modifier.padding(top = Spacing.xs),
+                )
             }
         }
         HorizontalDivider(color = CardBorder)
@@ -96,24 +102,25 @@ fun CourseCard(
     }
 }
 
-/** Level meter and target score; a course without either shows nothing. */
-@OptIn(ExperimentalLayoutApi::class)
+/**
+ * Level meter and target score on one line of fixed height: a course missing one or both still takes
+ * the same room, and a narrow card shortens the score instead of wrapping to a second line.
+ */
 @Composable
 fun CourseMetaRow(
     level: CourseLevel?,
     targetScore: Int?,
     modifier: Modifier = Modifier,
 ) {
-    if (level == null && targetScore == null) return
-    FlowRow(
-        modifier = modifier.padding(top = Spacing.xs),
+    Row(
+        modifier = modifier.height(MetaRowHeight),
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-        itemVerticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         level?.let { CourseLevelBadge(level = it) }
         targetScore?.let {
             Row(
+                modifier = Modifier.weight(1f, fill = false),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -128,6 +135,7 @@ fun CourseMetaRow(
                     style = AppTextStyles.Caption,
                     color = InkSoft,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }

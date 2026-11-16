@@ -50,6 +50,9 @@ import com.toeicspace.android.feature.course.presentation.components.labelRes
 private val SearchFieldHeight = 48.dp
 private val SearchIconSize = 20.dp
 
+/** Height of a text button, the tallest thing in the filter header. */
+private val FilterHeaderHeight = 48.dp
+
 /** Pill search box; the keyboard's search key searches at once instead of waiting for the debounce. */
 @Composable
 internal fun CourseSearchField(
@@ -255,7 +258,11 @@ internal fun FilterHeader(
     onClear: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    // Tall enough for the clear button from the start, so it appearing does not push the filters down.
+    Row(
+        modifier = modifier.fillMaxWidth().heightIn(min = FilterHeaderHeight),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             text = stringResource(R.string.course_title_filter),
             style = MaterialTheme.typography.titleMedium,
