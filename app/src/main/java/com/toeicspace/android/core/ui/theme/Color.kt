@@ -80,10 +80,6 @@ val AvatarGuestBorder = SubtleBorder
 val AvatarUserBorder = PrimaryBorder
 val AvatarStreakBorder = HighlightBorder
 
-val NavDropletGradientStart = Pearl
-val NavDropletGradientEnd = PastelSky
-val NavDropletBorder = BrandBorder.copy(alpha = 0.35f)
-
 /** Course prices: green like the web catalog, deep enough for large text on white (WCAG AA). */
 val PriceGreen = Color(0xFF12804A)
 

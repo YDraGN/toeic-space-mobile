@@ -44,7 +44,6 @@ import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.theme.BarSurface
 import com.toeicspace.android.core.ui.theme.CardBorder
 import com.toeicspace.android.core.ui.theme.InkSoft
-import com.toeicspace.android.core.ui.theme.NavDropletBorder
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.PrimaryGradientStart
 import com.toeicspace.android.core.ui.theme.Spacing
@@ -156,10 +155,6 @@ internal fun TabItem(
                             }.background(
                                 brush = SelectedItemBrush,
                                 shape = PillShape,
-                            ).border(
-                                width = 1.dp,
-                                color = NavDropletBorder,
-                                shape = PillShape,
                             ),
                 )
             }
@@ -168,7 +163,8 @@ internal fun TabItem(
             Icon(
                 painter = painterResource(id = tab.iconRes),
                 contentDescription = null,
-                tint = contentColor,
+                // On the gradient pill the icon turns white, like the label of a primary button.
+                tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else contentColor,
                 modifier =
                     Modifier
                         .size(20.dp)

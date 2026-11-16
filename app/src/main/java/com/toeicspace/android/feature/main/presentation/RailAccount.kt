@@ -1,12 +1,12 @@
 package com.toeicspace.android.feature.main.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,14 +18,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
-import com.toeicspace.android.core.ui.components.SelectedItemBrush
 import com.toeicspace.android.core.ui.components.UserAvatar
+import com.toeicspace.android.core.ui.components.selectedDroplet
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.Spacing
-import com.toeicspace.android.core.ui.theme.ToeicSpaceShapes
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
-private val RailAvatarSize = 40.dp
+private val RailAvatarSize = 48.dp
+private val AccountShape = RoundedCornerShape(16.dp)
 
 /**
  * Foot of the navigation rail, standing in for the Profile tab: the avatar alone when the rail is
@@ -39,25 +39,33 @@ internal fun RailAccount(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+    val nameColor = if (isSelected) colors.onPrimary else colors.onSurface
+    val detailColor = if (isSelected) colors.onPrimary else colors.onSurfaceVariant
     Row(
         modifier =
             modifier
                 .then(if (expanded) Modifier.fillMaxWidth() else Modifier)
-                .then(
-                    if (isSelected) {
-                        Modifier.background(
-                            SelectedItemBrush,
-                            ToeicSpaceShapes.small,
-                        )
-                    } else {
-                        Modifier
-                    },
-                ).selectable(selected = isSelected, onClick = onClick, role = Role.Tab)
-                .padding(Spacing.sm),
+                // Same gradient as the selected tabs, so Profile reads as one of them.
+                .selectedDroplet(
+                    isSelected,
+                    AccountShape,
+                ).selectable(
+                    selected = isSelected,
+                    onClick = onClick,
+                    role = Role.Tab,
+                    interactionSource = null,
+                    indication = null,
+                ).padding(Spacing.sm),
         horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        UserAvatar(onClick = onClick, isGuest = viewer is Viewer.Guest, size = RailAvatarSize)
+        UserAvatar(
+            onClick = onClick,
+            imageUrl = (viewer as? Viewer.Member)?.avatarUrl,
+            isGuest = viewer is Viewer.Guest,
+            size = RailAvatarSize,
+        )
         if (expanded) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -67,7 +75,7 @@ internal fun RailAccount(
                             is Viewer.Member -> viewer.fullName
                         },
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = nameColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -78,7 +86,7 @@ internal fun RailAccount(
                             is Viewer.Member -> viewer.email
                         },
                     style = AppTextStyles.Caption,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = detailColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
