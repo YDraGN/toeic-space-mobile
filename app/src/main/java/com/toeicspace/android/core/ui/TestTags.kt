@@ -17,4 +17,7 @@ object TestTags {
     const val PROFILE_FULL_NAME = "profile_full_name"
     const val PROFILE_PHONE = "profile_phone"
     const val PROFILE_BIOGRAPHY = "profile_biography"
+
+    const val COURSE_SEARCH = "course_search"
+    const val COURSE_FILTER = "course_filter"
 }

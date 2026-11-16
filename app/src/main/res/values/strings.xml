@@ -19,7 +19,6 @@
     <string name="common_cd_close_navigation">Thu gọn thanh điều hướng</string>
     <string name="common_cd_change_avatar">Đổi ảnh đại diện</string>
     <string name="common_label_coming_soon">Sắp ra mắt</string>
-    <string name="common_label_sample_data">Dữ liệu mẫu</string>
     <string name="common_action_sign_up_free">ĐĂNG KÝ MIỄN PHÍ</string>
     <string name="common_action_have_account">Tôi đã có tài khoản</string>
     <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
@@ -72,8 +71,6 @@
     <string name="home_title_today">Trang sổ hôm nay</string>
 
     <!-- Explore tab -->
-    <string name="explore_body_streak_guest">Học mỗi ngày một chút để giữ lửa. Đăng ký để Oysteic đếm chuỗi giúp bạn.</string>
-    <string name="explore_action_start_streak">BẮT ĐẦU CHUỖI NGÀY HỌC</string>
     <string-array name="explore_week_days">
         <item>T2</item>
         <item>T3</item>
@@ -83,27 +80,6 @@
         <item>T7</item>
         <item>CN</item>
     </string-array>
-    <string name="explore_title_centers">Trung tâm nổi bật</string>
-    <string name="explore_cd_center_cover">Ảnh trung tâm %1$s</string>
-    <string name="explore_label_online">Online</string>
-    <string name="explore_label_offline">Offline</string>
-    <string name="explore_label_all">Tất cả</string>
-    <string name="explore_cd_filter">Bộ lọc trung tâm</string>
-    <string name="explore_title_plans">Gói học</string>
-    <string name="explore_title_plan_free">Tự học miễn phí</string>
-    <string-array name="explore_plan_free_features">
-        <item>Luyện đề và bộ câu hỏi công khai</item>
-        <item>Flashcard từ vựng TOEIC</item>
-        <item>Chuỗi ngày học và tiến trình cá nhân</item>
-    </string-array>
-    <string name="explore_title_plan_center">Học cùng trung tâm</string>
-    <string-array name="explore_plan_center_features">
-        <item>Lớp học chính thức từ trung tâm đối tác</item>
-        <item>Bài tập và nhận xét của giáo viên</item>
-        <item>Báo cáo tiến độ chi tiết</item>
-    </string-array>
-    <string name="explore_plan_feature_item">✓ %1$s</string>
-    <string name="explore_label_current_plan">Gói bạn đang dùng</string>
 
     <!-- Profile tab -->
     <string name="profile_title_guest">Tạo tài khoản để lưu tiến trình</string>
@@ -277,4 +253,29 @@
     <string name="course_price_other">%1$s %2$s</string>
     <string name="course_cd_original_price">Giá gốc %1$s</string>
     <string name="course_cd_cover">Ảnh khoá học %1$s</string>
+    <string name="course_hint_search">Tìm khoá học…</string>
+    <string name="course_cd_clear_search">Xoá từ khoá</string>
+    <string name="course_cd_filter">Bộ lọc khoá học</string>
+    <string name="course_label_all">Tất cả</string>
+    <string name="course_label_result_count">%1$d khoá học</string>
+    <!-- %1$d: target score, e.g. 650 -->
+    <string name="course_label_target">Mục tiêu %1$d+</string>
+    <string name="course_label_target_option">%1$d+</string>
+    <string name="course_label_seats_left">Còn %1$d chỗ</string>
+    <string name="course_label_sold_out">Hết chỗ</string>
+    <string name="course_title_filter">Bộ lọc</string>
+    <string name="course_label_exam_type">Loại bài thi</string>
+    <string name="course_label_level">Trình độ</string>
+    <string name="course_label_target_score">Điểm mục tiêu</string>
+    <string name="course_action_clear_filters">Xoá bộ lọc</string>
+    <string name="course_action_done">Xong</string>
+    <string name="course_action_retry">Thử lại</string>
+    <string name="course_title_empty_filtered">Chưa có khoá học phù hợp</string>
+    <string name="course_body_empty_filtered">Thử bỏ bớt bộ lọc hoặc tìm với từ khoá khác nhé.</string>
+    <string name="course_title_empty">Khoá học đang được chuẩn bị</string>
+    <string name="course_body_empty">Khoá học mới sẽ sớm có mặt. Bạn quay lại sau nhé.</string>
+    <string name="course_title_error">Chưa tải được khoá học</string>
+    <string name="course_label_loading_more">Đang tải thêm khoá học…</string>
+    <string name="course_label_end">Bạn đã xem hết khoá học</string>
+    <string name="course_error_load_more">Chưa tải thêm được khoá học.</string>
 </resources>

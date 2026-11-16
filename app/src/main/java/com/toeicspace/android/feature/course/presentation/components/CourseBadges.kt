@@ -22,17 +22,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
-import com.toeicspace.android.core.ui.theme.CardBorder
 import com.toeicspace.android.core.ui.theme.ExamFourSkillsContainer
 import com.toeicspace.android.core.ui.theme.ExamFourSkillsContent
 import com.toeicspace.android.core.ui.theme.ExamListeningReadingContainer
 import com.toeicspace.android.core.ui.theme.ExamListeningReadingContent
 import com.toeicspace.android.core.ui.theme.ExamSpeakingWritingContainer
 import com.toeicspace.android.core.ui.theme.ExamSpeakingWritingContent
+import com.toeicspace.android.core.ui.theme.LevelAdvanced
+import com.toeicspace.android.core.ui.theme.LevelBeginner
 import com.toeicspace.android.core.ui.theme.LevelDotOff
-import com.toeicspace.android.core.ui.theme.OceanicInk
+import com.toeicspace.android.core.ui.theme.LevelIntermediate
 import com.toeicspace.android.core.ui.theme.PillShape
-import com.toeicspace.android.core.ui.theme.PrimaryGradientStart
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.feature.course.domain.CourseExamType
@@ -95,52 +95,57 @@ fun ExamTypeBadge(
 private const val LEVEL_DOTS = 3
 private val LevelDotSize = 6.dp
 
+/** Green for Beginner, violet for Intermediate, coral for Advanced: none of them is an exam hue. */
+val CourseLevel.color: Color
+    get() =
+        when (this) {
+            CourseLevel.BEGINNER -> LevelBeginner
+            CourseLevel.INTERMEDIATE -> LevelIntermediate
+            CourseLevel.ADVANCED -> LevelAdvanced
+        }
+
 /**
- * Level as a label with a three-dot meter (one dot for Beginner, three for Advanced). It stays
- * neutral so it never competes with the exam color next to it.
+ * Level as a label with a three-dot meter (one dot for Beginner, three for Advanced), outlined in
+ * the level's own color so a list mixes levels at a glance.
  */
 @Composable
 fun CourseLevelBadge(
     level: CourseLevel,
     modifier: Modifier = Modifier,
 ) {
+    val levelColor = level.color
     Row(
         modifier =
             modifier
                 .clip(PillShape)
-                .border(1.dp, CardBorder, PillShape)
+                .border(1.dp, levelColor.copy(alpha = LEVEL_BORDER_ALPHA), PillShape)
                 .padding(horizontal = Spacing.sm, vertical = Spacing.space2),
         horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing.space2)) {
             repeat(LEVEL_DOTS) { index ->
+                val lit = index <= level.ordinal
                 Box(
                     modifier =
                         Modifier
                             .size(LevelDotSize)
                             .clip(CircleShape)
-                            .background(
-                                if (index <=
-                                    level.ordinal
-                                ) {
-                                    PrimaryGradientStart
-                                } else {
-                                    LevelDotOff
-                                },
-                            ),
+                            .background(if (lit) levelColor else LevelDotOff),
                 )
             }
         }
         Text(
             text = stringResource(level.labelRes),
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.SemiBold,
-            color = OceanicInk,
+            fontWeight = FontWeight.Bold,
+            color = levelColor,
             maxLines = 1,
         )
     }
 }
+
+private const val LEVEL_BORDER_ALPHA = 0.45f
 
 @Preview(showBackground = true)
 @Composable

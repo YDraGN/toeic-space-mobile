@@ -28,6 +28,20 @@ val HeroGradientBrush =
         1f to SkySoft,
     )
 
+/**
+ * Covers for courses without a thumbnail. Each course keeps one of these for good (picked from its
+ * id), so a long catalog alternates colors instead of repeating one blue tile.
+ */
+val CourseCoverBrushes: List<Brush> =
+    listOf(
+        HeroGradientBrush,
+        Brush.linearGradient(listOf(CoverCoralStart, CoverCoralEnd)),
+        Brush.linearGradient(listOf(CoverLagoonStart, CoverLagoonEnd)),
+        Brush.linearGradient(listOf(CoverDuskStart, CoverDuskEnd)),
+        Brush.linearGradient(listOf(CoverPeachStart, CoverPeachEnd)),
+        Brush.linearGradient(listOf(CoverIndigoStart, CoverIndigoEnd)),
+    )
+
 val BrandGradientBrush =
     Brush.horizontalGradient(
         colors = listOf(PrimaryGradientStart, PrimaryGradientCenter, PrimaryGradientEnd),

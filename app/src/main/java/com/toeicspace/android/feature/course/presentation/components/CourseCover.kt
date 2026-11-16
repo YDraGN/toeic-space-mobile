@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -24,19 +24,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.toeicspace.android.R
-import com.toeicspace.android.core.ui.theme.HeroGradientBrush
+import com.toeicspace.android.core.ui.theme.CourseCoverBrushes
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
+/** The fallback cover of a course: always the same one for the same [seed] (the course id). */
+internal fun courseCoverBrush(seed: String): Brush =
+    CourseCoverBrushes[Math.floorMod(seed.hashCode(), CourseCoverBrushes.size)]
+
 /**
- * Square, rounded course cover. The brand gradient with a pearl sits underneath, so a course
- * without a thumbnail (or one that fails to load) still has a cover, and nothing jumps while the
- * image loads.
+ * Square, rounded course cover. A gradient with a pearl sits underneath, so a course without a
+ * thumbnail (or one that fails to load) still has a cover, and nothing jumps while the image loads.
+ * The gradient is chosen from [seed], so neighbouring courses get different colors.
  */
 @Composable
 fun CourseCover(
     imageUrl: String?,
     courseTitle: String,
+    seed: String,
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.small,
 ) {
@@ -45,7 +50,7 @@ fun CourseCover(
             modifier
                 .aspectRatio(1f)
                 .clip(shape)
-                .background(HeroGradientBrush),
+                .background(courseCoverBrush(seed)),
         contentAlignment = Alignment.Center,
     ) {
         Image(
@@ -66,37 +71,37 @@ fun CourseCover(
 
 private const val PEARL_FRACTION = 0.42f
 
-@Preview(showBackground = true)
+/** Seeds "0" to "5" land on the six cover gradients in order. */
+@Preview(showBackground = true, widthDp = 420)
 @Composable
-private fun CourseCoverPreview() {
+private fun CourseCoverPalettePreview() {
     ToeicSpaceTheme {
         Row(
             modifier = Modifier.padding(Spacing.md),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
-            CourseCover(
-                imageUrl = null,
-                courseTitle = "TOEIC 450+",
-                modifier = Modifier.size(88.dp),
-            )
-            CourseCover(
-                imageUrl = null,
-                courseTitle = "TOEIC 450+",
-                modifier = Modifier.width(160.dp),
-                shape = MaterialTheme.shapes.medium,
-            )
+            CourseCoverBrushes.indices.forEach { index ->
+                CourseCover(
+                    imageUrl = null,
+                    courseTitle = "TOEIC 450+",
+                    seed = "$index",
+                    modifier = Modifier.size(56.dp),
+                )
+            }
         }
     }
 }
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
-private fun CourseCoverWidePreview() {
+private fun CourseCoverLargePreview() {
     ToeicSpaceTheme {
         CourseCover(
             imageUrl = null,
             courseTitle = "TOEIC 450+",
+            seed = "3",
             modifier = Modifier.fillMaxWidth().padding(Spacing.md),
+            shape = MaterialTheme.shapes.medium,
         )
     }
 }

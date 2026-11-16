@@ -98,6 +98,23 @@ val ExamFourSkillsContent = Color(0xFF0E6E52)
 /** Unlit dot of the level meter. */
 val LevelDotOff = SubtleBorder
 
+/** Level meter colors: they climb from calm green to warm coral, apart from the exam hues. */
+val LevelBeginner = Color(0xFF1E9E63)
+val LevelIntermediate = Color(0xFF7457D6)
+val LevelAdvanced = Color(0xFFE0524F)
+
+/** Stops of the course cover gradients used when a course has no thumbnail. */
+val CoverCoralStart = Color(0xFFFF8A80)
+val CoverCoralEnd = Color(0xFFFFC7A8)
+val CoverLagoonStart = Color(0xFF0F8F86)
+val CoverLagoonEnd = Color(0xFF7FE0C4)
+val CoverDuskStart = Color(0xFF5B4BC4)
+val CoverDuskEnd = Color(0xFFE79AD6)
+val CoverPeachStart = Color(0xFFF2716B)
+val CoverPeachEnd = Color(0xFFFFB86B)
+val CoverIndigoStart = Color(0xFF233A8F)
+val CoverIndigoEnd = Color(0xFF6FA8FF)
+
 /** Outline of cards and bars: the brand border, softened so it reads as a hairline. */
 val CardBorder = BrandBorder.copy(alpha = 0.45f)
 

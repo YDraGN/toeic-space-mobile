@@ -273,7 +273,8 @@ private fun MainTabsNavHost(
             )
         }
         composable<ExploreTabRoute> {
-            ExploreTab(viewer = viewer, onSignUpClick = onSignUpClick, onComingSoon = onComingSoon)
+            // Course detail arrives in the next step; until then a tap says it is coming soon.
+            ExploreTab(onCourseClick = { onComingSoon() })
         }
         composable<PracticeTabRoute> {
             MemberOnlyTab(
