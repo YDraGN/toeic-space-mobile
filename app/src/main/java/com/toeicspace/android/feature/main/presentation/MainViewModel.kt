@@ -5,10 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.toeicspace.android.core.common.Clock
 import com.toeicspace.android.core.data.repository.SessionRepository
 import com.toeicspace.android.core.model.SessionState
+import com.toeicspace.android.feature.profile.domain.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -22,6 +27,8 @@ sealed interface Viewer {
     data class Member(
         val fullName: String,
         val email: String,
+        /** Shown in the rail and the top bar once the profile has been fetched. */
+        val avatarUrl: String? = null,
     ) : Viewer
 }
 
@@ -59,28 +66,43 @@ class MainViewModel
     @Inject
     constructor(
         private val sessionRepository: SessionRepository,
+        private val profileRepository: ProfileRepository,
         private val clock: Clock,
     ) : ViewModel() {
+        init {
+            // The session only knows name and email; the avatar comes with the full profile, fetched
+            // once per signed-in account.
+            viewModelScope.launch {
+                sessionRepository.session
+                    .filterIsInstance<SessionState.Ready>()
+                    .mapNotNull { it.user?.id }
+                    .distinctUntilChanged()
+                    .collect { profileRepository.refresh() }
+            }
+        }
+
         val uiState: StateFlow<MainUiState> =
-            sessionRepository.session
-                .map { session ->
-                    val viewer =
-                        when {
-                            session !is SessionState.Ready -> return@map MainUiState.Loading
-                            session.user != null ->
-                                Viewer.Member(
-                                    fullName = session.user.fullName,
-                                    email = session.user.email,
-                                )
-                            session.isGuest -> Viewer.Guest
-                            else -> return@map MainUiState.SessionEnded
-                        }
-                    MainUiState.Ready(viewer = viewer, timeOfDay = currentTimeOfDay())
-                }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5_000),
-                    initialValue = MainUiState.Loading,
-                )
+            combine(sessionRepository.session, profileRepository.profile) { session, profile ->
+                session to profile?.avatarUrl
+            }.map { (session, avatarUrl) ->
+                val viewer =
+                    when {
+                        session !is SessionState.Ready -> return@map MainUiState.Loading
+                        session.user != null ->
+                            Viewer.Member(
+                                fullName = session.user.fullName,
+                                email = session.user.email,
+                                avatarUrl = avatarUrl,
+                            )
+                        session.isGuest -> Viewer.Guest
+                        else -> return@map MainUiState.SessionEnded
+                    }
+                MainUiState.Ready(viewer = viewer, timeOfDay = currentTimeOfDay())
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = MainUiState.Loading,
+            )
 
         fun onSignOutClick() {
             viewModelScope.launch { sessionRepository.signOut() }
