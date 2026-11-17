@@ -24,7 +24,11 @@ import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 
-private val RailAvatarSize = 48.dp
+/** Big on the collapsed rail, where the avatar stands alone. */
+private val RailAvatarSize = 64.dp
+
+/** Smaller on the open panel, so the name and email beside it have room. */
+private val ExpandedRailAvatarSize = 40.dp
 private val AccountShape = RoundedCornerShape(16.dp)
 
 /**
@@ -64,7 +68,7 @@ internal fun RailAccount(
             onClick = onClick,
             imageUrl = (viewer as? Viewer.Member)?.avatarUrl,
             isGuest = viewer is Viewer.Guest,
-            size = RailAvatarSize,
+            size = if (expanded) ExpandedRailAvatarSize else RailAvatarSize,
         )
         if (expanded) {
             Column(modifier = Modifier.weight(1f)) {
