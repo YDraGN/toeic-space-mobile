@@ -1,5 +1,6 @@
 package com.toeicspace.android.feature.course.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,16 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.ToeicCard
 import com.toeicspace.android.core.ui.theme.AppTextStyles
-import com.toeicspace.android.core.ui.theme.BrandDestructive
-import com.toeicspace.android.core.ui.theme.CardBorder
-import com.toeicspace.android.core.ui.theme.CoralBadge
-import com.toeicspace.android.core.ui.theme.InkSoft
+import com.toeicspace.android.core.ui.theme.BlushTone
+import com.toeicspace.android.core.ui.theme.LilacTone
+import com.toeicspace.android.core.ui.theme.PeachTone
+import com.toeicspace.android.core.ui.theme.QuietFill
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.feature.course.domain.CourseExamType
@@ -37,12 +35,12 @@ import com.toeicspace.android.feature.course.domain.CoursePrice
 import com.toeicspace.android.feature.course.domain.CourseSummary
 
 private val CoverSize = 88.dp
-private val MetaIconSize = 14.dp
 private val MetaRowHeight = 24.dp
 
 /**
  * A course in the catalog: square cover on the left, then exam, title, a two-line summary, level
- * and target score, and the price row. Fixed line counts keep the cards in a grid row the same height.
+ * and target score, and the price on a quiet strip. Fixed line counts keep the cards in a grid row
+ * the same height.
  */
 @Composable
 fun CourseCard(
@@ -52,11 +50,11 @@ fun CourseCard(
 ) {
     ToeicCard(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(Spacing.smd),
-        itemSpacing = Spacing.smd,
+        contentPadding = PaddingValues(Spacing.md),
+        itemSpacing = Spacing.md,
         onClick = onClick,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.smd)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
             CourseCover(
                 imageUrl = course.thumbnailUrl,
                 courseTitle = course.title,
@@ -93,8 +91,15 @@ fun CourseCard(
                 )
             }
         }
-        HorizontalDivider(color = CardBorder)
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .background(QuietFill)
+                    .padding(horizontal = Spacing.smd, vertical = Spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             CoursePriceText(price = course.price)
             Spacer(modifier = Modifier.weight(1f))
             SeatsLabel(remainingSeats = course.remainingSeats)
@@ -119,25 +124,12 @@ fun CourseMetaRow(
     ) {
         level?.let { CourseLevelBadge(level = it) }
         targetScore?.let {
-            Row(
+            ToneBadge(
+                text = stringResource(R.string.course_label_target, it),
+                tone = PeachTone,
+                iconRes = R.drawable.ic_target,
                 modifier = Modifier.weight(1f, fill = false),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_target),
-                    contentDescription = null,
-                    tint = CoralBadge,
-                    modifier = Modifier.size(MetaIconSize),
-                )
-                Text(
-                    text = stringResource(R.string.course_label_target, it),
-                    style = AppTextStyles.Caption,
-                    color = InkSoft,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            )
         }
     }
 }
@@ -150,17 +142,15 @@ fun SeatsLabel(
 ) {
     if (remainingSeats == null) return
     val soldOut = remainingSeats <= 0
-    Text(
+    ToneBadge(
         text =
             if (soldOut) {
                 stringResource(R.string.course_label_sold_out)
             } else {
                 stringResource(R.string.course_label_seats_left, remainingSeats)
             },
-        style = AppTextStyles.Caption,
-        color = if (soldOut) BrandDestructive else InkSoft,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        tone = if (soldOut) BlushTone else LilacTone,
+        iconRes = R.drawable.ic_users,
         modifier = modifier,
     )
 }

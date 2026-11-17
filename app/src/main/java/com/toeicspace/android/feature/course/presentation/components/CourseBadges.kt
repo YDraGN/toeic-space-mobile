@@ -1,8 +1,8 @@
 package com.toeicspace.android.feature.course.presentation.components
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,8 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
@@ -34,6 +37,8 @@ import com.toeicspace.android.core.ui.theme.LevelDotOff
 import com.toeicspace.android.core.ui.theme.LevelIntermediate
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.Spacing
+import com.toeicspace.android.core.ui.theme.TagTone
+import com.toeicspace.android.core.ui.theme.TagTones
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.feature.course.domain.CourseExamType
 import com.toeicspace.android.feature.course.domain.CourseLevel
@@ -105,7 +110,7 @@ val CourseLevel.color: Color
         }
 
 /**
- * Level as a label with a three-dot meter (one dot for Beginner, three for Advanced), outlined in
+ * Level as a label with a three-dot meter (one dot for Beginner, three for Advanced), on a tint of
  * the level's own color so a list mixes levels at a glance.
  */
 @Composable
@@ -118,7 +123,7 @@ fun CourseLevelBadge(
         modifier =
             modifier
                 .clip(PillShape)
-                .border(1.dp, levelColor.copy(alpha = LEVEL_BORDER_ALPHA), PillShape)
+                .background(levelColor.copy(alpha = LEVEL_FILL_ALPHA))
                 .padding(horizontal = Spacing.sm, vertical = Spacing.space2),
         horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
@@ -145,7 +150,48 @@ fun CourseLevelBadge(
     }
 }
 
-private const val LEVEL_BORDER_ALPHA = 0.45f
+private const val LEVEL_FILL_ALPHA = 0.14f
+
+private val ToneBadgeIconSize = 12.dp
+
+/**
+ * A small pill in one [TagTone], optionally led by an icon: target score, seats, skills. Badges in
+ * the app always carry a tone so they stand out from the text around them.
+ */
+@Composable
+fun ToneBadge(
+    text: String,
+    tone: TagTone,
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int? = null,
+) {
+    Row(
+        modifier =
+            modifier
+                .clip(PillShape)
+                .background(tone.container)
+                .padding(horizontal = Spacing.sm, vertical = Spacing.space2),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        iconRes?.let {
+            Icon(
+                painter = painterResource(it),
+                contentDescription = null,
+                tint = tone.content,
+                modifier = Modifier.size(ToneBadgeIconSize),
+            )
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = tone.content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -160,6 +206,14 @@ private fun CourseBadgesPreview() {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 CourseLevel.entries.forEach { CourseLevelBadge(level = it) }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                TagTones.forEachIndexed {
+                    index,
+                    tone,
+                    ->
+                    ToneBadge(text = "Kỹ năng $index", tone = tone)
+                }
             }
         }
     }
