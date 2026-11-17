@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -36,7 +39,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.toeicspace.android.R
-import com.toeicspace.android.core.ui.WindowWidth
 import com.toeicspace.android.core.ui.components.BottomNavBar
 import com.toeicspace.android.core.ui.components.BottomNavTab
 import com.toeicspace.android.core.ui.components.ComingSoonState
@@ -71,6 +73,7 @@ internal fun MainRoute(
     onNavigateToSignUp: () -> Unit,
     onNavigateToAccountInfo: () -> Unit,
     onNavigateToChangePassword: () -> Unit,
+    onNavigateToCourseDetail: (courseId: String) -> Unit,
     onSessionEnded: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
@@ -90,6 +93,7 @@ internal fun MainRoute(
                 onSignOutClick = viewModel::onSignOutClick,
                 onAccountInfoClick = onNavigateToAccountInfo,
                 onChangePasswordClick = onNavigateToChangePassword,
+                onCourseClick = onNavigateToCourseDetail,
                 modifier = modifier,
             )
         // The session is read from local storage, so this lasts a frame or two.
@@ -109,6 +113,7 @@ internal fun MainShell(
     onSignOutClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
     onChangePasswordClick: () -> Unit,
+    onCourseClick: (courseId: String) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -126,28 +131,29 @@ internal fun MainShell(
 
     val windowWidth = currentWindowWidth()
     val useRail = windowWidth.isAtLeastMedium
-    // On medium widths the expanded rail floats over the content; on expanded widths it sits beside it.
-    val railOverlays = windowWidth == WindowWidth.MEDIUM
     var railExpanded by rememberSaveable { mutableStateOf(false) }
-    val showRailOverlay = useRail && railExpanded && railOverlays
+    // The expanded rail always opens over the content, with a scrim, like a drawer: the page keeps
+    // its layout instead of being squeezed sideways.
+    val showRailOverlay = useRail && railExpanded
     BackHandler(enabled = showRailOverlay) { railExpanded = false }
 
     val rail: @Composable (expanded: Boolean, floating: Boolean) -> Unit = { expanded, floating ->
         ToeicNavigationRail(
             selectedTab = currentTab,
             onTabSelected = { tab ->
-                if (railOverlays) railExpanded = false
+                railExpanded = false
                 onTabSelected(tab)
             },
             expanded = expanded,
-            containerColor = if (floating) MaterialTheme.colorScheme.surface else BarSurface,
+            // Same tone as the top bar above it, so header and open panel read as one surface.
+            containerColor = if (floating) MaterialTheme.colorScheme.background else BarSurface,
             account = { isExpanded ->
                 RailAccount(
                     viewer = viewer,
                     isSelected = currentTab == BottomNavTab.PROFILE,
                     expanded = isExpanded,
                     onClick = {
-                        if (railOverlays) railExpanded = false
+                        railExpanded = false
                         onTabSelected(BottomNavTab.PROFILE)
                     },
                 )
@@ -190,20 +196,34 @@ internal fun MainShell(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
+        val layoutDirection = LocalLayoutDirection.current
+        // Only the top bar pushes everything down. The rail runs on to the bottom edge, behind the
+        // gesture bar (it pads its own items), so it reads as part of the screen, not a floating card.
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+                    .padding(top = innerPadding.calculateTopPadding()),
         ) {
             Row(modifier = Modifier.fillMaxSize()) {
-                if (useRail) rail(railExpanded && !railOverlays, false)
+                if (useRail) rail(false, false)
                 Box(
                     modifier =
                         Modifier
                             .weight(1f)
-                            .fillMaxHeight(),
+                            .fillMaxHeight()
+                            .padding(
+                                start =
+                                    if (useRail) {
+                                        0.dp
+                                    } else {
+                                        innerPadding.calculateStartPadding(
+                                            layoutDirection,
+                                        )
+                                    },
+                                end = innerPadding.calculateEndPadding(layoutDirection),
+                                bottom = innerPadding.calculateBottomPadding(),
+                            ).consumeWindowInsets(innerPadding),
                     contentAlignment = Alignment.TopCenter,
                 ) {
                     MainTabsNavHost(
@@ -215,10 +235,11 @@ internal fun MainShell(
                         onSignInClick = onSignInClick,
                         onAccountInfoClick = onAccountInfoClick,
                         onChangePasswordClick = onChangePasswordClick,
+                        onCourseClick = onCourseClick,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
                         snackbarHostState = snackbarHostState,
-                        modifier = Modifier.widthIn(max = ContentMaxWidth).fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }
@@ -253,6 +274,7 @@ private fun MainTabsNavHost(
     onSignInClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
     onChangePasswordClick: () -> Unit,
+    onCourseClick: (courseId: String) -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -265,48 +287,64 @@ private fun MainTabsNavHost(
         modifier = modifier,
     ) {
         composable<HomeTabRoute> {
-            HomeTab(
-                viewer = viewer,
-                onSignUpClick = onSignUpClick,
-                onSignInClick = onSignInClick,
-                onExploreClick = { onTabSelected(BottomNavTab.EXPLORE) },
-            )
+            ReadableWidth {
+                HomeTab(
+                    viewer = viewer,
+                    onSignUpClick = onSignUpClick,
+                    onSignInClick = onSignInClick,
+                    onExploreClick = { onTabSelected(BottomNavTab.EXPLORE) },
+                )
+            }
         }
         composable<ExploreTabRoute> {
-            ExploreTab(viewer = viewer, onSignUpClick = onSignUpClick, onComingSoon = onComingSoon)
+            ExploreTab(onCourseClick = onCourseClick)
         }
         composable<PracticeTabRoute> {
-            MemberOnlyTab(
-                viewer = viewer,
-                titleRes = R.string.common_label_tab_practice,
-                guestTitleRes = R.string.main_title_practice_locked,
-                guestBodyRes = R.string.main_body_practice_locked,
-                onSignUpClick = onSignUpClick,
-                onSignInClick = onSignInClick,
-            )
+            ReadableWidth {
+                MemberOnlyTab(
+                    viewer = viewer,
+                    titleRes = R.string.common_label_tab_practice,
+                    guestTitleRes = R.string.main_title_practice_locked,
+                    guestBodyRes = R.string.main_body_practice_locked,
+                    onSignUpClick = onSignUpClick,
+                    onSignInClick = onSignInClick,
+                )
+            }
         }
         composable<VocabularyTabRoute> {
-            MemberOnlyTab(
-                viewer = viewer,
-                titleRes = R.string.common_label_tab_vocabulary,
-                guestTitleRes = R.string.main_title_vocabulary_locked,
-                guestBodyRes = R.string.main_body_vocabulary_locked,
-                onSignUpClick = onSignUpClick,
-                onSignInClick = onSignInClick,
-            )
+            ReadableWidth {
+                MemberOnlyTab(
+                    viewer = viewer,
+                    titleRes = R.string.common_label_tab_vocabulary,
+                    guestTitleRes = R.string.main_title_vocabulary_locked,
+                    guestBodyRes = R.string.main_body_vocabulary_locked,
+                    onSignUpClick = onSignUpClick,
+                    onSignInClick = onSignInClick,
+                )
+            }
         }
         composable<ProfileTabRoute> {
-            ProfileTab(
-                viewer = viewer,
-                onSignUpClick = onSignUpClick,
-                onSignInClick = onSignInClick,
-                onAccountInfoClick = onAccountInfoClick,
-                onChangePasswordClick = onChangePasswordClick,
-                onComingSoon = onComingSoon,
-                onSignOutClick = onSignOutClick,
-                snackbarHostState = snackbarHostState,
-            )
+            ReadableWidth {
+                ProfileTab(
+                    viewer = viewer,
+                    onSignUpClick = onSignUpClick,
+                    onSignInClick = onSignInClick,
+                    onAccountInfoClick = onAccountInfoClick,
+                    onChangePasswordClick = onChangePasswordClick,
+                    onComingSoon = onComingSoon,
+                    onSignOutClick = onSignOutClick,
+                    snackbarHostState = snackbarHostState,
+                )
+            }
         }
+    }
+}
+
+/** Home, practice, vocabulary and profile read best in a column; the course catalog uses the full width. */
+@Composable
+private fun ReadableWidth(content: @Composable () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        Box(modifier = Modifier.widthIn(max = ContentMaxWidth).fillMaxSize()) { content() }
     }
 }
 

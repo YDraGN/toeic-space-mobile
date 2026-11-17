@@ -80,9 +80,70 @@ val AvatarGuestBorder = SubtleBorder
 val AvatarUserBorder = PrimaryBorder
 val AvatarStreakBorder = HighlightBorder
 
-val NavDropletGradientStart = Pearl
-val NavDropletGradientEnd = PastelSky
-val NavDropletBorder = BrandBorder.copy(alpha = 0.35f)
+/** Course prices: green like the web catalog, deep enough for large text on white (WCAG AA). */
+val PriceGreen = Color(0xFF12804A)
+
+/** Exam type badges: each exam has its own hue so a long list can be scanned by type. */
+val ExamListeningReadingContainer = PastelSky
+val ExamListeningReadingContent = SeaDeep
+val ExamSpeakingWritingContainer = BlushTint
+val ExamSpeakingWritingContent = Color(0xFFA8323D)
+val ExamFourSkillsContainer = Color(0xFFD3F4E8)
+val ExamFourSkillsContent = Color(0xFF0E6E52)
+
+/** Unlit dot of the level meter. */
+val LevelDotOff = SubtleBorder
+
+/** Level meter colors: they climb from calm green to warm coral, apart from the exam hues. */
+val LevelBeginner = Color(0xFF1E9E63)
+val LevelIntermediate = Color(0xFF7457D6)
+val LevelAdvanced = Color(0xFFE0524F)
+
+/** Stops of the course cover gradients used when a course has no thumbnail. */
+val CoverCoralStart = Color(0xFFFF8A80)
+val CoverCoralEnd = Color(0xFFFFC7A8)
+val CoverLagoonStart = Color(0xFF0F8F86)
+val CoverLagoonEnd = Color(0xFF7FE0C4)
+val CoverDuskStart = Color(0xFF5B4BC4)
+val CoverDuskEnd = Color(0xFFE79AD6)
+val CoverPeachStart = Color(0xFFF2716B)
+val CoverPeachEnd = Color(0xFFFFB86B)
+val CoverIndigoStart = Color(0xFF233A8F)
+val CoverIndigoEnd = Color(0xFF6FA8FF)
+
+/**
+ * Stops of the soft page gradient behind reading-heavy pages (course detail): pale sky drifting to
+ * lilac and blush, the pastel sister of the auth backdrop, light enough that colored badges and
+ * the green price stay the only loud things on the page.
+ */
+val SoftPageSky = Color(0xFFEAF5FF)
+val SoftPageLilac = Color(0xFFF1ECFF)
+val SoftPageBlush = Color(0xFFFFEEF3)
+
+/** Quiet fill for stat strips and the open curriculum chapter on white cards. */
+val QuietFill = Color(0xFFF4F6FD)
+
+/**
+ * Tinted tones for tags, badges and section icons: a pale fill with a deep text color of the same
+ * hue (WCAG AA on the fill). Badges always carry one of these, never plain grey.
+ */
+data class TagTone(
+    val container: Color,
+    val content: Color,
+)
+
+val SkyTone = TagTone(container = PastelSky, content = SeaDeep)
+val BlushTone = TagTone(container = BlushTint, content = Color(0xFFA8323D))
+val MintTone = TagTone(container = Color(0xFFD3F4E8), content = Color(0xFF0E6E52))
+val LilacTone = TagTone(container = Color(0xFFEAE4FF), content = Color(0xFF5B3FC4))
+val PeachTone = TagTone(container = Color(0xFFFFE6D3), content = Color(0xFF9A4A0C))
+
+/** Tones cycled through by lists of tags such as a course's skills. */
+val TagTones = listOf(SkyTone, LilacTone, MintTone, PeachTone, BlushTone)
+
+/** Tick beside each learning objective. */
+val ObjectiveCheckContainer = MintTone.container
+val ObjectiveCheckContent = MintTone.content
 
 /** Outline of cards and bars: the brand border, softened so it reads as a hairline. */
 val CardBorder = BrandBorder.copy(alpha = 0.45f)

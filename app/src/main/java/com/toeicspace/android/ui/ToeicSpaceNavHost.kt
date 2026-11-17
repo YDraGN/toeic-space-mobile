@@ -12,6 +12,8 @@ import com.toeicspace.android.feature.auth.navigation.changePasswordScreen
 import com.toeicspace.android.feature.auth.navigation.navigateToChangePassword
 import com.toeicspace.android.feature.auth.navigation.navigateToSignIn
 import com.toeicspace.android.feature.auth.navigation.navigateToSignUp
+import com.toeicspace.android.feature.course.navigation.courseDetailScreen
+import com.toeicspace.android.feature.course.navigation.navigateToCourseDetail
 import com.toeicspace.android.feature.main.navigation.mainScreen
 import com.toeicspace.android.feature.main.navigation.navigateToMain
 import com.toeicspace.android.feature.onboarding.navigation.OnboardingDestination
@@ -22,7 +24,10 @@ import com.toeicspace.android.feature.profile.navigation.navigateToAccountInfo
 import com.toeicspace.android.feature.splash.navigation.SplashDestination
 import com.toeicspace.android.feature.splash.navigation.splashScreen
 
-/** Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info, Change password. */
+/**
+ * Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info, Change
+ * password, Course detail.
+ */
 @Composable
 fun ToeicSpaceNavHost(
     modifier: Modifier = Modifier,
@@ -73,9 +78,11 @@ fun ToeicSpaceNavHost(
             onNavigateToSignUp = { navController.navigateToSignUp() },
             onNavigateToAccountInfo = { navController.navigateToAccountInfo() },
             onNavigateToChangePassword = { navController.navigateToChangePassword() },
+            onNavigateToCourseDetail = { navController.navigateToCourseDetail(it) },
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
         )
         accountInfoScreen(onBack = { navController.popBackStack() })
+        courseDetailScreen(onBack = { navController.popBackStack() })
         changePasswordScreen(
             onBack = { navController.popBackStack() },
             onPasswordChanged = { email ->

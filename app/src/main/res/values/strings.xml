@@ -19,7 +19,6 @@
     <string name="common_cd_close_navigation">Thu gọn thanh điều hướng</string>
     <string name="common_cd_change_avatar">Đổi ảnh đại diện</string>
     <string name="common_label_coming_soon">Sắp ra mắt</string>
-    <string name="common_label_sample_data">Dữ liệu mẫu</string>
     <string name="common_action_sign_up_free">ĐĂNG KÝ MIỄN PHÍ</string>
     <string name="common_action_have_account">Tôi đã có tài khoản</string>
     <string name="common_msg_coming_soon">Tính năng đang được phát triển</string>
@@ -72,8 +71,6 @@
     <string name="home_title_today">Trang sổ hôm nay</string>
 
     <!-- Explore tab -->
-    <string name="explore_body_streak_guest">Học mỗi ngày một chút để giữ lửa. Đăng ký để Oysteic đếm chuỗi giúp bạn.</string>
-    <string name="explore_action_start_streak">BẮT ĐẦU CHUỖI NGÀY HỌC</string>
     <string-array name="explore_week_days">
         <item>T2</item>
         <item>T3</item>
@@ -83,27 +80,6 @@
         <item>T7</item>
         <item>CN</item>
     </string-array>
-    <string name="explore_title_centers">Trung tâm nổi bật</string>
-    <string name="explore_cd_center_cover">Ảnh trung tâm %1$s</string>
-    <string name="explore_label_online">Online</string>
-    <string name="explore_label_offline">Offline</string>
-    <string name="explore_label_all">Tất cả</string>
-    <string name="explore_cd_filter">Bộ lọc trung tâm</string>
-    <string name="explore_title_plans">Gói học</string>
-    <string name="explore_title_plan_free">Tự học miễn phí</string>
-    <string-array name="explore_plan_free_features">
-        <item>Luyện đề và bộ câu hỏi công khai</item>
-        <item>Flashcard từ vựng TOEIC</item>
-        <item>Chuỗi ngày học và tiến trình cá nhân</item>
-    </string-array>
-    <string name="explore_title_plan_center">Học cùng trung tâm</string>
-    <string-array name="explore_plan_center_features">
-        <item>Lớp học chính thức từ trung tâm đối tác</item>
-        <item>Bài tập và nhận xét của giáo viên</item>
-        <item>Báo cáo tiến độ chi tiết</item>
-    </string-array>
-    <string name="explore_plan_feature_item">✓ %1$s</string>
-    <string name="explore_label_current_plan">Gói bạn đang dùng</string>
 
     <!-- Profile tab -->
     <string name="profile_title_guest">Tạo tài khoản để lưu tiến trình</string>
@@ -262,4 +238,83 @@
     <string name="onboarding_tag_3_1">Nghe Part 1–4</string>
     <string name="onboarding_tag_3_2">Đọc Part 5–7</string>
     <string name="onboarding_tag_3_3">Full Test 120p</string>
+
+    <!-- Courses -->
+    <string name="course_exam_listening_reading">Nghe &amp; Đọc</string>
+    <string name="course_exam_speaking_writing">Nói &amp; Viết</string>
+    <string name="course_exam_four_skills">4 kỹ năng</string>
+    <string name="course_level_beginner">Cơ bản</string>
+    <string name="course_level_intermediate">Trung cấp</string>
+    <string name="course_level_advanced">Nâng cao</string>
+    <string name="course_price_free">Miễn phí</string>
+    <!-- %1$s: amount with thousands separators, e.g. 499.000 -->
+    <string name="course_price_vnd">%1$sđ</string>
+    <!-- %1$s: amount, %2$s: ISO currency code -->
+    <string name="course_price_other">%1$s %2$s</string>
+    <string name="course_cd_original_price">Giá gốc %1$s</string>
+    <string name="course_cd_cover">Ảnh khoá học %1$s</string>
+    <string name="course_hint_search">Tìm khoá học…</string>
+    <string name="course_cd_clear_search">Xoá từ khoá</string>
+    <string name="course_cd_filter">Bộ lọc khoá học</string>
+    <string name="course_label_all">Tất cả</string>
+    <string name="course_label_result_count">%1$d khoá học</string>
+    <!-- %1$d: target score, e.g. 650 -->
+    <string name="course_label_target">Mục tiêu %1$d+</string>
+    <string name="course_label_target_option">%1$d+</string>
+    <string name="course_label_seats_left">Còn %1$d chỗ</string>
+    <string name="course_label_sold_out">Hết chỗ</string>
+    <string name="course_title_filter">Bộ lọc</string>
+    <string name="course_label_exam_type">Loại bài thi</string>
+    <string name="course_label_level">Trình độ</string>
+    <string name="course_label_target_score">Điểm mục tiêu</string>
+    <string name="course_action_clear_filters">Xoá bộ lọc</string>
+    <string name="course_action_done">Xong</string>
+    <string name="course_action_retry">Thử lại</string>
+    <string name="course_title_empty_filtered">Chưa có khoá học phù hợp</string>
+    <string name="course_body_empty_filtered">Thử bỏ bớt bộ lọc hoặc tìm với từ khoá khác nhé.</string>
+    <string name="course_title_empty">Khoá học đang được chuẩn bị</string>
+    <string name="course_body_empty">Khoá học mới sẽ sớm có mặt. Bạn quay lại sau nhé.</string>
+    <string name="course_title_error">Chưa tải được khoá học</string>
+    <string name="course_label_loading_more">Đang tải thêm khoá học…</string>
+    <string name="course_label_end">Bạn đã xem hết khoá học</string>
+    <string name="course_error_load_more">Chưa tải thêm được khoá học.</string>
+    <string name="course_title_detail">Chi tiết khoá học</string>
+    <string name="course_section_intro">Giới thiệu</string>
+    <string name="course_section_objectives">Bạn sẽ đạt được</string>
+    <string name="course_section_skills">Kỹ năng</string>
+    <string name="course_section_prerequisites">Yêu cầu đầu vào</string>
+    <string name="course_section_curriculum">Giáo trình</string>
+    <string name="course_section_includes">Khoá học gồm</string>
+    <string name="course_label_curriculum_summary">%1$d chương · %2$d bài</string>
+    <string name="course_label_module_lessons">%1$d bài</string>
+    <string name="course_label_module_summary">%1$d bài · %2$s</string>
+    <string name="course_duration_hours_minutes">%1$d giờ %2$d phút</string>
+    <string name="course_duration_hours">%1$d giờ</string>
+    <string name="course_duration_minutes">%1$d phút</string>
+    <string name="course_duration_short_hours_minutes">%1$dg %2$dp</string>
+    <string name="course_duration_short_hours">%1$dg</string>
+    <string name="course_duration_short_minutes">%1$dp</string>
+    <string name="course_stat_lessons_value">%1$d bài</string>
+    <string name="course_stat_lessons">Bài học</string>
+    <string name="course_stat_duration">Thời lượng</string>
+    <string name="course_stat_target">Mục tiêu</string>
+    <string name="course_stat_seats">Chỗ còn</string>
+    <string name="course_stat_seats_value">%1$d/%2$d</string>
+    <string name="course_label_price">Học phí</string>
+    <string name="course_label_discount">-%1$d%%</string>
+    <string name="course_label_promotion_until">%1$s · đến %2$s</string>
+    <string name="course_action_enroll_soon">Đăng ký · Sắp có</string>
+    <string name="course_label_free_preview">Học thử</string>
+    <string name="course_cd_free_preview">Học thử bài %1$s</string>
+    <string name="course_cd_locked_lesson">Cần đăng ký để học</string>
+    <string name="course_cd_expand_module">Mở chương</string>
+    <string name="course_cd_collapse_module">Thu gọn chương</string>
+    <string name="course_include_lessons">%1$d bài học trong %2$d chương</string>
+    <string name="course_include_duration">Tổng thời lượng %1$s</string>
+    <string name="course_include_previews">%1$d bài học thử miễn phí</string>
+    <string name="course_include_seats">Còn %1$d / %2$d chỗ</string>
+    <string name="course_note_payment">Thanh toán trong ứng dụng sẽ có ở bản cập nhật tới.</string>
+    <string name="course_title_not_found">Không tìm thấy khoá học</string>
+    <string name="course_body_not_found">Khoá học này đã được gỡ hoặc chưa mở. Bạn xem các khoá học khác nhé.</string>
+    <string name="course_action_back_to_catalog">Xem khoá học khác</string>
 </resources>

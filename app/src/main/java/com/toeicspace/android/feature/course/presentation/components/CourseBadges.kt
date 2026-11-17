@@ -1,0 +1,220 @@
+package com.toeicspace.android.feature.course.presentation.components
+
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.theme.ExamFourSkillsContainer
+import com.toeicspace.android.core.ui.theme.ExamFourSkillsContent
+import com.toeicspace.android.core.ui.theme.ExamListeningReadingContainer
+import com.toeicspace.android.core.ui.theme.ExamListeningReadingContent
+import com.toeicspace.android.core.ui.theme.ExamSpeakingWritingContainer
+import com.toeicspace.android.core.ui.theme.ExamSpeakingWritingContent
+import com.toeicspace.android.core.ui.theme.LevelAdvanced
+import com.toeicspace.android.core.ui.theme.LevelBeginner
+import com.toeicspace.android.core.ui.theme.LevelDotOff
+import com.toeicspace.android.core.ui.theme.LevelIntermediate
+import com.toeicspace.android.core.ui.theme.PillShape
+import com.toeicspace.android.core.ui.theme.Spacing
+import com.toeicspace.android.core.ui.theme.TagTone
+import com.toeicspace.android.core.ui.theme.TagTones
+import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
+import com.toeicspace.android.feature.course.domain.CourseExamType
+import com.toeicspace.android.feature.course.domain.CourseLevel
+
+@get:StringRes
+val CourseExamType.labelRes: Int
+    get() =
+        when (this) {
+            CourseExamType.LISTENING_READING -> R.string.course_exam_listening_reading
+            CourseExamType.SPEAKING_WRITING -> R.string.course_exam_speaking_writing
+            CourseExamType.FOUR_SKILLS -> R.string.course_exam_four_skills
+        }
+
+@get:StringRes
+val CourseLevel.labelRes: Int
+    get() =
+        when (this) {
+            CourseLevel.BEGINNER -> R.string.course_level_beginner
+            CourseLevel.INTERMEDIATE -> R.string.course_level_intermediate
+            CourseLevel.ADVANCED -> R.string.course_level_advanced
+        }
+
+private val CourseExamType.container: Color
+    get() =
+        when (this) {
+            CourseExamType.LISTENING_READING -> ExamListeningReadingContainer
+            CourseExamType.SPEAKING_WRITING -> ExamSpeakingWritingContainer
+            CourseExamType.FOUR_SKILLS -> ExamFourSkillsContainer
+        }
+
+private val CourseExamType.content: Color
+    get() =
+        when (this) {
+            CourseExamType.LISTENING_READING -> ExamListeningReadingContent
+            CourseExamType.SPEAKING_WRITING -> ExamSpeakingWritingContent
+            CourseExamType.FOUR_SKILLS -> ExamFourSkillsContent
+        }
+
+/** The exam a course prepares for, in that exam's own color. */
+@Composable
+fun ExamTypeBadge(
+    examType: CourseExamType,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(examType.labelRes),
+        style = MaterialTheme.typography.labelSmall,
+        fontWeight = FontWeight.Bold,
+        color = examType.content,
+        maxLines = 1,
+        modifier =
+            modifier
+                .clip(PillShape)
+                .background(examType.container)
+                .padding(horizontal = Spacing.sm, vertical = Spacing.space2),
+    )
+}
+
+private const val LEVEL_DOTS = 3
+private val LevelDotSize = 6.dp
+
+/** Green for Beginner, violet for Intermediate, coral for Advanced: none of them is an exam hue. */
+val CourseLevel.color: Color
+    get() =
+        when (this) {
+            CourseLevel.BEGINNER -> LevelBeginner
+            CourseLevel.INTERMEDIATE -> LevelIntermediate
+            CourseLevel.ADVANCED -> LevelAdvanced
+        }
+
+/**
+ * Level as a label with a three-dot meter (one dot for Beginner, three for Advanced), on a tint of
+ * the level's own color so a list mixes levels at a glance.
+ */
+@Composable
+fun CourseLevelBadge(
+    level: CourseLevel,
+    modifier: Modifier = Modifier,
+) {
+    val levelColor = level.color
+    Row(
+        modifier =
+            modifier
+                .clip(PillShape)
+                .background(levelColor.copy(alpha = LEVEL_FILL_ALPHA))
+                .padding(horizontal = Spacing.sm, vertical = Spacing.space2),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.space2)) {
+            repeat(LEVEL_DOTS) { index ->
+                val lit = index <= level.ordinal
+                Box(
+                    modifier =
+                        Modifier
+                            .size(LevelDotSize)
+                            .clip(CircleShape)
+                            .background(if (lit) levelColor else LevelDotOff),
+                )
+            }
+        }
+        Text(
+            text = stringResource(level.labelRes),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = levelColor,
+            maxLines = 1,
+        )
+    }
+}
+
+private const val LEVEL_FILL_ALPHA = 0.14f
+
+private val ToneBadgeIconSize = 12.dp
+
+/**
+ * A small pill in one [TagTone], optionally led by an icon: target score, seats, skills. Badges in
+ * the app always carry a tone so they stand out from the text around them.
+ */
+@Composable
+fun ToneBadge(
+    text: String,
+    tone: TagTone,
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int? = null,
+) {
+    Row(
+        modifier =
+            modifier
+                .clip(PillShape)
+                .background(tone.container)
+                .padding(horizontal = Spacing.sm, vertical = Spacing.space2),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        iconRes?.let {
+            Icon(
+                painter = painterResource(it),
+                contentDescription = null,
+                tint = tone.content,
+                modifier = Modifier.size(ToneBadgeIconSize),
+            )
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = tone.content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CourseBadgesPreview() {
+    ToeicSpaceTheme {
+        Column(
+            modifier = Modifier.padding(Spacing.md),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                CourseExamType.entries.forEach { ExamTypeBadge(examType = it) }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                CourseLevel.entries.forEach { CourseLevelBadge(level = it) }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                TagTones.forEachIndexed {
+                    index,
+                    tone,
+                    ->
+                    ToneBadge(text = "Kỹ năng $index", tone = tone)
+                }
+            }
+        }
+    }
+}

@@ -56,6 +56,7 @@ internal fun MainTopBar(
                 } else {
                     UserAvatar(
                         onClick = onAvatarClick,
+                        imageUrl = (viewer as? Viewer.Member)?.avatarUrl,
                         isGuest = viewer is Viewer.Guest,
                         size = TopBarAvatarSize,
                     )
