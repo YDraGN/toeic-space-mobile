@@ -87,6 +87,21 @@ class MainViewModelTest {
         }
 
     @Test
+    fun `the shell stays ready while a page above it is open`() =
+        runTest {
+            // Nothing collects the state while course detail covers the shell; it must not fall
+            // back to Loading, or the shell would rebuild on the start tab when the learner returns.
+            val viewModel =
+                MainViewModel(
+                    FakeSessionRepository(user = TestUser),
+                    FakeProfileRepository(initial = null),
+                    clock,
+                )
+
+            assertTrue(viewModel.uiState.value is MainUiState.Ready)
+        }
+
+    @Test
     fun `member shows the avatar from the fetched profile`() =
         runTest {
             val profiles =

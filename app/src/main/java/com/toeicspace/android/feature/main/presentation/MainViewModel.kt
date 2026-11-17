@@ -100,7 +100,11 @@ class MainViewModel
                 MainUiState.Ready(viewer = viewer, timeOfDay = currentTimeOfDay())
             }.stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
+                // Eagerly, not WhileSubscribed: while a page above the shell (course detail, account
+                // info) is open, nothing collects this. A restart on return would emit Loading
+                // first, drop the shell for a frame and lose its tab back stack, so Back would land
+                // on the start tab instead of the tab the learner came from.
+                started = SharingStarted.Eagerly,
                 initialValue = MainUiState.Loading,
             )
 
