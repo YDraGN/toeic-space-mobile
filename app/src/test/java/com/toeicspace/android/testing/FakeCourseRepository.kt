@@ -51,5 +51,11 @@ class FakeCourseRepository(
         return AppResult.Success(CoursePage(items, page, this.pageSize, courses.size))
     }
 
-    override suspend fun getCourse(id: String): AppResult<CourseDetail> = detail
+    /** Ids passed to [getCourse], in call order. */
+    val detailRequests = mutableListOf<String>()
+
+    override suspend fun getCourse(id: String): AppResult<CourseDetail> {
+        detailRequests += id
+        return detail
+    }
 }

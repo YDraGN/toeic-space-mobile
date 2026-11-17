@@ -20,4 +20,5 @@ object TestTags {
 
     const val COURSE_SEARCH = "course_search"
     const val COURSE_FILTER = "course_filter"
+    const val COURSE_ENROLL = "course_enroll"
 }

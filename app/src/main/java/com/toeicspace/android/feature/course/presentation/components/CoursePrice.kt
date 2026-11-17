@@ -40,7 +40,7 @@ internal fun formatCourseAmount(amount: Long): String {
 }
 
 @Composable
-private fun amountText(
+internal fun amountText(
     amount: Long,
     currency: String,
 ): String =

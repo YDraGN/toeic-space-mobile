@@ -73,6 +73,7 @@ internal fun MainRoute(
     onNavigateToSignUp: () -> Unit,
     onNavigateToAccountInfo: () -> Unit,
     onNavigateToChangePassword: () -> Unit,
+    onNavigateToCourseDetail: (courseId: String) -> Unit,
     onSessionEnded: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
@@ -92,6 +93,7 @@ internal fun MainRoute(
                 onSignOutClick = viewModel::onSignOutClick,
                 onAccountInfoClick = onNavigateToAccountInfo,
                 onChangePasswordClick = onNavigateToChangePassword,
+                onCourseClick = onNavigateToCourseDetail,
                 modifier = modifier,
             )
         // The session is read from local storage, so this lasts a frame or two.
@@ -111,6 +113,7 @@ internal fun MainShell(
     onSignOutClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
     onChangePasswordClick: () -> Unit,
+    onCourseClick: (courseId: String) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -232,6 +235,7 @@ internal fun MainShell(
                         onSignInClick = onSignInClick,
                         onAccountInfoClick = onAccountInfoClick,
                         onChangePasswordClick = onChangePasswordClick,
+                        onCourseClick = onCourseClick,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
                         snackbarHostState = snackbarHostState,
@@ -270,6 +274,7 @@ private fun MainTabsNavHost(
     onSignInClick: () -> Unit,
     onAccountInfoClick: () -> Unit,
     onChangePasswordClick: () -> Unit,
+    onCourseClick: (courseId: String) -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -292,8 +297,7 @@ private fun MainTabsNavHost(
             }
         }
         composable<ExploreTabRoute> {
-            // Course detail arrives in the next step; until then a tap says it is coming soon.
-            ExploreTab(onCourseClick = { onComingSoon() })
+            ExploreTab(onCourseClick = onCourseClick)
         }
         composable<PracticeTabRoute> {
             ReadableWidth {
