@@ -36,7 +36,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.AppTopBar
 import com.toeicspace.android.core.ui.components.BrandLogo
@@ -44,6 +43,7 @@ import com.toeicspace.android.core.ui.components.MascotView
 import com.toeicspace.android.core.ui.components.ToeicIconButton
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.CardBorder
+import com.toeicspace.android.core.ui.theme.Dimens
 import com.toeicspace.android.core.ui.theme.OceanicInk
 import com.toeicspace.android.core.ui.theme.PillShape
 import com.toeicspace.android.core.ui.theme.PrimaryBorder
@@ -53,7 +53,7 @@ import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.core.ui.theme.softShadow
 
 // Forms stay readable on tablets and in landscape.
-private val MaxContentWidth = 480.dp
+private val MaxContentWidth = Dimens.formMaxWidth
 
 /** Shared layout of the auth screens: brand top bar, mascot, title and a white form card. */
 private val FormVerticalPadding = Spacing.md + Spacing.xs
@@ -116,7 +116,7 @@ internal fun AuthScaffold(
                     modifier = Modifier.widthIn(max = MaxContentWidth),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    MascotView(mascotResId = mascotRes, size = 120.dp)
+                    MascotView(mascotResId = mascotRes, size = Dimens.mascotMd)
                     Spacer(modifier = Modifier.height(Spacing.smd))
                     Text(
                         text = title,
@@ -141,7 +141,7 @@ internal fun AuthScaffold(
                         modifier = Modifier.fillMaxWidth().softShadow(ToeicSpaceShapes.large),
                         shape = ToeicSpaceShapes.large,
                         color = MaterialTheme.colorScheme.surface,
-                        border = BorderStroke(1.dp, CardBorder),
+                        border = BorderStroke(Dimens.borderHairline, CardBorder),
                     ) {
                         // 16dp sides and 12dp between fields, close to Google and Material sign-in
                         // forms; a helper line adds its own 4dp on top.
@@ -241,7 +241,7 @@ internal fun GuestEntryLink(
             modifier
                 .clip(PillShape)
                 .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-                .padding(horizontal = Spacing.sm, vertical = 6.dp),
+                .padding(horizontal = Spacing.sm, vertical = Spacing.space6),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -255,7 +255,7 @@ internal fun GuestEntryLink(
             painter = painterResource(id = R.drawable.ic_chevron_right),
             contentDescription = null,
             tint = contentColor,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(Dimens.iconSm),
         )
     }
 }
