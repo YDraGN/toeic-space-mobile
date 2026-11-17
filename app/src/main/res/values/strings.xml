@@ -317,4 +317,26 @@
     <string name="course_title_not_found">Không tìm thấy khoá học</string>
     <string name="course_body_not_found">Khoá học này đã được gỡ hoặc chưa mở. Bạn xem các khoá học khác nhé.</string>
     <string name="course_action_back_to_catalog">Xem khoá học khác</string>
+
+    <!-- Common UI states (PBL-105) -->
+    <string name="common_action_retry">Thử lại</string>
+    <string name="state_loading_title">Đang tải, bạn chờ một chút nhé…</string>
+    <string name="state_empty_title">Chưa có gì ở đây</string>
+    <string name="state_empty_body">Khi có nội dung mới, Oysteic sẽ mang đến cho bạn ngay.</string>
+    <string name="state_error_network_title">Mất kết nối mạng</string>
+    <string name="state_error_server_unreachable_title">Chưa kết nối được máy chủ</string>
+    <string name="state_error_server_title">Máy chủ đang gặp sự cố</string>
+    <string name="state_error_too_many_requests_title">Bạn thao tác hơi nhanh</string>
+    <string name="state_error_not_found_title">Không tìm thấy nội dung</string>
+    <string name="state_error_not_found_body">Nội dung này đã được gỡ hoặc chưa mở. Bạn xem mục khác nhé.</string>
+    <string name="state_error_forbidden_title">Bạn chưa có quyền truy cập</string>
+    <string name="state_error_forbidden_body">Nội dung này chỉ dành cho học viên đã đăng ký khoá học.</string>
+    <string name="state_error_session_expired_title">Phiên đăng nhập đã hết hạn</string>
+    <string name="state_error_session_expired_body">Bạn đăng nhập lại để tiếp tục học nhé.</string>
+    <string name="state_error_unknown_title">Đã có lỗi xảy ra</string>
+    <string name="state_action_sign_in_again">Đăng nhập lại</string>
+    <string name="state_sign_in_required_title">Đăng nhập để tiếp tục</string>
+    <string name="state_sign_in_required_body">Tạo tài khoản miễn phí để lưu tiến độ học và mở khoá tính năng này.</string>
+    <string name="state_offline_banner_network">Bạn đang offline. Đây là dữ liệu đã tải lần trước.</string>
+    <string name="state_offline_banner_server">Chưa kết nối được máy chủ. Đây là dữ liệu đã tải lần trước.</string>
 </resources>

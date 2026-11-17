@@ -17,6 +17,7 @@ object Spacing {
     // --- Specific Spacings ---
     val space1: Dp = 1.dp
     val space2: Dp = 2.dp
+    val space6: Dp = 6.dp
     val space12: Dp = 12.dp
     val space18: Dp = 18.dp
     val space22: Dp = 22.dp
@@ -26,4 +27,26 @@ object Spacing {
     // --- Layout ---
     val gutter: Dp = 16.dp
     val margin: Dp = 16.dp
+}
+
+/** Fixed sizes that are not spacing: borders, icons, mascots and readable widths. */
+object Dimens {
+    // --- Borders & strokes ---
+    val borderHairline: Dp = 1.dp
+    val strokeThin: Dp = 2.dp
+
+    // --- Icons & indicators ---
+    val iconSm: Dp = 20.dp
+    val iconMd: Dp = 24.dp
+    val progressSm: Dp = 24.dp
+    val progressMd: Dp = 40.dp
+
+    // --- Mascot ---
+    val mascotSm: Dp = 96.dp
+    val mascotMd: Dp = 120.dp
+    val mascotLg: Dp = 140.dp
+
+    // --- Readable widths ---
+    val messageMaxWidth: Dp = 360.dp
+    val formMaxWidth: Dp = 480.dp
 }
