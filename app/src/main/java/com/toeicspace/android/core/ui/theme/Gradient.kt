@@ -42,6 +42,17 @@ val CourseCoverBrushes: List<Brush> =
         Brush.linearGradient(listOf(CoverIndigoStart, CoverIndigoEnd)),
     )
 
+/**
+ * Background of reading-heavy pages such as course detail: lighter than the shell's sky-to-sea, a
+ * diagonal wash from sky to lilac to blush.
+ */
+val SoftPageGradientBrush =
+    Brush.linearGradient(
+        0f to SoftPageSky,
+        0.55f to SoftPageLilac,
+        1f to SoftPageBlush,
+    )
+
 val BrandGradientBrush =
     Brush.horizontalGradient(
         colors = listOf(PrimaryGradientStart, PrimaryGradientCenter, PrimaryGradientEnd),

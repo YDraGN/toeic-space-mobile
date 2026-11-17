@@ -174,6 +174,63 @@ object AppTextStyles {
             lineHeight = 32.sp,
         )
 
+    /*
+     * Reading pages (course detail) run a step smaller than the tabs, so long text and the colored
+     * badges do not crowd each other.
+     */
+
+    /** Course name at the top of its detail page; [CourseTitleLarge] on tablets. */
+    val CourseTitle =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            lineHeight = 24.sp,
+        )
+    val CourseTitleLarge =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            lineHeight = 28.sp,
+        )
+
+    /** Card headings on a reading page ("Giới thiệu", "Giáo trình"). */
+    val SectionTitle =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp,
+            lineHeight = 22.sp,
+        )
+
+    /** Paragraphs and list items on a reading page. */
+    val ReadingBody =
+        TextStyle(
+            fontFamily = BeVietnamPro,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            lineHeight = 22.sp,
+        )
+
+    /** One line of a list the learner scans, such as a lesson title. */
+    val ListItemTitle =
+        TextStyle(
+            fontFamily = BeVietnamPro,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+        )
+
+    /** The price on the phone's enroll bar: one step below [PriceLarge] so the button still fits. */
+    val PriceBar =
+        TextStyle(
+            fontFamily = Quicksand,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp,
+            lineHeight = 30.sp,
+        )
+
     /** The big day count on streak cards. */
     val StreakCount =
         TextStyle(
