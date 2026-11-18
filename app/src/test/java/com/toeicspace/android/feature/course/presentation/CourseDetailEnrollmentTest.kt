@@ -312,6 +312,34 @@ class CourseDetailEnrollmentTest {
         }
 
     @Test
+    fun `coming back reloads the seats quietly, and keeps the page if that fails`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            val viewModel = started(signedIn(), course(price = 499_000, remainingSeats = 5))
+            courses.detail = AppResult.Success(course(price = 499_000, remainingSeats = 4))
+
+            viewModel.onResume()
+            assertFalse(viewModel.uiState.value.isLoading)
+            runCurrent()
+            assertEquals(
+                4,
+                viewModel.uiState.value.course
+                    ?.summary
+                    ?.remainingSeats,
+            )
+
+            courses.detail = AppResult.Failure(AppError.Network)
+            viewModel.onResume()
+            runCurrent()
+            assertEquals(
+                4,
+                viewModel.uiState.value.course
+                    ?.summary
+                    ?.remainingSeats,
+            )
+            assertNull(viewModel.uiState.value.error)
+        }
+
+    @Test
     fun `before enrolling only free previews open`() =
         runTest(mainDispatcherRule.testDispatcher) {
             val viewModel = started(guest())

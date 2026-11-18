@@ -137,6 +137,7 @@ class CourseDetailViewModel
         val uiState: StateFlow<CourseDetailUiState> = _uiState.asStateFlow()
 
         private var enrollmentJob: Job? = null
+        private var refreshJob: Job? = null
 
         init {
             load()
@@ -171,12 +172,17 @@ class CourseDetailViewModel
             load()
         }
 
-        /** Back from checkout (or another app), the course may have been bought meanwhile. */
+        /**
+         * Back from checkout (or another app): the course may have been bought meanwhile, and its
+         * seats or price may have changed, so both are read again without a loading screen.
+         */
         fun onResume() {
             val state = _uiState.value
             if (state.isSignedIn == true && state.enrollment == EnrollmentStatus.NOT_ENROLLED) {
                 checkEnrollment()
             }
+            // The first resume happens while the page is still loading; only refresh a shown page.
+            if (state.course != null && !state.isLoading) refreshCourse()
         }
 
         fun onModuleToggle(moduleId: String) {
@@ -346,5 +352,17 @@ class CourseDetailViewModel
                         _uiState.update { it.copy(isLoading = false, error = result.error) }
                 }
             }
+        }
+
+        /** A quiet reload of a page already on screen; a failure keeps what is shown. */
+        private fun refreshCourse() {
+            refreshJob?.cancel()
+            refreshJob =
+                viewModelScope.launch {
+                    val result = courseRepository.getCourse(courseId)
+                    if (result is AppResult.Success) {
+                        _uiState.update { it.copy(course = result.data) }
+                    }
+                }
         }
     }
