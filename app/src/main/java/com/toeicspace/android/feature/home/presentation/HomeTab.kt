@@ -39,16 +39,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.MascotView
 import com.toeicspace.android.core.ui.components.PearlStreakCard
-import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SAMPLE_STREAK_DAYS
-import com.toeicspace.android.core.ui.components.SecondaryButton
+import com.toeicspace.android.core.ui.components.SignInRequiredState
 import com.toeicspace.android.core.ui.components.ToeicCard
 import com.toeicspace.android.core.ui.components.ToeicChip
 import com.toeicspace.android.core.ui.components.ToeicChipStyle
@@ -75,7 +73,6 @@ import java.util.Locale
 
 private val HeroShape = RoundedCornerShape(28.dp)
 private val HeroMascotSize = 116.dp
-private val SignUpMascotSize = 104.dp
 private val BenefitCardWidth = 156.dp
 private val BenefitIconSize = 40.dp
 private val TodayRowShape = RoundedCornerShape(14.dp)
@@ -325,45 +322,16 @@ private fun SignUpCard(
 ) {
     ToeicCard(
         modifier = modifier.fillMaxWidth(),
-        contentPadding =
-            PaddingValues(
-                horizontal = Spacing.md + Spacing.xs,
-                vertical =
-                    Spacing.md + Spacing.xs,
-            ),
+        contentPadding = PaddingValues(horizontal = Spacing.md + Spacing.xs),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.smd),
+        SignInRequiredState(
+            onSignUpClick = onSignUpClick,
+            onSignInClick = onSignInClick,
+            title = stringResource(id = R.string.home_title_guest),
+            body = stringResource(id = R.string.home_body_guest),
+            fullScreen = false,
+            mascotResId = R.drawable.oy2_cheer,
         ) {
-            MascotView(
-                mascotResId = R.drawable.oy2_cheer,
-                size = SignUpMascotSize,
-                isFloating = false,
-            )
-            Text(
-                text = stringResource(id = R.string.home_title_guest),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = stringResource(id = R.string.home_body_guest),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            PrimaryButton(
-                text = stringResource(id = R.string.common_action_sign_up_free),
-                onClick = onSignUpClick,
-                modifier = Modifier.fillMaxWidth().padding(top = Spacing.xs),
-            )
-            SecondaryButton(
-                text = stringResource(id = R.string.common_action_have_account),
-                onClick = onSignInClick,
-                modifier = Modifier.fillMaxWidth(),
-            )
             TextButton(onClick = onExploreClick) {
                 Text(
                     text = stringResource(id = R.string.home_action_explore_first),

@@ -31,9 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.BuildConfig
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.EditableAvatar
-import com.toeicspace.android.core.ui.components.MascotView
-import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SecondaryButton
+import com.toeicspace.android.core.ui.components.SignInRequiredState
 import com.toeicspace.android.core.ui.components.ToeicCard
 import com.toeicspace.android.core.ui.components.ToeicChip
 import com.toeicspace.android.core.ui.components.ToeicChipStyle
@@ -51,7 +50,6 @@ import com.toeicspace.android.feature.profile.domain.EnglishLevel
 import com.toeicspace.android.feature.profile.domain.UserProfile
 
 private val ButtonIconSize = 20.dp
-private val GuestMascotSize = 80.dp
 
 /**
  * The learner's own space, and for now also the settings: account, app and support links, sign out
@@ -271,41 +269,14 @@ private fun GuestCard(
     onSignUpClick: () -> Unit,
     onSignInClick: () -> Unit,
 ) {
-    ToeicCard(modifier = Modifier.fillMaxWidth(), containerColor = PearlPaper) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            MascotView(
-                mascotResId = R.drawable.oy2_warm,
-                size = GuestMascotSize,
-                isFloating = false,
-            )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-            ) {
-                Text(
-                    text = stringResource(id = R.string.profile_title_guest),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = stringResource(id = R.string.profile_body_guest),
-                    style = AppTextStyles.Caption,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        PrimaryButton(
-            text = stringResource(id = R.string.common_action_sign_up_free),
-            onClick = onSignUpClick,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        SecondaryButton(
-            text = stringResource(id = R.string.common_action_have_account),
-            onClick = onSignInClick,
-            modifier = Modifier.fillMaxWidth(),
+    ToeicCard(modifier = Modifier.fillMaxWidth()) {
+        SignInRequiredState(
+            onSignUpClick = onSignUpClick,
+            onSignInClick = onSignInClick,
+            title = stringResource(id = R.string.profile_title_guest),
+            body = stringResource(id = R.string.profile_body_guest),
+            fullScreen = false,
+            mascotResId = R.drawable.oy2_warm,
         )
     }
 }

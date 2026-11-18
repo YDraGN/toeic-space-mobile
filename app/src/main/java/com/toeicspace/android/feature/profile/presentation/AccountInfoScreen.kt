@@ -37,6 +37,7 @@ import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.TestTags
 import com.toeicspace.android.core.ui.components.DetailScaffold
 import com.toeicspace.android.core.ui.components.EditableAvatar
+import com.toeicspace.android.core.ui.components.LoadingState
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.ToeicCard
@@ -70,7 +71,12 @@ internal fun AccountInfoRoute(
     LaunchedEffect(uiState.isLoading, uiState.profile) {
         if (!uiState.isLoading && uiState.profile == null) onBackClick()
     }
-    val profile = uiState.profile ?: return
+    val profile = uiState.profile
+    if (profile == null) {
+        // The cached profile usually arrives in a frame; show the shared loading state meanwhile.
+        if (uiState.isLoading) LoadingState()
+        return
+    }
 
     AccountInfoScreen(
         profile = profile,
