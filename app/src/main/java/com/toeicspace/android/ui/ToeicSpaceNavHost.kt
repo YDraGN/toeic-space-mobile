@@ -12,6 +12,8 @@ import com.toeicspace.android.feature.auth.navigation.changePasswordScreen
 import com.toeicspace.android.feature.auth.navigation.navigateToChangePassword
 import com.toeicspace.android.feature.auth.navigation.navigateToSignIn
 import com.toeicspace.android.feature.auth.navigation.navigateToSignUp
+import com.toeicspace.android.feature.checkout.navigation.checkoutScreen
+import com.toeicspace.android.feature.checkout.navigation.navigateToCheckout
 import com.toeicspace.android.feature.course.navigation.courseDetailScreen
 import com.toeicspace.android.feature.course.navigation.navigateToCourseDetail
 import com.toeicspace.android.feature.course.navigation.returnToCourseAfterSignIn
@@ -31,7 +33,7 @@ import com.toeicspace.android.feature.splash.navigation.splashScreen
 
 /**
  * Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info, Change
- * password, Course detail, My courses, Lesson.
+ * password, Course detail, Checkout, My courses, Lesson.
  */
 @Composable
 fun ToeicSpaceNavHost(
@@ -99,6 +101,13 @@ fun ToeicSpaceNavHost(
             onOpenLesson = { courseId, lessonId, preview ->
                 navController.navigateToLesson(courseId, lessonId, preview)
             },
+            onOpenCheckout = { navController.navigateToCheckout(it) },
+        )
+        // Paid: back to the course page, which re-checks the enrollment on resume and turns the
+        // buy button into "Vào học".
+        checkoutScreen(
+            onBack = { navController.popBackStack() },
+            onPaid = { navController.popBackStack() },
         )
         lessonScreen(onBack = { navController.popBackStack() })
         myCoursesScreen(

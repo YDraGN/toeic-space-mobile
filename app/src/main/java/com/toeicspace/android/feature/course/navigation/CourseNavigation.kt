@@ -33,13 +33,13 @@ fun NavController.returnToCourseAfterSignIn(): Boolean =
 
 /**
  * [onSignInRequired] opens sign in for a guest who taps enroll or buy. [onOpenCheckout] opens the
- * checkout of a paid course; while it is null, buying shows "coming soon".
+ * checkout of a paid course for a signed-in learner.
  */
 fun NavGraphBuilder.courseDetailScreen(
     onBack: () -> Unit,
     onSignInRequired: () -> Unit,
     onOpenLesson: (courseId: String, lessonId: String, preview: Boolean) -> Unit,
-    onOpenCheckout: ((courseId: String) -> Unit)? = null,
+    onOpenCheckout: (courseId: String) -> Unit,
 ) {
     composable<CourseDetailDestination> {
         CourseDetailRoute(
