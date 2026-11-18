@@ -59,6 +59,36 @@ class EnrollmentRepositoryImplTest {
     )
 
     @Test
+    fun `owned ids read every page of my courses`() =
+        runTest {
+            respond(
+                """{"items":[{"courseId":"a","title":"A"},{"courseId":"b","title":"B"}],"page":1,"pageSize":2,"totalCount":3}""",
+            )
+            respond(
+                """{"items":[{"courseId":"c","title":"C"}],"page":2,"pageSize":2,"totalCount":3}""",
+            )
+
+            val result = repository.getOwnedCourseIds()
+
+            assertEquals(setOf("a", "b", "c"), (result as AppResult.Success).data)
+            val first = server.takeRequest()
+            assertEquals("/content/api/v1/enrollments/me", first.url.encodedPath)
+            assertEquals("100", first.url.queryParameter("pageSize"))
+            assertEquals("2", server.takeRequest().url.queryParameter("page"))
+        }
+
+    @Test
+    fun `owned ids fail when a page fails`() =
+        runTest {
+            respond(
+                """{"items":[{"courseId":"a","title":"A"}],"page":1,"pageSize":1,"totalCount":2}""",
+            )
+            respond("""{"status":500}""", code = 500)
+
+            assertTrue(repository.getOwnedCourseIds() is AppResult.Failure)
+        }
+
+    @Test
     fun `enroll posts to the course and reads the enrollment`() =
         runTest {
             respond(ENROLLMENT_JSON)

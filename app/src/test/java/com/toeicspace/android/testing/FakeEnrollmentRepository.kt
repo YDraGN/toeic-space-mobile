@@ -29,6 +29,12 @@ class FakeEnrollmentRepository(
     var statusFailure: AppError? = null
     var myCoursesFailure: AppError? = null
 
+    /** Served by [getOwnedCourseIds]; set [ownedFailure] to make it fail. */
+    var ownedIds: Set<String> = emptySet()
+    var ownedFailure: AppError? = null
+    var ownedRequests = 0
+        private set
+
     val enrollRequests = mutableListOf<String>()
     val statusRequests = mutableListOf<String>()
     val myCoursesRequests = mutableListOf<Pair<String, Int>>()
@@ -57,5 +63,11 @@ class FakeEnrollmentRepository(
         myCoursesFailure?.let { return AppResult.Failure(it) }
         val items = myCourses.drop((page - 1) * this.pageSize).take(this.pageSize)
         return AppResult.Success(MyCoursePage(items, page, this.pageSize, myCourses.size))
+    }
+
+    override suspend fun getOwnedCourseIds(): AppResult<Set<String>> {
+        ownedRequests++
+        ownedFailure?.let { return AppResult.Failure(it) }
+        return AppResult.Success(ownedIds + enrolled)
     }
 }

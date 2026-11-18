@@ -20,11 +20,20 @@ interface EnrollmentRepository {
         pageSize: Int = DEFAULT_PAGE_SIZE,
     ): AppResult<MyCoursePage>
 
+    /**
+     * Ids of every course the learner is enrolled in, read page by page like the web's
+     * `useOwnedCourseIds`. The catalog and the related courses hide these.
+     */
+    suspend fun getOwnedCourseIds(): AppResult<Set<String>>
+
     companion object {
         const val DEFAULT_PAGE_SIZE = 20
 
         /** The backend allows at most this many items per page. */
         const val MAX_PAGE_SIZE = 100
+
+        /** Stops reading owned ids after this many pages (10 000 courses), whatever the total says. */
+        const val MAX_OWNED_PAGES = 100
 
         const val ERROR_COURSE_FULL = "COURSE_FULL"
         const val ERROR_FREE_ENROLLMENT_UNAVAILABLE = "FREE_ENROLLMENT_UNAVAILABLE"
