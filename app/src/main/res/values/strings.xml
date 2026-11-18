@@ -517,6 +517,7 @@
     <string name="my_classes_label_description">Giới thiệu lớp</string>
     <string name="my_classes_value_date_range">%1$s – %2$s</string>
     <string name="my_classes_value_date_unset">Chưa thiết lập</string>
+    <string name="my_classes_value_schedule_unset">Chưa có lịch học</string>
     <string name="my_classes_value_teacher_unknown">Chưa có thông tin giáo viên</string>
     <string name="my_classes_value_teacher_unassigned">Chưa phân công</string>
     <string name="my_classes_value_no_description">Lớp học chưa có mô tả.</string>

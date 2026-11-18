@@ -1,5 +1,6 @@
 package com.toeicspace.android.feature.classes.presentation.components
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -41,6 +42,26 @@ internal val StudentClassStatus.tone: TagTone
             StudentClassStatus.ARCHIVED -> LilacTone
         }
 
+/**
+ * The mascot on a class card and the class header: reading while the class runs, determined before
+ * it opens, proud once it is done, warm when it is kept as a memory. A status this app version does
+ * not know gets the plain mascot.
+ */
+@get:DrawableRes
+internal val StudentClassStatus?.mascotRes: Int
+    get() =
+        when (this) {
+            StudentClassStatus.DRAFT -> R.drawable.oy2_determined
+            StudentClassStatus.ACTIVE -> R.drawable.oy2_reading
+            StudentClassStatus.COMPLETED -> R.drawable.oy2_proud
+            StudentClassStatus.ARCHIVED -> R.drawable.oy2_warm
+            null -> R.drawable.oy2_base
+        }
+
+/** Soft circle behind the mascot, in the status tone; sky for an unknown status. */
+internal val StudentClassStatus?.mascotTone: TagTone
+    get() = this?.tone ?: SkyTone
+
 @Composable
 internal fun LocalDate?.classDateText(): String =
     this?.format(ClassDateFormat) ?: stringResource(R.string.my_classes_value_date_unset)
@@ -56,14 +77,21 @@ internal fun StudentClass.teacherText(): String =
             },
         )
 
-/** "07/09/2026 – 20/12/2026"; a date not set yet reads "Chưa thiết lập". */
+/**
+ * "07/09/2026 – 20/12/2026"; one date not set yet reads "Chưa thiết lập", and with neither set the
+ * whole range reads "Chưa có lịch học" instead of repeating it.
+ */
 @Composable
 internal fun StudentClass.dateRangeText(): String =
-    stringResource(
-        R.string.my_classes_value_date_range,
-        startDate.classDateText(),
-        endDate.classDateText(),
-    )
+    if (startDate == null && endDate == null) {
+        stringResource(R.string.my_classes_value_schedule_unset)
+    } else {
+        stringResource(
+            R.string.my_classes_value_date_range,
+            startDate.classDateText(),
+            endDate.classDateText(),
+        )
+    }
 
 /** Classroom answers 404 for a class the student is not (or no longer) enrolled in. */
 internal val AppError.isNotFound: Boolean

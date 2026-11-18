@@ -1,13 +1,17 @@
 package com.toeicspace.android.feature.classes.presentation.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,11 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.components.AppTopBar
@@ -34,6 +40,7 @@ import com.toeicspace.android.feature.classes.domain.StudentClassStatus
 import java.time.LocalDate
 
 private val InfoIconSize = 16.dp
+private val CardMascotSize = 76.dp
 
 /** Back and the screen title, like the course page. */
 @Composable
@@ -130,30 +137,84 @@ internal fun ClassInfoLine(
     }
 }
 
-/** One class in the list: code and status, name, teacher and dates. */
+/** The status mascot on a soft circle in the status tone. Decorative: the status tag says it. */
+@Composable
+internal fun ClassMascot(
+    status: StudentClassStatus?,
+    size: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .size(size)
+                .clip(CircleShape)
+                .background(status.mascotTone.container),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(status.mascotRes),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize().padding(Spacing.xs),
+        )
+    }
+}
+
+/** The sign-in screens' background picture behind both class screens. */
+@Composable
+internal fun ClassesPageBackground(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(R.drawable.img_splash_background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        content()
+    }
+}
+
+/** One class in the list: code and status, name, teacher and dates, with the status mascot. */
 @Composable
 internal fun ClassCard(
     studentClass: StudentClass,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ToeicCard(modifier = modifier.fillMaxWidth(), itemSpacing = Spacing.sm, onClick = onClick) {
+    ToeicCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ClassCodeText(code = studentClass.code, modifier = Modifier.weight(1f))
-            studentClass.status?.let { ClassStatusTag(status = it) }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    ClassCodeText(
+                        code = studentClass.code,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    studentClass.status?.let { ClassStatusTag(status = it) }
+                }
+                Text(
+                    text = studentClass.name,
+                    style = AppTextStyles.CourseTitle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                ClassInfoLine(iconRes = R.drawable.ic_account, text = studentClass.teacherText())
+                ClassInfoLine(iconRes = R.drawable.ic_calendar, text = studentClass.dateRangeText())
+            }
+            ClassMascot(status = studentClass.status, size = CardMascotSize)
         }
-        Text(
-            text = studentClass.name,
-            style = AppTextStyles.CourseTitle,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-        ClassInfoLine(iconRes = R.drawable.ic_account, text = studentClass.teacherText())
-        ClassInfoLine(iconRes = R.drawable.ic_calendar, text = studentClass.dateRangeText())
     }
 }
 

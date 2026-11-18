@@ -1,6 +1,5 @@
 package com.toeicspace.android.feature.classes.presentation.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,10 +34,10 @@ import com.toeicspace.android.core.ui.components.LoadingState
 import com.toeicspace.android.core.ui.components.OfflineBanner
 import com.toeicspace.android.core.ui.currentWindowWidth
 import com.toeicspace.android.core.ui.theme.AppTextStyles
-import com.toeicspace.android.core.ui.theme.SoftPageGradientBrush
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.feature.classes.presentation.components.ClassCard
+import com.toeicspace.android.feature.classes.presentation.components.ClassesPageBackground
 import com.toeicspace.android.feature.classes.presentation.components.ClassesTopBar
 import com.toeicspace.android.feature.classes.presentation.components.PreviewClasses
 import com.toeicspace.android.feature.classes.presentation.components.classMessageRes
@@ -80,7 +79,6 @@ internal fun MyClassesRoute(
  * The classes the student is enrolled in. One column of cards on phones, as many columns as fit on
  * wider windows. Pull to refresh; when a refresh fails the list loaded before stays, with a banner.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyClassesScreen(
     state: MyClassesUiState,
@@ -88,8 +86,19 @@ internal fun MyClassesScreen(
     windowWidth: WindowWidth,
     modifier: Modifier = Modifier,
 ) {
+    ClassesPageBackground(modifier = modifier) {
+        MyClassesScaffold(state = state, actions = actions, windowWidth = windowWidth)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MyClassesScaffold(
+    state: MyClassesUiState,
+    actions: MyClassesActions,
+    windowWidth: WindowWidth,
+) {
     Scaffold(
-        modifier = modifier.background(SoftPageGradientBrush),
         containerColor = Color.Transparent,
         topBar = {
             ClassesTopBar(
@@ -147,7 +156,8 @@ private fun ClassGrid(
     actions: MyClassesActions,
     windowWidth: WindowWidth,
 ) {
-    val horizontalPadding = if (windowWidth.isAtLeastMedium) Spacing.lg else Spacing.md
+    // 16dp on every width, the same gutter as the sign-in screens.
+    val horizontalPadding = Spacing.md
     LazyVerticalGrid(
         columns =
             if (windowWidth.isAtLeastMedium) {

@@ -2,6 +2,7 @@ package com.toeicspace.android.feature.classes.presentation.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -44,16 +45,18 @@ import com.toeicspace.android.core.ui.components.ToeicListSection
 import com.toeicspace.android.core.ui.currentWindowWidth
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.BlushTone
+import com.toeicspace.android.core.ui.theme.Dimens
 import com.toeicspace.android.core.ui.theme.LilacTone
 import com.toeicspace.android.core.ui.theme.MintTone
 import com.toeicspace.android.core.ui.theme.SkyTone
-import com.toeicspace.android.core.ui.theme.SoftPageGradientBrush
 import com.toeicspace.android.core.ui.theme.Spacing
 import com.toeicspace.android.core.ui.theme.ToeicSpaceTheme
 import com.toeicspace.android.feature.classes.domain.StudentClass
 import com.toeicspace.android.feature.classes.domain.StudentClassStatus
 import com.toeicspace.android.feature.classes.presentation.components.ClassCodeText
+import com.toeicspace.android.feature.classes.presentation.components.ClassMascot
 import com.toeicspace.android.feature.classes.presentation.components.ClassStatusTag
+import com.toeicspace.android.feature.classes.presentation.components.ClassesPageBackground
 import com.toeicspace.android.feature.classes.presentation.components.ClassesTopBar
 import com.toeicspace.android.feature.classes.presentation.components.PreviewClasses
 import com.toeicspace.android.feature.classes.presentation.components.classDateText
@@ -95,7 +98,6 @@ internal fun MyClassDetailRoute(
  * in landscape put the facts in a side column. Classroom has no schedule or sessions yet, so there
  * is no timetable section.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyClassDetailScreen(
     state: MyClassDetailUiState,
@@ -103,8 +105,19 @@ internal fun MyClassDetailScreen(
     windowWidth: WindowWidth,
     modifier: Modifier = Modifier,
 ) {
+    ClassesPageBackground(modifier = modifier) {
+        MyClassDetailScaffold(state = state, actions = actions, windowWidth = windowWidth)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MyClassDetailScaffold(
+    state: MyClassDetailUiState,
+    actions: MyClassDetailActions,
+    windowWidth: WindowWidth,
+) {
     Scaffold(
-        modifier = modifier.background(SoftPageGradientBrush),
         containerColor = Color.Transparent,
         topBar = {
             ClassesTopBar(
@@ -132,7 +145,6 @@ internal fun MyClassDetailScreen(
                         studentClass = studentClass,
                         state = state,
                         actions = actions,
-                        wide = windowWidth.isAtLeastMedium,
                     )
                 state.isLoading ->
                     LoadingState(message = stringResource(R.string.my_classes_label_loading))
@@ -166,14 +178,13 @@ private fun SinglePaneContent(
     studentClass: StudentClass,
     state: MyClassDetailUiState,
     actions: MyClassDetailActions,
-    wide: Boolean,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding =
             PaddingValues(
-                start = if (wide) Spacing.lg else Spacing.md,
-                end = if (wide) Spacing.lg else Spacing.md,
+                start = Spacing.md,
+                end = Spacing.md,
                 top = Spacing.sm,
                 bottom = Spacing.xl,
             ),
@@ -194,7 +205,7 @@ private fun TwoPaneContent(
     actions: MyClassDetailActions,
 ) {
     Row(
-        modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.lg),
+        modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.md),
         horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         LazyColumn(
@@ -229,17 +240,31 @@ private fun LazyListScope.staleBanner(
 private fun HeroCard(studentClass: StudentClass) {
     ToeicCard(modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(Spacing.lg)) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ClassCodeText(code = studentClass.code, modifier = Modifier.weight(1f))
-            studentClass.status?.let { ClassStatusTag(status = it) }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    ClassCodeText(
+                        code = studentClass.code,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    studentClass.status?.let { ClassStatusTag(status = it) }
+                }
+                Text(
+                    text = studentClass.name,
+                    style = AppTextStyles.CourseTitleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            ClassMascot(status = studentClass.status, size = Dimens.mascotSm)
         }
-        Text(
-            text = studentClass.name,
-            style = AppTextStyles.CourseTitleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
         if (studentClass.isReadOnly) ReadOnlyNote(status = studentClass.status)
     }
 }
