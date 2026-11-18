@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Checkout (PBL-116): only the folder holding the QR image being shared. -->
+<paths>
+    <cache-path
+        name="shared_qr"
+        path="shared_qr/" />
+</paths>
