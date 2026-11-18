@@ -68,6 +68,7 @@ internal fun ProfileTab(
     onSignOutClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     onMyCoursesClick: () -> Unit = {},
+    onMyClassesClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -98,6 +99,7 @@ internal fun ProfileTab(
         isUploadingAvatar = isUploadingAvatar,
         onAvatarPicked = viewModel::onAvatarPicked,
         onMyCoursesClick = onMyCoursesClick,
+        onMyClassesClick = onMyClassesClick,
     )
 }
 
@@ -116,6 +118,7 @@ internal fun ProfileContent(
     isUploadingAvatar: Boolean = false,
     onAvatarPicked: (String) -> Unit = {},
     onMyCoursesClick: () -> Unit = {},
+    onMyClassesClick: () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -144,6 +147,13 @@ internal fun ProfileContent(
                         supportingText = stringResource(id = R.string.my_courses_body_entry),
                         onClick = onMyCoursesClick,
                         modifier = Modifier.testTag(TestTags.MY_COURSES_ENTRY),
+                    )
+                    ToeicListDivider()
+                    ToeicListRow(
+                        iconRes = R.drawable.ic_users,
+                        label = stringResource(id = R.string.my_classes_title),
+                        supportingText = stringResource(id = R.string.my_classes_body_entry),
+                        onClick = onMyClassesClick,
                     )
                 }
                 ToeicListSection(title = stringResource(id = R.string.profile_section_account)) {

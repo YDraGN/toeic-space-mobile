@@ -499,4 +499,38 @@
     <string name="checkout_error_order_not_found">Không tìm thấy đơn hàng này.</string>
     <string name="checkout_error_order_settled">Đơn hàng đã được thanh toán, hết hạn hoặc huỷ nên không huỷ được nữa.</string>
     <string name="checkout_error_conflict">Dữ liệu vừa thay đổi. Bạn thử lại nhé.</string>
+
+    <!-- My Classes (PBL-121) -->
+    <string name="my_classes_title">Lớp học của tôi</string>
+    <string name="my_classes_body_entry">Lớp bạn đang học, giáo viên và thời gian học</string>
+    <string name="my_classes_subtitle">Xem các lớp bạn đang tham gia và thông tin giáo viên phụ trách.</string>
+    <string name="my_classes_label_count">%1$d lớp học</string>
+    <string name="my_classes_title_detail">Chi tiết lớp học</string>
+    <string name="my_classes_status_draft">Bản nháp</string>
+    <string name="my_classes_status_active">Đang hoạt động</string>
+    <string name="my_classes_status_completed">Đã hoàn thành</string>
+    <string name="my_classes_status_archived">Đã lưu trữ</string>
+    <string name="my_classes_section_info">Thông tin lớp</string>
+    <string name="my_classes_label_teacher">Giáo viên phụ trách</string>
+    <string name="my_classes_label_start">Ngày bắt đầu</string>
+    <string name="my_classes_label_end">Ngày kết thúc</string>
+    <string name="my_classes_label_description">Giới thiệu lớp</string>
+    <string name="my_classes_value_date_range">%1$s – %2$s</string>
+    <string name="my_classes_value_date_unset">Chưa thiết lập</string>
+    <string name="my_classes_value_schedule_unset">Chưa có lịch học</string>
+    <string name="my_classes_value_teacher_unknown">Chưa có thông tin giáo viên</string>
+    <string name="my_classes_value_teacher_unassigned">Chưa phân công</string>
+    <string name="my_classes_value_no_description">Lớp học chưa có mô tả.</string>
+    <string name="my_classes_note_completed">Lớp đã hoàn thành. Thông tin chỉ có thể xem.</string>
+    <string name="my_classes_note_archived">Lớp đã lưu trữ. Thông tin chỉ có thể xem.</string>
+    <string name="my_classes_label_loading">Đang tải lớp học…</string>
+    <string name="my_classes_title_empty">Bạn chưa tham gia lớp học nào</string>
+    <string name="my_classes_body_empty">Khi được thêm vào lớp, lớp học sẽ hiện ở đây. Bạn kéo xuống để làm mới nhé.</string>
+    <string name="my_classes_title_error">Chưa tải được lớp học</string>
+    <string name="my_classes_title_not_found">Không tìm thấy lớp học</string>
+    <string name="my_classes_body_not_found">Lớp này không còn hoặc bạn không còn trong lớp nữa.</string>
+    <string name="my_classes_error_load">Không thể tải lớp học. Bạn thử lại sau nhé.</string>
+    <string name="my_classes_error_session">Phiên đăng nhập đã hết. Bạn đăng nhập lại nhé.</string>
+    <string name="my_classes_error_forbidden">Tài khoản của bạn không có quyền xem lớp học.</string>
+    <string name="my_classes_action_back_to_list">Về danh sách lớp</string>
 </resources>

@@ -77,6 +77,7 @@ internal fun MainRoute(
     onSessionEnded: () -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToMyCourses: () -> Unit = {},
+    onNavigateToMyClasses: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -96,6 +97,7 @@ internal fun MainRoute(
                 onChangePasswordClick = onNavigateToChangePassword,
                 onCourseClick = onNavigateToCourseDetail,
                 onMyCoursesClick = onNavigateToMyCourses,
+                onMyClassesClick = onNavigateToMyClasses,
                 modifier = modifier,
             )
         // The session is read from local storage, so this lasts a frame or two.
@@ -118,6 +120,7 @@ internal fun MainShell(
     onCourseClick: (courseId: String) -> Unit,
     modifier: Modifier = Modifier,
     onMyCoursesClick: () -> Unit = {},
+    onMyClassesClick: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val viewer = state.viewer
@@ -240,6 +243,7 @@ internal fun MainShell(
                         onChangePasswordClick = onChangePasswordClick,
                         onCourseClick = onCourseClick,
                         onMyCoursesClick = onMyCoursesClick,
+                        onMyClassesClick = onMyClassesClick,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
                         snackbarHostState = snackbarHostState,
@@ -280,6 +284,7 @@ private fun MainTabsNavHost(
     onChangePasswordClick: () -> Unit,
     onCourseClick: (courseId: String) -> Unit,
     onMyCoursesClick: () -> Unit,
+    onMyClassesClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -340,6 +345,7 @@ private fun MainTabsNavHost(
                     onSignOutClick = onSignOutClick,
                     snackbarHostState = snackbarHostState,
                     onMyCoursesClick = onMyCoursesClick,
+                    onMyClassesClick = onMyClassesClick,
                 )
             }
         }
