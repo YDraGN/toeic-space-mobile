@@ -77,6 +77,7 @@ import com.toeicspace.android.feature.course.domain.CourseLesson
 import com.toeicspace.android.feature.course.domain.CourseModule
 import com.toeicspace.android.feature.course.domain.CoursePrice
 import com.toeicspace.android.feature.course.domain.CoursePromotion
+import com.toeicspace.android.feature.course.domain.CourseSummary
 import com.toeicspace.android.feature.course.presentation.components.PreviewCourses
 import com.toeicspace.android.feature.course.presentation.components.amountText
 import com.toeicspace.android.feature.enrollment.presentation.learningMessageRes
@@ -103,6 +104,7 @@ data class CourseDetailActions(
     val onLessonClick: (lessonId: String) -> Unit = {},
     val onConfirmEnroll: () -> Unit = {},
     val onDialogDismiss: () -> Unit = {},
+    val onRelatedCourseClick: (courseId: String) -> Unit = {},
 )
 
 /**
@@ -116,9 +118,12 @@ internal fun CourseDetailRoute(
     onOpenCheckout: (courseId: String) -> Unit,
     onOpenLesson: (courseId: String, lessonId: String, preview: Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onCourseClick: (courseId: String) -> Unit = {},
     viewModel: CourseDetailViewModel = hiltViewModel(),
+    relatedViewModel: RelatedCoursesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val relatedCourses by relatedViewModel.courses.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
@@ -156,7 +161,9 @@ internal fun CourseDetailRoute(
                 onLessonClick = viewModel::onLessonClick,
                 onConfirmEnroll = viewModel::onConfirmEnroll,
                 onDialogDismiss = viewModel::onDialogDismiss,
+                onRelatedCourseClick = onCourseClick,
             ),
+        relatedCourses = relatedCourses,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
@@ -181,6 +188,7 @@ internal fun CourseDetailScreen(
     actions: CourseDetailActions,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    relatedCourses: List<CourseSummary> = emptyList(),
 ) {
     val enroll =
         EnrollUi(
@@ -222,6 +230,7 @@ internal fun CourseDetailScreen(
                         state = state,
                         actions = actions,
                         enroll = enroll,
+                        relatedCourses = relatedCourses,
                     )
                 course != null ->
                     SinglePaneContent(
@@ -230,6 +239,7 @@ internal fun CourseDetailScreen(
                         actions = actions,
                         enroll = enroll,
                         showPriceCard = !pinnedEnrollBar,
+                        relatedCourses = relatedCourses,
                     )
                 state.isLoading ->
                     CircularProgressIndicator(
@@ -300,6 +310,7 @@ private fun SinglePaneContent(
     actions: CourseDetailActions,
     enroll: EnrollUi,
     showPriceCard: Boolean,
+    relatedCourses: List<CourseSummary>,
 ) {
     LazyColumn(
         modifier = Modifier.widthIn(max = SinglePaneMaxWidth).fillMaxSize(),
@@ -318,6 +329,11 @@ private fun SinglePaneContent(
         }
         readingSections(course = course, includeSkills = true)
         curriculum(course = course, state = state, actions = actions)
+        relatedCourses(
+            courses = relatedCourses,
+            wide = false,
+            onCourseClick = actions.onRelatedCourseClick,
+        )
     }
 }
 
@@ -328,6 +344,7 @@ private fun TwoPaneContent(
     state: CourseDetailUiState,
     actions: CourseDetailActions,
     enroll: EnrollUi,
+    relatedCourses: List<CourseSummary>,
 ) {
     Row(
         modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.lg),
@@ -341,6 +358,11 @@ private fun TwoPaneContent(
             item(key = "hero") { CourseHeroCard(course = course, large = true) }
             readingSections(course = course, includeSkills = false)
             curriculum(course = course, state = state, actions = actions)
+            relatedCourses(
+                courses = relatedCourses,
+                wide = true,
+                onCourseClick = actions.onRelatedCourseClick,
+            )
         }
         Column(
             modifier =
@@ -726,13 +748,25 @@ private val PreviewEnrolledState =
 @Preview(widthDp = 390, heightDp = 1400)
 @Composable
 private fun CourseDetailPhonePreview() {
-    ToeicSpaceTheme { CourseDetailScreen(state = PreviewLoadedState, actions = PreviewActions) }
+    ToeicSpaceTheme {
+        CourseDetailScreen(
+            state = PreviewLoadedState,
+            actions = PreviewActions,
+            relatedCourses = PreviewCourses.take(RELATED_COURSES_LIMIT),
+        )
+    }
 }
 
 @Preview(widthDp = 1280, heightDp = 800)
 @Composable
 private fun CourseDetailTabletPreview() {
-    ToeicSpaceTheme { CourseDetailScreen(state = PreviewLoadedState, actions = PreviewActions) }
+    ToeicSpaceTheme {
+        CourseDetailScreen(
+            state = PreviewLoadedState,
+            actions = PreviewActions,
+            relatedCourses = PreviewCourses.take(RELATED_COURSES_LIMIT),
+        )
+    }
 }
 
 @Preview(widthDp = 390, heightDp = 700)

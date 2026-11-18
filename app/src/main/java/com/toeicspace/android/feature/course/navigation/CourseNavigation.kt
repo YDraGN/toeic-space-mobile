@@ -40,9 +40,11 @@ fun NavGraphBuilder.courseDetailScreen(
     onSignInRequired: () -> Unit,
     onOpenLesson: (courseId: String, lessonId: String, preview: Boolean) -> Unit,
     onOpenCheckout: (courseId: String) -> Unit,
+    onCourseClick: (courseId: String) -> Unit = {},
 ) {
     composable<CourseDetailDestination> {
         CourseDetailRoute(
+            onCourseClick = onCourseClick,
             onBackClick = onBack,
             onSignInRequired = onSignInRequired,
             onOpenCheckout = onOpenCheckout,

@@ -106,6 +106,7 @@ fun ToeicSpaceNavHost(
                 navController.navigateToLesson(courseId, lessonId, preview)
             },
             onOpenCheckout = { navController.navigateToCheckout(it) },
+            onCourseClick = { navController.navigateToCourseDetail(it) },
         )
         // Paid: back to the course page, which re-checks the enrollment on resume and turns the
         // buy button into "Vào học".
