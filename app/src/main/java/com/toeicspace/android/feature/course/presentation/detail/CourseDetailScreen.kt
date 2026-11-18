@@ -58,7 +58,6 @@ import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.ToeicCard
 import com.toeicspace.android.core.ui.components.ToeicIconButton
-import com.toeicspace.android.core.ui.components.rememberComingSoonAction
 import com.toeicspace.android.core.ui.currentWindowWidth
 import com.toeicspace.android.core.ui.theme.AppTextStyles
 import com.toeicspace.android.core.ui.theme.BlushTint
@@ -107,21 +106,20 @@ data class CourseDetailActions(
 )
 
 /**
- * [onOpenCheckout] is the paid-course checkout; while it is null, buying says "coming soon".
+ * [onOpenCheckout] opens the checkout of a paid course for a signed-in learner.
  * [onSignInRequired] opens sign in for a guest, who comes back here once signed in.
  */
 @Composable
 internal fun CourseDetailRoute(
     onBackClick: () -> Unit,
     onSignInRequired: () -> Unit,
-    onOpenCheckout: ((courseId: String) -> Unit)?,
+    onOpenCheckout: (courseId: String) -> Unit,
     onOpenLesson: (courseId: String, lessonId: String, preview: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CourseDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val onComingSoon = rememberComingSoonAction(snackbarHostState)
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
 
@@ -130,8 +128,7 @@ internal fun CourseDetailRoute(
         when (event) {
             null -> return@LaunchedEffect
             CourseDetailEvent.SignInRequired -> onSignInRequired()
-            is CourseDetailEvent.OpenCheckout ->
-                if (onOpenCheckout != null) onOpenCheckout(event.courseId) else onComingSoon()
+            is CourseDetailEvent.OpenCheckout -> onOpenCheckout(event.courseId)
             is CourseDetailEvent.OpenLesson ->
                 onOpenLesson(event.courseId, event.lessonId, event.preview)
         }
@@ -160,7 +157,6 @@ internal fun CourseDetailRoute(
                 onConfirmEnroll = viewModel::onConfirmEnroll,
                 onDialogDismiss = viewModel::onDialogDismiss,
             ),
-        checkoutAvailable = onOpenCheckout != null,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
@@ -184,14 +180,12 @@ internal fun CourseDetailScreen(
     state: CourseDetailUiState,
     actions: CourseDetailActions,
     modifier: Modifier = Modifier,
-    checkoutAvailable: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val enroll =
         EnrollUi(
             action = state.primaryAction,
             isEnrolling = state.isEnrolling,
-            showPaymentNote = state.primaryAction == CoursePrimaryAction.BUY && !checkoutAvailable,
             onClick = actions.onPrimaryClick,
         )
     val windowWidth = currentWindowWidth()
@@ -271,7 +265,6 @@ internal fun CourseDetailScreen(
 private data class EnrollUi(
     val action: CoursePrimaryAction,
     val isEnrolling: Boolean,
-    val showPaymentNote: Boolean,
     val onClick: () -> Unit,
 )
 
@@ -463,17 +456,12 @@ private fun PriceCard(
     }
 }
 
-/** Under the button on cards: "you own this", or that in-app payment is not ready yet. */
+/** Under the button on cards: "you own this". */
 @Composable
 private fun EnrollNote(enroll: EnrollUi) {
-    val text =
-        when {
-            enroll.action == CoursePrimaryAction.START -> R.string.course_note_enrolled
-            enroll.showPaymentNote -> R.string.course_note_payment
-            else -> return
-        }
+    if (enroll.action != CoursePrimaryAction.START) return
     Text(
-        text = stringResource(text),
+        text = stringResource(R.string.course_note_enrolled),
         style = MaterialTheme.typography.labelSmall,
         color = HintText,
         textAlign = TextAlign.Center,

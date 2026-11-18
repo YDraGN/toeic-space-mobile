@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -172,7 +173,11 @@ internal fun SoldOutDialog(
     }
 }
 
-/** The card both dialogs sit on: the app's card, capped in width and scrollable on short screens. */
+/**
+ * The card both dialogs sit on: the app's card, capped in width and scrollable on short screens.
+ * The dialog window spans the screen (`usePlatformDefaultWidth = false`), so the outer padding is
+ * what keeps the card off the edges on a phone.
+ */
 @Composable
 private fun DialogCard(
     modifier: Modifier = Modifier,
@@ -181,6 +186,7 @@ private fun DialogCard(
     ToeicCard(
         modifier =
             modifier
+                .padding(Spacing.lg)
                 .widthIn(max = DialogMaxWidth)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
