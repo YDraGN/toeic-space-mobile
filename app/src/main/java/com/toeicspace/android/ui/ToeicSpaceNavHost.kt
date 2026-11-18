@@ -14,6 +14,11 @@ import com.toeicspace.android.feature.auth.navigation.navigateToSignIn
 import com.toeicspace.android.feature.auth.navigation.navigateToSignUp
 import com.toeicspace.android.feature.course.navigation.courseDetailScreen
 import com.toeicspace.android.feature.course.navigation.navigateToCourseDetail
+import com.toeicspace.android.feature.course.navigation.returnToCourseAfterSignIn
+import com.toeicspace.android.feature.enrollment.navigation.myCoursesScreen
+import com.toeicspace.android.feature.enrollment.navigation.navigateToMyCourses
+import com.toeicspace.android.feature.lesson.navigation.lessonScreen
+import com.toeicspace.android.feature.lesson.navigation.navigateToLesson
 import com.toeicspace.android.feature.main.navigation.mainScreen
 import com.toeicspace.android.feature.main.navigation.navigateToMain
 import com.toeicspace.android.feature.onboarding.navigation.OnboardingDestination
@@ -26,7 +31,7 @@ import com.toeicspace.android.feature.splash.navigation.splashScreen
 
 /**
  * Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info, Change
- * password, Course detail.
+ * password, Course detail, My courses, Lesson.
  */
 @Composable
 fun ToeicSpaceNavHost(
@@ -71,7 +76,12 @@ fun ToeicSpaceNavHost(
         )
         authScreens(
             navController = navController,
-            onEnterApp = { navController.navigateToMain(clearAll()) },
+            // A guest who left a course page to sign in goes back to it; anyone else starts fresh.
+            onEnterApp = {
+                if (!navController.returnToCourseAfterSignIn()) {
+                    navController.navigateToMain(clearAll())
+                }
+            },
         )
         mainScreen(
             onNavigateToSignIn = { navController.navigateToSignIn() },
@@ -80,9 +90,21 @@ fun ToeicSpaceNavHost(
             onNavigateToChangePassword = { navController.navigateToChangePassword() },
             onNavigateToCourseDetail = { navController.navigateToCourseDetail(it) },
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
+            onNavigateToMyCourses = { navController.navigateToMyCourses() },
         )
         accountInfoScreen(onBack = { navController.popBackStack() })
-        courseDetailScreen(onBack = { navController.popBackStack() })
+        courseDetailScreen(
+            onBack = { navController.popBackStack() },
+            onSignInRequired = { navController.navigateToSignIn() },
+            onOpenLesson = { courseId, lessonId, preview ->
+                navController.navigateToLesson(courseId, lessonId, preview)
+            },
+        )
+        lessonScreen(onBack = { navController.popBackStack() })
+        myCoursesScreen(
+            onBack = { navController.popBackStack() },
+            onCourseClick = { navController.navigateToCourseDetail(it) },
+        )
         changePasswordScreen(
             onBack = { navController.popBackStack() },
             onPasswordChanged = { email ->

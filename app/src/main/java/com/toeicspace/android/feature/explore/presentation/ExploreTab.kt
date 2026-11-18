@@ -5,6 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.core.ui.currentWindowWidth
 import com.toeicspace.android.feature.course.presentation.catalog.CourseCatalogActions
@@ -22,6 +24,7 @@ internal fun ExploreTab(
     viewModel: CourseCatalogViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
     val actions =
         remember(viewModel, onCourseClick) {
             CourseCatalogActions(

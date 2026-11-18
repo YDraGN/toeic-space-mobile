@@ -42,6 +42,11 @@ class FakeSessionRepository(
         state.value = state.value.copy(user = null, isGuest = false)
     }
 
+    /** Simulates signing in from the sign-in screen. */
+    fun signIn(user: AuthUser) {
+        state.value = state.value.copy(user = user, isGuest = false)
+    }
+
     /** Simulates the session ending on the server, e.g. a failed refresh. */
     fun expireSession() {
         state.value = state.value.copy(user = null, isGuest = false)

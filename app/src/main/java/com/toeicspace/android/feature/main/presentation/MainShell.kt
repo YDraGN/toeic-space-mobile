@@ -76,6 +76,7 @@ internal fun MainRoute(
     onNavigateToCourseDetail: (courseId: String) -> Unit,
     onSessionEnded: () -> Unit,
     modifier: Modifier = Modifier,
+    onNavigateToMyCourses: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -94,6 +95,7 @@ internal fun MainRoute(
                 onAccountInfoClick = onNavigateToAccountInfo,
                 onChangePasswordClick = onNavigateToChangePassword,
                 onCourseClick = onNavigateToCourseDetail,
+                onMyCoursesClick = onNavigateToMyCourses,
                 modifier = modifier,
             )
         // The session is read from local storage, so this lasts a frame or two.
@@ -115,6 +117,7 @@ internal fun MainShell(
     onChangePasswordClick: () -> Unit,
     onCourseClick: (courseId: String) -> Unit,
     modifier: Modifier = Modifier,
+    onMyCoursesClick: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val viewer = state.viewer
@@ -236,6 +239,7 @@ internal fun MainShell(
                         onAccountInfoClick = onAccountInfoClick,
                         onChangePasswordClick = onChangePasswordClick,
                         onCourseClick = onCourseClick,
+                        onMyCoursesClick = onMyCoursesClick,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
                         snackbarHostState = snackbarHostState,
@@ -275,6 +279,7 @@ private fun MainTabsNavHost(
     onAccountInfoClick: () -> Unit,
     onChangePasswordClick: () -> Unit,
     onCourseClick: (courseId: String) -> Unit,
+    onMyCoursesClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -334,6 +339,7 @@ private fun MainTabsNavHost(
                     onComingSoon = onComingSoon,
                     onSignOutClick = onSignOutClick,
                     snackbarHostState = snackbarHostState,
+                    onMyCoursesClick = onMyCoursesClick,
                 )
             }
         }

@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,6 +45,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.R
 import com.toeicspace.android.core.common.AppError
@@ -77,6 +80,7 @@ import com.toeicspace.android.feature.course.domain.CoursePrice
 import com.toeicspace.android.feature.course.domain.CoursePromotion
 import com.toeicspace.android.feature.course.presentation.components.PreviewCourses
 import com.toeicspace.android.feature.course.presentation.components.amountText
+import com.toeicspace.android.feature.enrollment.presentation.learningMessageRes
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -96,15 +100,54 @@ data class CourseDetailActions(
     val onBackClick: () -> Unit,
     val onRetry: () -> Unit,
     val onModuleToggle: (moduleId: String) -> Unit,
+    val onPrimaryClick: () -> Unit = {},
+    val onLessonClick: (lessonId: String) -> Unit = {},
+    val onConfirmEnroll: () -> Unit = {},
+    val onDialogDismiss: () -> Unit = {},
 )
 
+/**
+ * [onOpenCheckout] is the paid-course checkout; while it is null, buying says "coming soon".
+ * [onSignInRequired] opens sign in for a guest, who comes back here once signed in.
+ */
 @Composable
 internal fun CourseDetailRoute(
     onBackClick: () -> Unit,
+    onSignInRequired: () -> Unit,
+    onOpenCheckout: ((courseId: String) -> Unit)?,
+    onOpenLesson: (courseId: String, lessonId: String, preview: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CourseDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val onComingSoon = rememberComingSoonAction(snackbarHostState)
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onResume() }
+
+    val event = state.event
+    LaunchedEffect(event) {
+        when (event) {
+            null -> return@LaunchedEffect
+            CourseDetailEvent.SignInRequired -> onSignInRequired()
+            is CourseDetailEvent.OpenCheckout ->
+                if (onOpenCheckout != null) onOpenCheckout(event.courseId) else onComingSoon()
+            is CourseDetailEvent.OpenLesson ->
+                onOpenLesson(event.courseId, event.lessonId, event.preview)
+        }
+        viewModel.onEventHandled()
+    }
+
+    val message = state.message
+    val messageText = message?.let { stringResource(it.textRes()) }
+    LaunchedEffect(message) {
+        if (messageText != null) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            viewModel.onMessageShown()
+            snackbarHostState.showSnackbar(messageText)
+        }
+    }
+
     CourseDetailScreen(
         state = state,
         actions =
@@ -112,24 +155,45 @@ internal fun CourseDetailRoute(
                 onBackClick = onBackClick,
                 onRetry = viewModel::onRetry,
                 onModuleToggle = viewModel::onModuleToggle,
+                onPrimaryClick = viewModel::onPrimaryClick,
+                onLessonClick = viewModel::onLessonClick,
+                onConfirmEnroll = viewModel::onConfirmEnroll,
+                onDialogDismiss = viewModel::onDialogDismiss,
             ),
+        checkoutAvailable = onOpenCheckout != null,
+        snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
 }
 
+private fun CourseDetailMessage.textRes(): Int =
+    when (this) {
+        CourseDetailMessage.Enrolled -> R.string.course_msg_enrolled
+        CourseDetailMessage.NoLessons -> R.string.course_msg_no_lessons
+        CourseDetailMessage.LessonLocked -> R.string.course_msg_lesson_locked
+        is CourseDetailMessage.Failed -> error.learningMessageRes()
+    }
+
 /**
  * One course from the public catalog. Phones get one column with the price pinned at the bottom;
- * wide windows put the price card in a side column. Enrolling and the free-preview player are not
- * built yet, so both say so in a snackbar.
+ * wide windows put the price card in a side column. The button under the price enrolls, buys or
+ * opens the first lesson, depending on the price and on whether the learner owns the course.
  */
 @Composable
 internal fun CourseDetailScreen(
     state: CourseDetailUiState,
     actions: CourseDetailActions,
     modifier: Modifier = Modifier,
+    checkoutAvailable: Boolean = false,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val onComingSoon = rememberComingSoonAction(snackbarHostState)
+    val enroll =
+        EnrollUi(
+            action = state.primaryAction,
+            isEnrolling = state.isEnrolling,
+            showPaymentNote = state.primaryAction == CoursePrimaryAction.BUY && !checkoutAvailable,
+            onClick = actions.onPrimaryClick,
+        )
     val windowWidth = currentWindowWidth()
     val twoPane = windowWidth == WindowWidth.EXPANDED
     // Only phones pin the price to the bottom; wider windows show it as a card, which reads better
@@ -143,11 +207,7 @@ internal fun CourseDetailScreen(
         topBar = { DetailTopBar(onBackClick = actions.onBackClick) },
         bottomBar = {
             if (course != null && pinnedEnrollBar) {
-                EnrollBar(
-                    price = course.summary.price,
-                    soldOut = course.isSoldOut,
-                    onEnrollClick = onComingSoon,
-                )
+                EnrollBar(price = course.summary.price, enroll = enroll)
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -167,14 +227,14 @@ internal fun CourseDetailScreen(
                         course = course,
                         state = state,
                         actions = actions,
-                        onComingSoon = onComingSoon,
+                        enroll = enroll,
                     )
                 course != null ->
                     SinglePaneContent(
                         course = course,
                         state = state,
                         actions = actions,
-                        onComingSoon = onComingSoon,
+                        enroll = enroll,
                         showPriceCard = !pinnedEnrollBar,
                     )
                 state.isLoading ->
@@ -190,10 +250,30 @@ internal fun CourseDetailScreen(
             }
         }
     }
+
+    if (course != null) {
+        when (state.dialog) {
+            CourseDetailDialog.ConfirmEnroll ->
+                EnrollConfirmDialog(
+                    course = course,
+                    isEnrolling = state.isEnrolling,
+                    onConfirm = actions.onConfirmEnroll,
+                    onDismiss = actions.onDialogDismiss,
+                )
+            CourseDetailDialog.SoldOut ->
+                SoldOutDialog(course = course, onDismiss = actions.onDialogDismiss)
+            null -> Unit
+        }
+    }
 }
 
-private val CourseDetail.isSoldOut: Boolean
-    get() = (summary.remainingSeats ?: 1) <= 0
+/** What the enroll button shows and does, shared by the pinned bar and the price card. */
+private data class EnrollUi(
+    val action: CoursePrimaryAction,
+    val isEnrolling: Boolean,
+    val showPaymentNote: Boolean,
+    val onClick: () -> Unit,
+)
 
 @Composable
 private fun DetailTopBar(onBackClick: () -> Unit) {
@@ -225,7 +305,7 @@ private fun SinglePaneContent(
     course: CourseDetail,
     state: CourseDetailUiState,
     actions: CourseDetailActions,
-    onComingSoon: () -> Unit,
+    enroll: EnrollUi,
     showPriceCard: Boolean,
 ) {
     LazyColumn(
@@ -241,10 +321,10 @@ private fun SinglePaneContent(
         if (showPriceCard) {
             item(
                 key = "price",
-            ) { PriceCard(course = course, onEnrollClick = onComingSoon, wide = true) }
+            ) { PriceCard(course = course, enroll = enroll, wide = true) }
         }
         readingSections(course = course, includeSkills = true)
-        curriculum(course = course, state = state, actions = actions, onPreviewClick = onComingSoon)
+        curriculum(course = course, state = state, actions = actions)
     }
 }
 
@@ -254,7 +334,7 @@ private fun TwoPaneContent(
     course: CourseDetail,
     state: CourseDetailUiState,
     actions: CourseDetailActions,
-    onComingSoon: () -> Unit,
+    enroll: EnrollUi,
 ) {
     Row(
         modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.lg),
@@ -267,12 +347,7 @@ private fun TwoPaneContent(
         ) {
             item(key = "hero") { CourseHeroCard(course = course, large = true) }
             readingSections(course = course, includeSkills = false)
-            curriculum(
-                course = course,
-                state = state,
-                actions = actions,
-                onPreviewClick = onComingSoon,
-            )
+            curriculum(course = course, state = state, actions = actions)
         }
         Column(
             modifier =
@@ -283,7 +358,7 @@ private fun TwoPaneContent(
                     .padding(top = Spacing.sm, bottom = Spacing.xl),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
-            PriceCard(course = course, onEnrollClick = onComingSoon)
+            PriceCard(course = course, enroll = enroll)
             SkillsSection(skills = course.skills, prerequisites = course.prerequisites)
         }
     }
@@ -310,7 +385,6 @@ private fun LazyListScope.curriculum(
     course: CourseDetail,
     state: CourseDetailUiState,
     actions: CourseDetailActions,
-    onPreviewClick: () -> Unit,
 ) {
     if (course.modules.isEmpty()) return
     item(key = "curriculum") {
@@ -318,7 +392,8 @@ private fun LazyListScope.curriculum(
             modules = course.modules,
             expandedModuleIds = state.expandedModuleIds,
             onModuleToggle = actions.onModuleToggle,
-            onPreviewClick = { onPreviewClick() },
+            onLessonClick = actions.onLessonClick,
+            unlocked = state.isEnrolled,
         )
     }
 }
@@ -327,8 +402,7 @@ private fun LazyListScope.curriculum(
 @Composable
 private fun EnrollBar(
     price: CoursePrice,
-    soldOut: Boolean,
-    onEnrollClick: () -> Unit,
+    enroll: EnrollUi,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth().softShadow(EnrollBarShape),
@@ -345,7 +419,7 @@ private fun EnrollBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             PriceBlock(price = price, large = false, modifier = Modifier.weight(1f))
-            EnrollButton(soldOut = soldOut, onClick = onEnrollClick)
+            EnrollButton(enroll = enroll)
         }
     }
 }
@@ -357,7 +431,7 @@ private fun EnrollBar(
 @Composable
 private fun PriceCard(
     course: CourseDetail,
-    onEnrollClick: () -> Unit,
+    enroll: EnrollUi,
     wide: Boolean = false,
 ) {
     ToeicCard(modifier = Modifier.fillMaxWidth(), itemSpacing = Spacing.smd) {
@@ -375,32 +449,31 @@ private fun PriceCard(
                     modifier = Modifier.width(WideEnrollWidth),
                     verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 ) {
-                    EnrollButton(
-                        soldOut = course.isSoldOut,
-                        onClick = onEnrollClick,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    PaymentNote()
+                    EnrollButton(enroll = enroll, modifier = Modifier.fillMaxWidth())
+                    EnrollNote(enroll = enroll)
                 }
             }
         } else {
             PriceBlock(price = course.summary.price, large = true)
-            EnrollButton(
-                soldOut = course.isSoldOut,
-                onClick = onEnrollClick,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            PaymentNote()
+            EnrollButton(enroll = enroll, modifier = Modifier.fillMaxWidth())
+            EnrollNote(enroll = enroll)
         }
         HorizontalDivider(color = SubtleBorder)
         CourseIncludes(course = course)
     }
 }
 
+/** Under the button on cards: "you own this", or that in-app payment is not ready yet. */
 @Composable
-private fun PaymentNote() {
+private fun EnrollNote(enroll: EnrollUi) {
+    val text =
+        when {
+            enroll.action == CoursePrimaryAction.START -> R.string.course_note_enrolled
+            enroll.showPaymentNote -> R.string.course_note_payment
+            else -> return
+        }
     Text(
-        text = stringResource(R.string.course_note_payment),
+        text = stringResource(text),
         style = MaterialTheme.typography.labelSmall,
         color = HintText,
         textAlign = TextAlign.Center,
@@ -410,17 +483,39 @@ private fun PaymentNote() {
 
 @Composable
 private fun EnrollButton(
-    soldOut: Boolean,
-    onClick: () -> Unit,
+    enroll: EnrollUi,
     modifier: Modifier = Modifier,
 ) {
+    val action = enroll.action
+    // Sold out stays tappable, as an outline button, so the learner can read why in a dialog.
+    if (action == CoursePrimaryAction.SOLD_OUT) {
+        SecondaryButton(
+            text = stringResource(R.string.course_label_sold_out),
+            onClick = enroll.onClick,
+            shape = PillShape,
+            modifier = modifier.testTag(TestTags.COURSE_ENROLL),
+        )
+        return
+    }
     PrimaryButton(
         text =
             stringResource(
-                if (soldOut) R.string.course_label_sold_out else R.string.course_action_enroll_soon,
+                when (action) {
+                    CoursePrimaryAction.CHECKING -> R.string.course_label_checking_enrollment
+                    CoursePrimaryAction.ENROLL -> R.string.course_action_enroll
+                    CoursePrimaryAction.BUY -> R.string.course_action_buy
+                    CoursePrimaryAction.START -> R.string.course_action_start
+                    CoursePrimaryAction.SOLD_OUT -> R.string.course_label_sold_out
+                },
             ),
-        onClick = onClick,
-        enabled = !soldOut,
+        onClick = enroll.onClick,
+        isLoading = enroll.isEnrolling || action == CoursePrimaryAction.CHECKING,
+        loadingText =
+            if (enroll.isEnrolling) {
+                stringResource(R.string.course_label_enrolling)
+            } else {
+                stringResource(R.string.course_label_checking_enrollment)
+            },
         shape = PillShape,
         modifier = modifier.testTag(TestTags.COURSE_ENROLL),
     )
@@ -624,6 +719,20 @@ private val PreviewLoadedState =
         isLoading = false,
         course = PreviewCourseDetail,
         expandedModuleIds = setOf("m1"),
+        isSignedIn = true,
+        enrollment = EnrollmentStatus.NOT_ENROLLED,
+    )
+
+private val PreviewEnrolledState =
+    PreviewLoadedState.copy(
+        course =
+            PreviewCourseDetail.copy(
+                summary =
+                    PreviewCourseDetail.summary.copy(
+                        price = CoursePrice(amount = 0, currency = "VND"),
+                    ),
+            ),
+        enrollment = EnrollmentStatus.ENROLLED,
     )
 
 @Preview(widthDp = 390, heightDp = 1400)
@@ -657,4 +766,16 @@ private fun CourseDetailNotFoundPreview() {
             actions = PreviewActions,
         )
     }
+}
+
+@Preview(widthDp = 390, heightDp = 1400)
+@Composable
+private fun CourseDetailEnrolledPhonePreview() {
+    ToeicSpaceTheme { CourseDetailScreen(state = PreviewEnrolledState, actions = PreviewActions) }
+}
+
+@Preview(widthDp = 1280, heightDp = 800)
+@Composable
+private fun CourseDetailEnrolledTabletPreview() {
+    ToeicSpaceTheme { CourseDetailScreen(state = PreviewEnrolledState, actions = PreviewActions) }
 }

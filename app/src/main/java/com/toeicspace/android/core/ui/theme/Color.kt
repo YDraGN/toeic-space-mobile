@@ -123,6 +123,9 @@ val SoftPageBlush = Color(0xFFFFEEF3)
 /** Quiet fill for stat strips and the open curriculum chapter on white cards. */
 val QuietFill = Color(0xFFF4F6FD)
 
+/** Behind a video, letterboxing included, and the whole screen in fullscreen playback. */
+val VideoBackdrop = Color(0xFF000000)
+
 /**
  * Tinted tones for tags, badges and section icons: a pale fill with a deep text color of the same
  * hue (WCAG AA on the fill). Badges always carry one of these, never plain grey.

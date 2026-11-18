@@ -110,6 +110,11 @@ dependencies {
     // --- DataStore ---
     implementation(libs.androidx.datastore.preferences)
 
+    // --- Lesson player (PBL-115) ---
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.browser)
+
     // --- Test (đã có) ---
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

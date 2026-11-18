@@ -424,14 +424,18 @@ internal fun SkillsSection(
     }
 }
 
-/** Chapters that open to show their lessons; free previews are marked, the rest locked. */
+/**
+ * Chapters that open to show their lessons. Before enrolling, free previews are marked and the rest
+ * locked; once [unlocked] (enrolled), every lesson opens.
+ */
 @Composable
 internal fun CurriculumSection(
     modules: List<CourseModule>,
     expandedModuleIds: Set<String>,
     onModuleToggle: (moduleId: String) -> Unit,
-    onPreviewClick: (lessonId: String) -> Unit,
+    onLessonClick: (lessonId: String) -> Unit,
     modifier: Modifier = Modifier,
+    unlocked: Boolean = false,
 ) {
     DetailSection(
         title = stringResource(R.string.course_section_curriculum),
@@ -450,7 +454,8 @@ internal fun CurriculumSection(
                 module = module,
                 expanded = module.id in expandedModuleIds,
                 onToggle = { onModuleToggle(module.id) },
-                onPreviewClick = onPreviewClick,
+                onLessonClick = onLessonClick,
+                unlocked = unlocked,
             )
         }
     }
@@ -461,7 +466,8 @@ private fun ModuleBlock(
     module: CourseModule,
     expanded: Boolean,
     onToggle: () -> Unit,
-    onPreviewClick: (lessonId: String) -> Unit,
+    onLessonClick: (lessonId: String) -> Unit,
+    unlocked: Boolean,
 ) {
     val shape = MaterialTheme.shapes.small
     val durationSeconds = module.lessons.sumOf { it.durationSeconds ?: 0 }
@@ -550,7 +556,8 @@ private fun ModuleBlock(
                     LessonRow(
                         number = index + 1,
                         lesson = lesson,
-                        onPreviewClick = { onPreviewClick(lesson.id) },
+                        unlocked = unlocked,
+                        onClick = { onLessonClick(lesson.id) },
                     )
                 }
             }
@@ -562,10 +569,28 @@ private fun ModuleBlock(
 private fun LessonRow(
     number: Int,
     lesson: CourseLesson,
-    onPreviewClick: () -> Unit,
+    unlocked: Boolean,
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.sm),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .then(
+                    if (unlocked) {
+                        Modifier.clip(MaterialTheme.shapes.extraSmall).clickable(
+                            onClickLabel =
+                                stringResource(
+                                    R.string.course_cd_open_lesson,
+                                    lesson.title,
+                                ),
+                            role = Role.Button,
+                            onClick = onClick,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ).padding(vertical = Spacing.sm),
         horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -613,8 +638,15 @@ private fun LessonRow(
                 }
             }
         }
-        if (lesson.isFreePreview) {
-            PreviewPill(lessonTitle = lesson.title, onClick = onPreviewClick)
+        if (unlocked) {
+            Icon(
+                painter = painterResource(R.drawable.ic_play),
+                contentDescription = null,
+                tint = SecondaryButtonContent,
+                modifier = Modifier.size(LockIconSize),
+            )
+        } else if (lesson.isFreePreview) {
+            PreviewPill(lessonTitle = lesson.title, onClick = onClick)
         } else {
             Icon(
                 painter = painterResource(R.drawable.ic_lock),
