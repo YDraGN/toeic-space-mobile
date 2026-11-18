@@ -14,6 +14,9 @@ import com.toeicspace.android.feature.auth.navigation.navigateToSignIn
 import com.toeicspace.android.feature.auth.navigation.navigateToSignUp
 import com.toeicspace.android.feature.checkout.navigation.checkoutScreen
 import com.toeicspace.android.feature.checkout.navigation.navigateToCheckout
+import com.toeicspace.android.feature.classes.navigation.myClassesScreens
+import com.toeicspace.android.feature.classes.navigation.navigateToMyClassDetail
+import com.toeicspace.android.feature.classes.navigation.navigateToMyClasses
 import com.toeicspace.android.feature.course.navigation.courseDetailScreen
 import com.toeicspace.android.feature.course.navigation.navigateToCourseDetail
 import com.toeicspace.android.feature.course.navigation.returnToCourseAfterSignIn
@@ -93,6 +96,7 @@ fun ToeicSpaceNavHost(
             onNavigateToCourseDetail = { navController.navigateToCourseDetail(it) },
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
             onNavigateToMyCourses = { navController.navigateToMyCourses() },
+            onNavigateToMyClasses = { navController.navigateToMyClasses() },
         )
         accountInfoScreen(onBack = { navController.popBackStack() })
         courseDetailScreen(
@@ -113,6 +117,10 @@ fun ToeicSpaceNavHost(
         myCoursesScreen(
             onBack = { navController.popBackStack() },
             onCourseClick = { navController.navigateToCourseDetail(it) },
+        )
+        myClassesScreens(
+            onBack = { navController.popBackStack() },
+            onClassClick = { navController.navigateToMyClassDetail(it) },
         )
         changePasswordScreen(
             onBack = { navController.popBackStack() },
