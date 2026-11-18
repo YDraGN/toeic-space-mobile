@@ -1,9 +1,11 @@
 package com.toeicspace.android.feature.course.navigation
 
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import com.toeicspace.android.feature.course.presentation.detail.CourseDetailRoute
 import kotlinx.serialization.Serializable
 
@@ -23,6 +25,22 @@ private val SingleTop = navOptions { launchSingleTop = true }
 
 fun NavController.navigateToCourseDetail(courseId: String) =
     navigate(CourseDetailDestination(courseId), SingleTop)
+
+/**
+ * From one course page to another (the related courses). Single top would reuse the page on top,
+ * which is also a course page, and ignore the new id; so this pushes a new page instead, unless the
+ * top page already shows [courseId] (a second tap while the first one navigates).
+ */
+fun NavController.navigateToRelatedCourse(courseId: String) {
+    val top = currentBackStackEntry
+    val showing =
+        top
+            ?.takeIf { it.destination.hasRoute<CourseDetailDestination>() }
+            ?.toRoute<CourseDetailDestination>()
+            ?.courseId
+    if (showing == courseId) return
+    navigate(CourseDetailDestination(courseId))
+}
 
 /**
  * After signing in: back to the course page the guest left to sign in, which then shows their

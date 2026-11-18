@@ -108,6 +108,67 @@ fun CourseCard(
 }
 
 /**
+ * A course as a narrow, tall tile: wide cover on top, then exam, title, a three-line summary, level
+ * and target score, and the price strip. For rows of cards too narrow for [CourseCard]'s side cover,
+ * such as the suggestions under a course. Fixed line counts keep tiles in a row the same height.
+ */
+@Composable
+fun CourseTileCard(
+    course: CourseSummary,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ToeicCard(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(Spacing.md),
+        itemSpacing = Spacing.sm,
+        onClick = onClick,
+    ) {
+        CourseCover(
+            imageUrl = course.thumbnailUrl,
+            courseTitle = course.title,
+            seed = course.id,
+            aspectRatio = TILE_COVER_RATIO,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        course.examType?.let { ExamTypeBadge(examType = it) }
+        Text(
+            text = course.title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            minLines = 2,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = course.shortDescription.orEmpty(),
+            style = AppTextStyles.Caption,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            minLines = TILE_SUMMARY_LINES,
+            maxLines = TILE_SUMMARY_LINES,
+            overflow = TextOverflow.Ellipsis,
+        )
+        CourseMetaRow(level = course.level, targetScore = course.targetScore)
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .background(QuietFill)
+                    .padding(horizontal = Spacing.smd, vertical = Spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CoursePriceText(price = course.price)
+            Spacer(modifier = Modifier.weight(1f))
+            SeatsLabel(remainingSeats = course.remainingSeats)
+        }
+    }
+}
+
+private const val TILE_COVER_RATIO = 2.4f
+private const val TILE_SUMMARY_LINES = 3
+
+/**
  * Level meter and target score on one line of fixed height: a course missing one or both still takes
  * the same room, and a narrow card shortens the score instead of wrapping to a second line.
  */
@@ -204,6 +265,21 @@ private fun CourseCardPreview() {
             verticalArrangement = Arrangement.spacedBy(Spacing.smd),
         ) {
             PreviewCourses.forEach { CourseCard(course = it, onClick = {}) }
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFE7FAFF, widthDp = 820)
+@Composable
+private fun CourseTileCardPreview() {
+    ToeicSpaceTheme {
+        Row(
+            modifier = Modifier.padding(Spacing.md),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
+        ) {
+            PreviewCourses.forEach {
+                CourseTileCard(course = it, onClick = {}, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

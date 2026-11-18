@@ -36,7 +36,7 @@ import com.toeicspace.android.feature.course.domain.CourseFilter
 import com.toeicspace.android.feature.course.domain.CourseRepository
 import com.toeicspace.android.feature.course.domain.CourseSummary
 import com.toeicspace.android.feature.course.navigation.CourseDetailDestination
-import com.toeicspace.android.feature.course.presentation.components.CourseCard
+import com.toeicspace.android.feature.course.presentation.components.CourseTileCard
 import com.toeicspace.android.feature.course.presentation.components.PreviewCourses
 import com.toeicspace.android.feature.enrollment.domain.EnrollmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,8 +53,8 @@ import javax.inject.Inject
 /** At most this many suggestions, like the web's `RelatedCourses`. */
 internal const val RELATED_COURSES_LIMIT = 3
 
-/** Phone cards keep this width in the horizontal row, so the next card peeks in. */
-private val CompactCardWidth = 300.dp
+/** Phone tiles keep this width in the horizontal row, so the next tile peeks in. */
+private val CompactCardWidth = 260.dp
 
 /**
  * Published courses other than [currentId] that the learner doesn't own, in catalog order, capped
@@ -181,7 +181,7 @@ internal fun RelatedCoursesSection(
         if (wide) {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.smd)) {
                 courses.forEach { course ->
-                    CourseCard(
+                    CourseTileCard(
                         course = course,
                         onClick = { onCourseClick(course.id) },
                         modifier = Modifier.weight(1f),
@@ -195,7 +195,7 @@ internal fun RelatedCoursesSection(
         } else {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(Spacing.smd)) {
                 items(items = courses, key = { it.id }) { course ->
-                    CourseCard(
+                    CourseTileCard(
                         course = course,
                         onClick = { onCourseClick(course.id) },
                         modifier = Modifier.width(CompactCardWidth),
