@@ -8,6 +8,8 @@ import com.toeicspace.android.feature.course.presentation.catalog.CATALOG_STALE_
 import com.toeicspace.android.feature.course.presentation.catalog.CourseCatalogViewModel
 import com.toeicspace.android.feature.course.presentation.catalog.SEARCH_DEBOUNCE_MILLIS
 import com.toeicspace.android.testing.FakeCourseRepository
+import com.toeicspace.android.testing.FakeEnrollmentRepository
+import com.toeicspace.android.testing.FakeSessionRepository
 import com.toeicspace.android.testing.MainDispatcherRule
 import com.toeicspace.android.testing.testCourse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,11 +31,13 @@ class CourseCatalogViewModelTest {
     val mainDispatcherRule = MainDispatcherRule(StandardTestDispatcher())
 
     private val repository = FakeCourseRepository()
+    private val enrollments = FakeEnrollmentRepository()
+    private val session = FakeSessionRepository(isGuest = true)
 
     private var now = 1_000_000L
 
     private fun TestScope.started(): CourseCatalogViewModel =
-        CourseCatalogViewModel(repository) { now }.also {
+        CourseCatalogViewModel(repository, enrollments, session) { now }.also {
             runCurrent()
         }
 

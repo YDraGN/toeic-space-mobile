@@ -19,6 +19,7 @@ import com.toeicspace.android.feature.classes.navigation.navigateToMyClassDetail
 import com.toeicspace.android.feature.classes.navigation.navigateToMyClasses
 import com.toeicspace.android.feature.course.navigation.courseDetailScreen
 import com.toeicspace.android.feature.course.navigation.navigateToCourseDetail
+import com.toeicspace.android.feature.course.navigation.navigateToRelatedCourse
 import com.toeicspace.android.feature.course.navigation.returnToCourseAfterSignIn
 import com.toeicspace.android.feature.enrollment.navigation.myCoursesScreen
 import com.toeicspace.android.feature.enrollment.navigation.navigateToMyCourses
@@ -106,6 +107,7 @@ fun ToeicSpaceNavHost(
                 navController.navigateToLesson(courseId, lessonId, preview)
             },
             onOpenCheckout = { navController.navigateToCheckout(it) },
+            onCourseClick = { navController.navigateToRelatedCourse(it) },
         )
         // Paid: back to the course page, which re-checks the enrollment on resume and turns the
         // buy button into "Vào học".

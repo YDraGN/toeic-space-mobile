@@ -42,4 +42,27 @@ internal class EnrollmentRepositoryImpl
                     pageSize = pageSize.coerceIn(1, EnrollmentRepository.MAX_PAGE_SIZE),
                 )
             }.map { it.toDomain() }
+
+        override suspend fun getOwnedCourseIds(): AppResult<Set<String>> =
+            safeApiCall(json) {
+                val pageSize = EnrollmentRepository.MAX_PAGE_SIZE
+                val first =
+                    enrollmentApiService.getMyCourses(
+                        search = null,
+                        page = 1,
+                        pageSize = pageSize,
+                    )
+                val ids = first.items.mapTo(LinkedHashSet()) { it.courseId }
+                val served = first.pageSize.coerceAtLeast(1)
+                val pages =
+                    ((first.totalCount + served - 1) / served)
+                        .coerceAtMost(EnrollmentRepository.MAX_OWNED_PAGES)
+                for (page in 2..pages) {
+                    enrollmentApiService
+                        .getMyCourses(search = null, page = page, pageSize = pageSize)
+                        .items
+                        .mapTo(ids) { it.courseId }
+                }
+                ids
+            }
     }

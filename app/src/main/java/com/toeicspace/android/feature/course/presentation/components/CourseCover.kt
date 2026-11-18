@@ -33,7 +33,7 @@ internal fun courseCoverBrush(seed: String): Brush =
     CourseCoverBrushes[Math.floorMod(seed.hashCode(), CourseCoverBrushes.size)]
 
 /**
- * Square, rounded course cover. A gradient with a pearl sits underneath, so a course without a
+ * Rounded course cover, square unless [aspectRatio] says otherwise (width / height). A gradient with a pearl sits underneath, so a course without a
  * thumbnail (or one that fails to load) still has a cover, and nothing jumps while the image loads.
  * The gradient is chosen from [seed], so neighbouring courses get different colors. [onImageError]
  * lets a screen refetch an expired signed URL.
@@ -46,11 +46,12 @@ fun CourseCover(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.small,
     onImageError: (() -> Unit)? = null,
+    aspectRatio: Float = 1f,
 ) {
     Box(
         modifier =
             modifier
-                .aspectRatio(1f)
+                .aspectRatio(aspectRatio)
                 .clip(shape)
                 .background(courseCoverBrush(seed)),
         contentAlignment = Alignment.Center,

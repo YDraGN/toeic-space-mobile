@@ -533,4 +533,9 @@
     <string name="my_classes_error_session">Phiên đăng nhập đã hết. Bạn đăng nhập lại nhé.</string>
     <string name="my_classes_error_forbidden">Tài khoản của bạn không có quyền xem lớp học.</string>
     <string name="my_classes_action_back_to_list">Về danh sách lớp</string>
+
+    <!-- Related courses and owned courses (PBL-122) -->
+    <string name="course_title_owned_error">Chưa kiểm tra được khoá học bạn đã đăng ký</string>
+    <string name="course_body_owned_error">Bạn thử lại để xem những khoá học bạn chưa đăng ký nhé.</string>
+    <string name="course_title_related">Khoá học bạn có thể khám phá</string>
 </resources>

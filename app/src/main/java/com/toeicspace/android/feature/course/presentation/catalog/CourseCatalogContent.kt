@@ -3,7 +3,6 @@ package com.toeicspace.android.feature.course.presentation.catalog
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -44,6 +43,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.toeicspace.android.R
 import com.toeicspace.android.core.ui.WindowWidth
+import com.toeicspace.android.core.ui.components.ErrorState
+import com.toeicspace.android.core.ui.components.LoadingState
 import com.toeicspace.android.core.ui.components.PrimaryButton
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.ToeicCard
@@ -227,15 +228,18 @@ private fun LazyGridScope.catalogBody(
     actions: CourseCatalogActions,
 ) {
     val error = state.error
+    val ownedError = state.ownedError
     when {
-        state.isLoading ->
-            fullWidthItem(key = "loading") {
-                Box(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.xxl),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
+        state.isWaiting -> fullWidthItem(key = "loading") { LoadingState(fullScreen = false) }
+        ownedError != null ->
+            fullWidthItem(key = "owned-error") {
+                ErrorState(
+                    error = ownedError,
+                    onRetry = actions.onRetry,
+                    fullScreen = false,
+                    title = stringResource(R.string.course_title_owned_error),
+                    body = stringResource(R.string.course_body_owned_error),
+                )
             }
         error != null ->
             fullWidthItem(key = "error") {
@@ -274,12 +278,12 @@ private fun LazyGridScope.catalogBody(
         else -> {
             fullWidthItem(key = "count") {
                 Text(
-                    text = stringResource(R.string.course_label_result_count, state.totalCount),
+                    text = stringResource(R.string.course_label_result_count, state.visibleCount),
                     style = AppTextStyles.Caption,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            items(items = state.courses, key = { it.id }) { course ->
+            items(items = state.visibleCourses, key = { it.id }) { course ->
                 CourseCard(course = course, onClick = { actions.onCourseClick(course.id) })
             }
             fullWidthItem(
