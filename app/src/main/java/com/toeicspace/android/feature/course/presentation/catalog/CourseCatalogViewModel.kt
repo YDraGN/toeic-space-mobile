@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
+import com.toeicspace.android.core.common.Clock
 import com.toeicspace.android.feature.course.domain.CourseExamType
 import com.toeicspace.android.feature.course.domain.CourseFilter
 import com.toeicspace.android.feature.course.domain.CourseLevel
@@ -21,6 +22,12 @@ import javax.inject.Inject
 
 /** Wait this long after the last keystroke before searching, so typing a word sends one request. */
 internal const val SEARCH_DEBOUNCE_MILLIS = 400L
+
+/**
+ * Coming back to the catalog after this long reloads it quietly, so courses published, repriced or
+ * filled up meanwhile show up without a pull to refresh.
+ */
+internal const val CATALOG_STALE_AFTER_MILLIS = 30_000L
 
 /** Target score choices offered in the filter; the backend takes any number. */
 internal val TargetScoreOptions = listOf(450, 650, 800)
@@ -55,11 +62,15 @@ class CourseCatalogViewModel
     @Inject
     constructor(
         private val courseRepository: CourseRepository,
+        private val clock: Clock,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(CourseCatalogUiState())
         val uiState: StateFlow<CourseCatalogUiState> = _uiState.asStateFlow()
 
         private var nextPage = 1
+
+        /** When the first page last arrived; 0 until then. */
+        private var loadedAtMillis = 0L
         private var loadJob: Job? = null
         private var searchJob: Job? = null
 
@@ -103,6 +114,19 @@ class CourseCatalogViewModel
             loadFirstPage(refreshing = true)
         }
 
+        /**
+         * The tab is shown again (switching tabs, back from a course, or the app returning to the
+         * foreground). The tab keeps its state, so without this the list would stay as it was at
+         * launch until the learner pulls to refresh.
+         */
+        fun onResume() {
+            val state = _uiState.value
+            if (state.isLoading || state.isRefreshing || state.isLoadingMore) return
+            if (loadedAtMillis == 0L) return
+            if (clock.nowMillis() - loadedAtMillis < CATALOG_STALE_AFTER_MILLIS) return
+            loadFirstPage(refreshing = true, quiet = true)
+        }
+
         /** Called when the list nears its end. */
         fun onLoadMore() {
             val state = _uiState.value
@@ -125,12 +149,16 @@ class CourseCatalogViewModel
             loadFirstPage()
         }
 
-        private fun loadFirstPage(refreshing: Boolean = false) {
+        /** [quiet]: a background refresh, without the pull-to-refresh indicator or an error. */
+        private fun loadFirstPage(
+            refreshing: Boolean = false,
+            quiet: Boolean = false,
+        ) {
             // A newer filter wins: the answer to an older request must not land on top of it.
             loadJob?.cancel()
             _uiState.update {
                 if (refreshing) {
-                    it.copy(isRefreshing = true, loadMoreError = null)
+                    it.copy(isRefreshing = !quiet, loadMoreError = null)
                 } else {
                     it.copy(
                         isLoading = true,
@@ -150,6 +178,7 @@ class CourseCatalogViewModel
                         is AppResult.Success -> {
                             val page = result.data
                             nextPage = 2
+                            loadedAtMillis = clock.nowMillis()
                             _uiState.update {
                                 it.copy(
                                     courses = page.items,
@@ -166,7 +195,10 @@ class CourseCatalogViewModel
                         is AppResult.Failure ->
                             _uiState.update {
                                 if (refreshing && it.courses.isNotEmpty()) {
-                                    it.copy(isRefreshing = false, loadMoreError = result.error)
+                                    it.copy(
+                                        isRefreshing = false,
+                                        loadMoreError = if (quiet) null else result.error,
+                                    )
                                 } else {
                                     it.copy(
                                         isLoading = false,

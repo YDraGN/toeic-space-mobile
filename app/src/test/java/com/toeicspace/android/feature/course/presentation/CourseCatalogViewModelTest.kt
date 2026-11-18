@@ -4,6 +4,7 @@ import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.feature.course.domain.CourseExamType
 import com.toeicspace.android.feature.course.domain.CourseFilter
 import com.toeicspace.android.feature.course.domain.CourseLevel
+import com.toeicspace.android.feature.course.presentation.catalog.CATALOG_STALE_AFTER_MILLIS
 import com.toeicspace.android.feature.course.presentation.catalog.CourseCatalogViewModel
 import com.toeicspace.android.feature.course.presentation.catalog.SEARCH_DEBOUNCE_MILLIS
 import com.toeicspace.android.testing.FakeCourseRepository
@@ -29,12 +30,41 @@ class CourseCatalogViewModelTest {
 
     private val repository = FakeCourseRepository()
 
+    private var now = 1_000_000L
+
     private fun TestScope.started(): CourseCatalogViewModel =
-        CourseCatalogViewModel(repository).also {
+        CourseCatalogViewModel(repository) { now }.also {
             runCurrent()
         }
 
     private val CourseCatalogViewModel.ids get() = uiState.value.courses.map { it.id }
+
+    @Test
+    fun `coming back after a while reloads quietly and shows new courses`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            val viewModel = started()
+            repository.courses = listOf(testCourse("new")) + repository.courses
+
+            now += CATALOG_STALE_AFTER_MILLIS
+            viewModel.onResume()
+            assertFalse(viewModel.uiState.value.isRefreshing)
+            runCurrent()
+
+            assertEquals(listOf("new", "1"), viewModel.ids)
+            assertEquals(2, repository.requests.size)
+        }
+
+    @Test
+    fun `coming back right away does not reload`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            val viewModel = started()
+
+            now += CATALOG_STALE_AFTER_MILLIS - 1
+            viewModel.onResume()
+            runCurrent()
+
+            assertEquals(1, repository.requests.size)
+        }
 
     @Test
     fun `first page loads on start`() =
