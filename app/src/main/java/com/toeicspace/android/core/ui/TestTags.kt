@@ -21,6 +21,16 @@ object TestTags {
     const val COURSE_SEARCH = "course_search"
     const val COURSE_FILTER = "course_filter"
     const val COURSE_ENROLL = "course_enroll"
+    const val COURSE_ENROLL_CONFIRM = "course_enroll_confirm"
+    const val COURSE_ENROLL_CONFIRM_BUTTON = "course_enroll_confirm_button"
+    const val COURSE_SOLD_OUT_DIALOG = "course_sold_out_dialog"
+
+    const val MY_COURSES_ENTRY = "my_courses_entry"
+    const val MY_COURSES_ITEM = "my_courses_item"
+
+    const val LESSON_PLAYER = "lesson_player"
+    const val LESSON_PREVIOUS = "lesson_previous"
+    const val LESSON_NEXT = "lesson_next"
 
     // Shared UI states (core/ui/components/*State.kt)
     const val STATE_LOADING = "state_loading"

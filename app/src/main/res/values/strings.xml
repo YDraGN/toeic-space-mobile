@@ -339,4 +339,76 @@
     <string name="state_sign_in_required_body">Tạo tài khoản miễn phí để lưu tiến độ học và mở khoá tính năng này.</string>
     <string name="state_offline_banner_network">Bạn đang offline. Đây là dữ liệu đã tải lần trước.</string>
     <string name="state_offline_banner_server">Chưa kết nối được máy chủ. Đây là dữ liệu đã tải lần trước.</string>
+
+    <!-- Enrollment & lessons (PBL-114/115) -->
+    <string name="state_action_retry">Thử lại</string>
+    <string name="enrollment_error_session_expired">Phiên đăng nhập đã hết hạn. Bạn đăng nhập lại nhé.</string>
+    <string name="course_action_enroll">Đăng ký học</string>
+    <string name="course_action_buy">Mua khoá học</string>
+    <string name="course_action_start">Vào học</string>
+    <string name="course_label_checking_enrollment">Đang kiểm tra…</string>
+    <string name="course_label_enrolling">Đang đăng ký…</string>
+    <string name="course_note_enrolled">Bạn đã sở hữu khoá học này.</string>
+    <string name="course_msg_enrolled">Đăng ký thành công. Vào học ngay nhé!</string>
+    <string name="course_dialog_enroll_title">Xác nhận đăng ký</string>
+    <string name="course_dialog_enroll_body">Bạn xem lại thông tin khoá học trước khi đăng ký nhé.</string>
+    <string name="course_bill_content">Nội dung</string>
+    <string name="course_bill_duration">Thời lượng</string>
+    <string name="course_bill_seats">Chỗ còn lại</string>
+    <string name="course_bill_seats_value">%1$d / %2$d chỗ</string>
+    <string name="course_bill_original_price">Giá gốc</string>
+    <string name="course_bill_total">Tổng thanh toán</string>
+    <string name="course_dialog_enroll_note">Sau khi đăng ký, khoá học nằm trong mục Khoá học của tôi ở tab Cá nhân.</string>
+    <string name="course_action_confirm_enroll">Xác nhận đăng ký</string>
+    <string name="course_action_later">Để sau</string>
+    <string name="course_dialog_sold_out_title">Khoá học đã hết chỗ</string>
+    <string name="course_dialog_sold_out_body">Khoá “%1$s” đã đủ %2$d học viên. Bạn có thể xem các khoá học khác, hoặc quay lại khi khoá mở thêm chỗ.</string>
+    <string name="course_dialog_sold_out_body_no_capacity">Khoá “%1$s” đã đủ học viên. Bạn có thể xem các khoá học khác, hoặc quay lại khi khoá mở thêm chỗ.</string>
+    <string name="course_action_got_it">Đã hiểu</string>
+    <string name="course_msg_no_lessons">Khoá học chưa có bài học nào.</string>
+    <string name="course_msg_lesson_locked">Đăng ký khoá học để mở bài này.</string>
+    <string name="course_cd_open_lesson">Mở bài %1$s</string>
+    <string name="my_courses_section_learning">Học tập</string>
+    <string name="my_courses_title">Khoá học của tôi</string>
+    <string name="my_courses_body_entry">Các khoá học bạn đã đăng ký</string>
+    <string name="my_courses_search_hint">Tìm trong khoá học của bạn</string>
+    <string name="my_courses_title_error">Chưa tải được khoá học của bạn</string>
+    <string name="my_courses_title_empty">Bạn chưa có khoá học nào</string>
+    <string name="my_courses_body_empty">Vào tab Khám phá để chọn khoá học đầu tiên nhé.</string>
+    <string name="my_courses_title_no_match">Không tìm thấy khoá học</string>
+    <string name="my_courses_body_no_match">Thử tìm với từ khoá khác nhé.</string>
+    <string name="my_courses_action_clear_search">Xoá tìm kiếm</string>
+    <!-- %1$d: number of enrolled courses -->
+    <string name="my_courses_label_count">%1$d khoá học</string>
+    <!-- %1$s: date, e.g. 10/11/2026 -->
+    <string name="my_courses_label_enrolled_at">Đăng ký ngày %1$s</string>
+    <string name="my_courses_action_continue">Tiếp tục học</string>
+    <string name="my_courses_error_load_more">Chưa tải thêm được khoá học.</string>
+    <string name="my_courses_label_end">Bạn đã xem hết khoá học của mình</string>
+    <string name="lesson_title_default">Bài học</string>
+    <string name="lesson_section_content">Nội dung bài học</string>
+    <string name="lesson_section_attachments">Tài liệu đính kèm</string>
+    <string name="lesson_section_outline">Danh sách bài học</string>
+    <!-- %1$d: number of attached files -->
+    <string name="lesson_label_attachment_count">%1$d tệp</string>
+    <!-- %1$d: number of lessons in the course -->
+    <string name="lesson_label_outline_count">%1$d bài</string>
+    <!-- %1$d: lesson position, %2$d: number of lessons the learner can open -->
+    <string name="lesson_label_position">Bài %1$d/%2$d</string>
+    <!-- %1$d: video number within the lesson -->
+    <string name="lesson_label_video_part">Video %1$d</string>
+    <string name="lesson_size_kb">%1$s KB</string>
+    <string name="lesson_size_mb">%1$s MB</string>
+    <string name="lesson_cd_open_attachment">Mở tệp %1$s</string>
+    <string name="lesson_action_previous">Bài trước</string>
+    <string name="lesson_action_next">Bài sau</string>
+    <string name="lesson_action_back_to_course">Quay lại khoá học</string>
+    <string name="lesson_body_empty">Bài học này chưa có nội dung.</string>
+    <string name="lesson_title_error">Chưa tải được bài học</string>
+    <string name="lesson_title_not_found">Không mở được bài học</string>
+    <string name="lesson_body_not_found">Bài học đã được gỡ, hoặc bạn chưa đăng ký khoá học này.</string>
+    <string name="lesson_title_locked">Bài học cần đăng ký</string>
+    <string name="lesson_body_locked">Đăng ký khoá học để mở bài này. Bạn vẫn có thể học thử các bài miễn phí.</string>
+    <string name="lesson_msg_video_failed">Chưa phát được video. Bạn thử lại sau nhé.</string>
+    <string name="lesson_msg_no_browser">Không tìm thấy trình duyệt để mở tệp.</string>
 </resources>

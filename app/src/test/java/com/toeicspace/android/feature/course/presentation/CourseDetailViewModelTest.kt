@@ -8,6 +8,8 @@ import com.toeicspace.android.feature.course.domain.CourseModule
 import com.toeicspace.android.feature.course.navigation.CourseDetailDestination
 import com.toeicspace.android.feature.course.presentation.detail.CourseDetailViewModel
 import com.toeicspace.android.testing.FakeCourseRepository
+import com.toeicspace.android.testing.FakeEnrollmentRepository
+import com.toeicspace.android.testing.FakeSessionRepository
 import com.toeicspace.android.testing.MainDispatcherRule
 import com.toeicspace.android.testing.testCourse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,6 +51,8 @@ class CourseDetailViewModelTest {
                     mapOf(CourseDetailDestination.ARG_COURSE_ID to "c1"),
                 ),
             courseRepository = repository,
+            enrollmentRepository = FakeEnrollmentRepository(),
+            sessionRepository = FakeSessionRepository(isGuest = true),
         ).also { runCurrent() }
 
     @Test
@@ -64,6 +68,8 @@ class CourseDetailViewModelTest {
                             ),
                         ),
                     courseRepository = repository,
+                    enrollmentRepository = FakeEnrollmentRepository(),
+                    sessionRepository = FakeSessionRepository(isGuest = true),
                 )
 
             assertTrue(viewModel.uiState.value.isLoading)

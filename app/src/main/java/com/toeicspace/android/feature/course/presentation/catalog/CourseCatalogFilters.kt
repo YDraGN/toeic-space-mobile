@@ -60,6 +60,7 @@ internal fun CourseSearchField(
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
     modifier: Modifier = Modifier,
+    placeholder: String = stringResource(R.string.course_hint_search),
 ) {
     val focusManager = LocalFocusManager.current
     val colors = MaterialTheme.colorScheme
@@ -100,7 +101,7 @@ internal fun CourseSearchField(
                     Box(modifier = Modifier.weight(1f)) {
                         if (query.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.course_hint_search),
+                                text = placeholder,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colors.onSurfaceVariant,
                                 maxLines = 1,

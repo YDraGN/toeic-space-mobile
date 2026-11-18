@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +31,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toeicspace.android.BuildConfig
 import com.toeicspace.android.R
+import com.toeicspace.android.core.ui.TestTags
 import com.toeicspace.android.core.ui.components.EditableAvatar
 import com.toeicspace.android.core.ui.components.SecondaryButton
 import com.toeicspace.android.core.ui.components.SignInRequiredState
@@ -65,6 +67,7 @@ internal fun ProfileTab(
     onComingSoon: () -> Unit,
     onSignOutClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
+    onMyCoursesClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -94,6 +97,7 @@ internal fun ProfileTab(
         modifier = modifier,
         isUploadingAvatar = isUploadingAvatar,
         onAvatarPicked = viewModel::onAvatarPicked,
+        onMyCoursesClick = onMyCoursesClick,
     )
 }
 
@@ -111,6 +115,7 @@ internal fun ProfileContent(
     modifier: Modifier = Modifier,
     isUploadingAvatar: Boolean = false,
     onAvatarPicked: (String) -> Unit = {},
+    onMyCoursesClick: () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -130,6 +135,17 @@ internal fun ProfileContent(
                     isUploadingAvatar = isUploadingAvatar,
                     onAvatarPicked = onAvatarPicked,
                 )
+                ToeicListSection(
+                    title = stringResource(id = R.string.my_courses_section_learning),
+                ) {
+                    ToeicListRow(
+                        iconRes = R.drawable.ic_graduation_cap,
+                        label = stringResource(id = R.string.my_courses_title),
+                        supportingText = stringResource(id = R.string.my_courses_body_entry),
+                        onClick = onMyCoursesClick,
+                        modifier = Modifier.testTag(TestTags.MY_COURSES_ENTRY),
+                    )
+                }
                 ToeicListSection(title = stringResource(id = R.string.profile_section_account)) {
                     ToeicListRow(
                         iconRes = R.drawable.ic_account,

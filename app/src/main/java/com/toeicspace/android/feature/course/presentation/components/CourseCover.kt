@@ -35,7 +35,8 @@ internal fun courseCoverBrush(seed: String): Brush =
 /**
  * Square, rounded course cover. A gradient with a pearl sits underneath, so a course without a
  * thumbnail (or one that fails to load) still has a cover, and nothing jumps while the image loads.
- * The gradient is chosen from [seed], so neighbouring courses get different colors.
+ * The gradient is chosen from [seed], so neighbouring courses get different colors. [onImageError]
+ * lets a screen refetch an expired signed URL.
  */
 @Composable
 fun CourseCover(
@@ -44,6 +45,7 @@ fun CourseCover(
     seed: String,
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.small,
+    onImageError: (() -> Unit)? = null,
 ) {
     Box(
         modifier =
@@ -64,6 +66,7 @@ fun CourseCover(
                 contentDescription = stringResource(R.string.course_cd_cover, courseTitle),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
+                onError = onImageError?.let { callback -> { callback() } },
             )
         }
     }

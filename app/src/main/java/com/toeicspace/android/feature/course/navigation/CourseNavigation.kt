@@ -24,6 +24,29 @@ private val SingleTop = navOptions { launchSingleTop = true }
 fun NavController.navigateToCourseDetail(courseId: String) =
     navigate(CourseDetailDestination(courseId), SingleTop)
 
-fun NavGraphBuilder.courseDetailScreen(onBack: () -> Unit) {
-    composable<CourseDetailDestination> { CourseDetailRoute(onBackClick = onBack) }
+/**
+ * After signing in: back to the course page the guest left to sign in, which then shows their
+ * enrollment. False when sign in was not opened from a course page.
+ */
+fun NavController.returnToCourseAfterSignIn(): Boolean =
+    popBackStack<CourseDetailDestination>(inclusive = false)
+
+/**
+ * [onSignInRequired] opens sign in for a guest who taps enroll or buy. [onOpenCheckout] opens the
+ * checkout of a paid course; while it is null, buying shows "coming soon".
+ */
+fun NavGraphBuilder.courseDetailScreen(
+    onBack: () -> Unit,
+    onSignInRequired: () -> Unit,
+    onOpenLesson: (courseId: String, lessonId: String, preview: Boolean) -> Unit,
+    onOpenCheckout: ((courseId: String) -> Unit)? = null,
+) {
+    composable<CourseDetailDestination> {
+        CourseDetailRoute(
+            onBackClick = onBack,
+            onSignInRequired = onSignInRequired,
+            onOpenCheckout = onOpenCheckout,
+            onOpenLesson = onOpenLesson,
+        )
+    }
 }
