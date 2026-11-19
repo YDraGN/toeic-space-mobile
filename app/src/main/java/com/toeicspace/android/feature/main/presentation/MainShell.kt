@@ -62,6 +62,9 @@ import com.toeicspace.android.feature.main.navigation.route
 import com.toeicspace.android.feature.main.navigation.startTab
 import com.toeicspace.android.feature.main.navigation.toTab
 import com.toeicspace.android.feature.profile.presentation.ProfileTab
+import com.toeicspace.android.feature.vocabulary.domain.ReviewSource
+import com.toeicspace.android.feature.vocabulary.presentation.home.VocabularyTab
+import com.toeicspace.android.feature.vocabulary.presentation.review.ReviewDueCard
 
 /** Content stays readable on wide screens; past this it is centered with sea on both sides. */
 private val ContentMaxWidth = 840.dp
@@ -78,6 +81,8 @@ internal fun MainRoute(
     modifier: Modifier = Modifier,
     onNavigateToMyCourses: () -> Unit = {},
     onNavigateToMyClasses: () -> Unit = {},
+    onNavigateToVocabularySet: (setId: String) -> Unit = {},
+    onNavigateToReview: (source: ReviewSource) -> Unit = {},
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -98,6 +103,8 @@ internal fun MainRoute(
                 onCourseClick = onNavigateToCourseDetail,
                 onMyCoursesClick = onNavigateToMyCourses,
                 onMyClassesClick = onNavigateToMyClasses,
+                onVocabularySetClick = onNavigateToVocabularySet,
+                onStartReview = onNavigateToReview,
                 modifier = modifier,
             )
         // The session is read from local storage, so this lasts a frame or two.
@@ -121,6 +128,8 @@ internal fun MainShell(
     modifier: Modifier = Modifier,
     onMyCoursesClick: () -> Unit = {},
     onMyClassesClick: () -> Unit = {},
+    onVocabularySetClick: (setId: String) -> Unit = {},
+    onStartReview: (source: ReviewSource) -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val viewer = state.viewer
@@ -244,6 +253,8 @@ internal fun MainShell(
                         onCourseClick = onCourseClick,
                         onMyCoursesClick = onMyCoursesClick,
                         onMyClassesClick = onMyClassesClick,
+                        onVocabularySetClick = onVocabularySetClick,
+                        onStartReview = onStartReview,
                         onSignOutClick = onSignOutClick,
                         onComingSoon = onComingSoon,
                         snackbarHostState = snackbarHostState,
@@ -285,6 +296,8 @@ private fun MainTabsNavHost(
     onCourseClick: (courseId: String) -> Unit,
     onMyCoursesClick: () -> Unit,
     onMyClassesClick: () -> Unit,
+    onVocabularySetClick: (setId: String) -> Unit,
+    onStartReview: (source: ReviewSource) -> Unit,
     onSignOutClick: () -> Unit,
     onComingSoon: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -321,17 +334,19 @@ private fun MainTabsNavHost(
                 )
             }
         }
+        // Guests can study too; the tab lays itself out on wide screens, like Explore.
         composable<VocabularyTabRoute> {
-            ReadableWidth {
-                MemberOnlyTab(
-                    viewer = viewer,
-                    titleRes = R.string.common_label_tab_vocabulary,
-                    guestTitleRes = R.string.main_title_vocabulary_locked,
-                    guestBodyRes = R.string.main_body_vocabulary_locked,
-                    onSignUpClick = onSignUpClick,
-                    onSignInClick = onSignInClick,
-                )
-            }
+            VocabularyTab(
+                onSetClick = onVocabularySetClick,
+                header = { windowWidth ->
+                    ReviewDueCard(
+                        windowWidth = windowWidth,
+                        onStartReview = onStartReview,
+                        onSignInClick = onSignInClick,
+                        onSignUpClick = onSignUpClick,
+                    )
+                },
+            )
         }
         composable<ProfileTabRoute> {
             ReadableWidth {
@@ -352,7 +367,7 @@ private fun MainTabsNavHost(
     }
 }
 
-/** Home, practice, vocabulary and profile read best in a column; the course catalog uses the full width. */
+/** Home, practice and profile read best in a column; the course catalog and vocabulary use the full width. */
 @Composable
 private fun ReadableWidth(content: @Composable () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -360,7 +375,7 @@ private fun ReadableWidth(content: @Composable () -> Unit) {
     }
 }
 
-/** Practice and Vocabulary: a sign-in prompt for guests, "coming soon" until their features are built. */
+/** Practice: a sign-in prompt for guests, "coming soon" until its features are built. */
 @Composable
 private fun MemberOnlyTab(
     viewer: Viewer,

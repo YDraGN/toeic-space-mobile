@@ -43,4 +43,11 @@ object TestTags {
     const val STATE_ACTION_RETRY = "state_action_retry"
     const val STATE_ACTION_SIGN_UP = "state_action_sign_up"
     const val STATE_ACTION_SIGN_IN = "state_action_sign_in"
+
+    // Vocabulary (PBL-124, PBL-125)
+    const val VOCAB_STUDY_FLASHCARDS = "vocab_study_flashcards"
+    const val VOCAB_FLASHCARD = "vocab_flashcard"
+    const val VOCAB_FLASHCARD_NEXT = "vocab_flashcard_next"
+    const val VOCAB_REVIEW_START = "vocab_review_start"
+    const val VOCAB_REVIEW_OPTION = "vocab_review_option"
 }

@@ -8,6 +8,13 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
+    <!-- Vocabulary (PBL-124): Android 11+ hides the text-to-speech engines unless the app declares it looks for them. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <application
         android:name=".ToeicSpaceApp"
         android:allowBackup="true"
