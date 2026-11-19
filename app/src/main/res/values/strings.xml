@@ -639,4 +639,19 @@
     <string name="vocab_action_study_learning">Học lại thẻ chưa thuộc (%1$d)</string>
     <string name="vocab_action_restart_all">Học lại từ đầu</string>
     <string name="vocab_msg_marks_guest">Bạn đang học với tư cách khách nên kết quả chỉ lưu trên máy này. Đăng nhập để lưu vào tài khoản.</string>
+
+    <!-- Firebase (PBL-110) -->
+    <string name="notification_channel_general">Thông báo chung</string>
+    <string name="notification_channel_general_body">Tin mới từ ToeicSpace, cập nhật khoá học và lớp học</string>
+    <string name="dev_section_title">Công cụ dành cho dev</string>
+    <string name="dev_action_test_crash">Gửi crash thử</string>
+    <string name="dev_body_test_crash">App sẽ tắt ngay. Mở lại app để gửi báo cáo lên Crashlytics.</string>
+    <string name="dev_action_test_non_fatal">Ghi lỗi thử</string>
+    <string name="dev_body_test_non_fatal">Ghi một lỗi không làm tắt app vào mục Non-fatals.</string>
+    <string name="dev_action_copy_push_token">Sao chép FCM token</string>
+    <string name="dev_body_copy_push_token">Dán vào Firebase để gửi thông báo thử tới máy này.</string>
+    <string name="dev_label_push_token">FCM token</string>
+    <string name="dev_message_test_error_recorded">Đã ghi lỗi thử. Vài phút nữa lỗi sẽ hiện trên Crashlytics.</string>
+    <string name="dev_message_push_token_copied">Đã sao chép FCM token.</string>
+    <string name="dev_message_push_token_unavailable">Chưa lấy được FCM token. Bạn kiểm tra mạng rồi thử lại nhé.</string>
 </resources>
