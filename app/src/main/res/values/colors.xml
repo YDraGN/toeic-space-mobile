@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification icon tint (PBL-110). Same value as PrimaryGradientStart in core/ui/theme/Color.kt:
+         the system reads it from resources, so it cannot come from the Compose theme. -->
+    <color name="notification_accent">#FF1467C2</color>
+</resources>

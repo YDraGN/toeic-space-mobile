@@ -1,5 +1,7 @@
 package com.toeicspace.android.feature.profile.presentation
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -76,6 +79,10 @@ internal fun ProfileTab(
     val isUploadingAvatar by viewModel.isUploadingAvatar.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
+    val tokenToCopy by viewModel.tokenToCopy.collectAsStateWithLifecycle()
+    val notifications = rememberNotificationToggle()
+    val context = LocalContext.current
+
     val messageText = message?.let { stringResource(id = it.messageRes()) }
     LaunchedEffect(message) {
         if (messageText != null) {
@@ -83,6 +90,14 @@ internal fun ProfileTab(
             snackbarHostState.showSnackbar(messageText)
             viewModel.onMessageShown()
         }
+    }
+    val tokenLabel = stringResource(id = R.string.dev_label_push_token)
+    LaunchedEffect(tokenToCopy) {
+        val token = tokenToCopy ?: return@LaunchedEffect
+        context
+            .getSystemService(ClipboardManager::class.java)
+            ?.setPrimaryClip(ClipData.newPlainText(tokenLabel, token))
+        viewModel.onPushTokenCopied()
     }
 
     ProfileContent(
@@ -100,8 +115,27 @@ internal fun ProfileTab(
         onAvatarPicked = viewModel::onAvatarPicked,
         onMyCoursesClick = onMyCoursesClick,
         onMyClassesClick = onMyClassesClick,
+        notificationsEnabled = notifications.enabled,
+        onNotificationsToggle = notifications.onToggle,
+        devTools =
+            if (BuildConfig.DEBUG) {
+                DevTools(
+                    onTestCrash = viewModel::onTestCrash,
+                    onTestNonFatal = viewModel::onTestNonFatal,
+                    onCopyPushToken = viewModel::onCopyPushToken,
+                )
+            } else {
+                null
+            },
     )
 }
+
+/** Debug builds only (PBL-110): try Crashlytics and FCM without waiting for a real crash. */
+internal data class DevTools(
+    val onTestCrash: () -> Unit,
+    val onTestNonFatal: () -> Unit,
+    val onCopyPushToken: () -> Unit,
+)
 
 @Composable
 internal fun ProfileContent(
@@ -119,6 +153,9 @@ internal fun ProfileContent(
     onAvatarPicked: (String) -> Unit = {},
     onMyCoursesClick: () -> Unit = {},
     onMyClassesClick: () -> Unit = {},
+    notificationsEnabled: Boolean = false,
+    onNotificationsToggle: (Boolean) -> Unit = {},
+    devTools: DevTools? = null,
 ) {
     Column(
         modifier =
@@ -179,9 +216,13 @@ internal fun ProfileContent(
                 label = stringResource(id = R.string.profile_label_notifications),
                 supportingText = stringResource(id = R.string.profile_body_notifications),
                 iconBackground = BlushTint,
-                trailing = { Switch(checked = false, onCheckedChange = { onComingSoon() }) },
+                trailing = {
+                    Switch(checked = notificationsEnabled, onCheckedChange = onNotificationsToggle)
+                },
             )
         }
+
+        if (devTools != null) DevToolsSection(devTools)
 
         ToeicListSection(title = stringResource(id = R.string.profile_section_support)) {
             ToeicListRow(
@@ -289,6 +330,34 @@ private fun MemberHeader(
     }
 }
 
+@Composable
+private fun DevToolsSection(devTools: DevTools) {
+    ToeicListSection(title = stringResource(id = R.string.dev_section_title)) {
+        ToeicListRow(
+            iconRes = R.drawable.ic_bug,
+            label = stringResource(id = R.string.dev_action_test_crash),
+            supportingText = stringResource(id = R.string.dev_body_test_crash),
+            iconBackground = BlushTint,
+            onClick = devTools.onTestCrash,
+        )
+        ToeicListDivider()
+        ToeicListRow(
+            iconRes = R.drawable.ic_info,
+            label = stringResource(id = R.string.dev_action_test_non_fatal),
+            supportingText = stringResource(id = R.string.dev_body_test_non_fatal),
+            onClick = devTools.onTestNonFatal,
+        )
+        ToeicListDivider()
+        ToeicListRow(
+            iconRes = R.drawable.ic_copy,
+            label = stringResource(id = R.string.dev_action_copy_push_token),
+            supportingText = stringResource(id = R.string.dev_body_copy_push_token),
+            iconBackground = Pearl,
+            onClick = devTools.onCopyPushToken,
+        )
+    }
+}
+
 /** Guests have no account yet, so the first card invites them to make one. */
 @Composable
 private fun GuestCard(
@@ -327,6 +396,8 @@ private fun ProfileContentMemberPreview() {
             onChangePasswordClick = {},
             onComingSoon = {},
             onSignOutClick = {},
+            notificationsEnabled = true,
+            devTools = DevTools(onTestCrash = {}, onTestNonFatal = {}, onCopyPushToken = {}),
         )
     }
 }

@@ -18,6 +18,13 @@ sealed interface ProfileMessage {
     data class AvatarFailed(
         val error: AppError,
     ) : ProfileMessage
+
+    /** Debug tools (PBL-110). */
+    data object TestErrorRecorded : ProfileMessage
+
+    data object PushTokenCopied : ProfileMessage
+
+    data object PushTokenUnavailable : ProfileMessage
 }
 
 @StringRes
@@ -35,4 +42,7 @@ internal fun ProfileMessage.messageRes(): Int =
             } else {
                 error.messageRes()
             }
+        ProfileMessage.TestErrorRecorded -> R.string.dev_message_test_error_recorded
+        ProfileMessage.PushTokenCopied -> R.string.dev_message_push_token_copied
+        ProfileMessage.PushTokenUnavailable -> R.string.dev_message_push_token_unavailable
     }

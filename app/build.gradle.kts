@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ktlint)
+    // Firebase (PBL-110): reads app/google-services.json, which is git-ignored; CI writes it from a secret.
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 // local.properties is git-ignored; CI writes its own copy.
@@ -37,9 +40,15 @@ android {
         // Public base of the avatar bucket (same value as the web's VITE_AVATAR_CDN_URL).
         val avatarCdnUrl = localProperties.getProperty("AVATAR_CDN_URL") ?: ""
         buildConfigField("String", "AVATAR_CDN_URL", "\"$avatarCdnUrl\"")
+
+        // Crash reports are sent from release builds; debug builds only after "Gửi crash thử".
+        manifestPlaceholders["crashlyticsCollectionEnabled"] = true
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
+        }
         release {
             optimization {
                 enable = false
@@ -114,6 +123,12 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.browser)
+
+    // --- Firebase (PBL-110) ---
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
 
     // --- Test (đã có) ---
     testImplementation(libs.junit)

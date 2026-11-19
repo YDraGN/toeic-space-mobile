@@ -39,6 +39,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.toeicspace.android.R
+import com.toeicspace.android.core.analytics.TrackScreenViews
 import com.toeicspace.android.core.ui.components.BottomNavBar
 import com.toeicspace.android.core.ui.components.BottomNavTab
 import com.toeicspace.android.core.ui.components.ComingSoonState
@@ -132,6 +133,8 @@ internal fun MainShell(
     onStartReview: (source: ReviewSource) -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
+    // The tabs have their own nav controller, so their screen views are logged here.
+    TrackScreenViews(navController)
     val viewer = state.viewer
     // Fixed for the life of the shell: signing in or out always rebuilds it from the root graph.
     val startTab = remember { viewer.startTab }

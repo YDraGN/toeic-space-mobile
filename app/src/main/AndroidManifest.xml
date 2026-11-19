@@ -7,6 +7,8 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <!-- Firebase Cloud Messaging (PBL-110): Android 13+ asks before showing notifications. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Vocabulary (PBL-124): Android 11+ hides the text-to-speech engines unless the app declares it looks for them. -->
     <queries>
@@ -47,6 +49,29 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/checkout_file_paths" />
         </provider>
+
+        <!-- Firebase (PBL-110) -->
+        <service
+            android:name=".core.notifications.ToeicMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- Used by the system for notification messages that arrive while the app is in the background. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="general" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_bell" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_accent" />
+        <!-- Off in debug builds until "Gửi crash thử" turns it on; on in release. -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="${crashlyticsCollectionEnabled}" />
     </application>
 
 </manifest>
