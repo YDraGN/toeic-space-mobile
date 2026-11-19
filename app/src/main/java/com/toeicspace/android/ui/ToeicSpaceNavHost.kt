@@ -34,10 +34,16 @@ import com.toeicspace.android.feature.profile.navigation.accountInfoScreen
 import com.toeicspace.android.feature.profile.navigation.navigateToAccountInfo
 import com.toeicspace.android.feature.splash.navigation.SplashDestination
 import com.toeicspace.android.feature.splash.navigation.splashScreen
+import com.toeicspace.android.feature.vocabulary.navigation.navigateToFlashcards
+import com.toeicspace.android.feature.vocabulary.navigation.navigateToReviewSession
+import com.toeicspace.android.feature.vocabulary.navigation.navigateToVocabularySet
+import com.toeicspace.android.feature.vocabulary.navigation.reviewSessionScreen
+import com.toeicspace.android.feature.vocabulary.navigation.vocabularyScreens
 
 /**
  * Root navigation graph: Splash → Onboarding → Auth / Main shell (tabs) → Account info, Change
- * password, Course detail, Checkout, My courses, Lesson.
+ * password, Course detail, Checkout, My courses, Lesson, My classes, Vocabulary set, flashcards
+ * and review session.
  */
 @Composable
 fun ToeicSpaceNavHost(
@@ -98,8 +104,21 @@ fun ToeicSpaceNavHost(
             onSessionEnded = { navController.navigateToSignIn(navOptions = clearAll()) },
             onNavigateToMyCourses = { navController.navigateToMyCourses() },
             onNavigateToMyClasses = { navController.navigateToMyClasses() },
+            onNavigateToVocabularySet = { navController.navigateToVocabularySet(it) },
+            onNavigateToReview = { navController.navigateToReviewSession(it) },
         )
         accountInfoScreen(onBack = { navController.popBackStack() })
+        vocabularyScreens(
+            onBack = { navController.popBackStack() },
+            onStudySet = {
+                setId,
+                startIndex,
+                ->
+                navController.navigateToFlashcards(setId, startIndex)
+            },
+            onOpenSet = { navController.navigateToVocabularySet(it) },
+        )
+        reviewSessionScreen(onBack = { navController.popBackStack() })
         courseDetailScreen(
             onBack = { navController.popBackStack() },
             onSignInRequired = { navController.navigateToSignIn() },

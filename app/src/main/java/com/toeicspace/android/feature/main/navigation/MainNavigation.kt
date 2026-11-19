@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import com.toeicspace.android.core.ui.components.BottomNavTab
 import com.toeicspace.android.feature.main.presentation.MainRoute
 import com.toeicspace.android.feature.main.presentation.Viewer
+import com.toeicspace.android.feature.vocabulary.domain.ReviewSource
 import kotlinx.serialization.Serializable
 
 /** The shell screen in the root graph. Its tabs live in a nested [MainGraph]. */
@@ -47,9 +48,13 @@ fun NavGraphBuilder.mainScreen(
     onSessionEnded: () -> Unit,
     onNavigateToMyCourses: () -> Unit = {},
     onNavigateToMyClasses: () -> Unit = {},
+    onNavigateToVocabularySet: (setId: String) -> Unit = {},
+    onNavigateToReview: (source: ReviewSource) -> Unit = {},
 ) {
     composable<MainDestination> {
         MainRoute(
+            onNavigateToVocabularySet = onNavigateToVocabularySet,
+            onNavigateToReview = onNavigateToReview,
             onNavigateToSignIn = onNavigateToSignIn,
             onNavigateToSignUp = onNavigateToSignUp,
             onNavigateToAccountInfo = onNavigateToAccountInfo,
