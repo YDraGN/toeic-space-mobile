@@ -1,6 +1,7 @@
 package com.toeicspace.android.feature.course.presentation
 
 import androidx.lifecycle.SavedStateHandle
+import com.toeicspace.android.core.analytics.AnalyticsEvent
 import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.core.model.AuthUser
@@ -17,6 +18,7 @@ import com.toeicspace.android.feature.course.presentation.detail.CourseDetailVie
 import com.toeicspace.android.feature.course.presentation.detail.CoursePrimaryAction
 import com.toeicspace.android.feature.course.presentation.detail.EnrollmentStatus
 import com.toeicspace.android.feature.enrollment.domain.EnrollmentRepository
+import com.toeicspace.android.testing.FakeAnalyticsHelper
 import com.toeicspace.android.testing.FakeCourseRepository
 import com.toeicspace.android.testing.FakeEnrollmentRepository
 import com.toeicspace.android.testing.FakeSessionRepository
@@ -41,6 +43,7 @@ class CourseDetailEnrollmentTest {
 
     private val courses = FakeCourseRepository()
     private val enrollments = FakeEnrollmentRepository()
+    private val analytics = FakeAnalyticsHelper()
     private val user =
         AuthUser(id = "u1", fullName = "An", email = "an@example.com", role = UserRole.User)
 
@@ -83,6 +86,7 @@ class CourseDetailEnrollmentTest {
             courseRepository = courses,
             enrollmentRepository = enrollments,
             sessionRepository = session,
+            analytics = analytics,
         ).also { runCurrent() }
     }
 
@@ -213,6 +217,10 @@ class CourseDetailEnrollmentTest {
             assertEquals(CourseDetailMessage.Enrolled, state.message)
             viewModel.onMessageShown()
             assertNull(viewModel.uiState.value.message)
+            assertEquals(
+                listOf(AnalyticsEvent.enrollCourse("c1")),
+                analytics.named(AnalyticsEvent.Names.ENROLL_COURSE),
+            )
         }
 
     @Test

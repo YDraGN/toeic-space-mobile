@@ -1,9 +1,11 @@
 package com.toeicspace.android.feature.auth.presentation.signin
 
 import com.toeicspace.android.R
+import com.toeicspace.android.core.analytics.AnalyticsEvent
 import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.auth.domain.FieldError
+import com.toeicspace.android.testing.FakeAnalyticsHelper
 import com.toeicspace.android.testing.FakeAuthRepository
 import com.toeicspace.android.testing.FakeSessionRepository
 import com.toeicspace.android.testing.MainDispatcherRule
@@ -20,11 +22,12 @@ class SignInViewModelTest {
 
     private val authRepository = FakeAuthRepository()
     private val sessionRepository = FakeSessionRepository(isOnboardingCompleted = true)
+    private val analytics = FakeAnalyticsHelper()
 
     private fun createViewModel(
         email: String = "",
         notice: SignInNotice? = null,
-    ) = SignInViewModel(email, notice, authRepository, sessionRepository)
+    ) = SignInViewModel(email, notice, authRepository, sessionRepository, analytics)
 
     @Test
     fun `invalid input is rejected on the device without calling the backend`() =
@@ -49,6 +52,7 @@ class SignInViewModelTest {
 
             assertEquals(SignInNextStep.Home, viewModel.uiState.value.nextStep)
             assertFalse(viewModel.uiState.value.isSubmitting)
+            assertEquals(listOf(AnalyticsEvent.login()), analytics.events)
         }
 
     @Test
@@ -66,6 +70,7 @@ class SignInViewModelTest {
                 viewModel.uiState.value.errorMessage,
             )
             assertEquals(null, viewModel.uiState.value.nextStep)
+            assertTrue(analytics.events.isEmpty())
         }
 
     @Test

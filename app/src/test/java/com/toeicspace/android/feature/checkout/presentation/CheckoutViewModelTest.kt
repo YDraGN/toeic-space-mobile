@@ -2,12 +2,14 @@ package com.toeicspace.android.feature.checkout.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.toeicspace.android.R
+import com.toeicspace.android.core.analytics.AnalyticsEvent
 import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.checkout.domain.FulfillmentStatus
 import com.toeicspace.android.feature.checkout.domain.OrderStatus
 import com.toeicspace.android.feature.checkout.navigation.CheckoutDestination
 import com.toeicspace.android.feature.course.domain.CourseDetail
+import com.toeicspace.android.testing.FakeAnalyticsHelper
 import com.toeicspace.android.testing.FakeCheckoutRepository
 import com.toeicspace.android.testing.FakeCourseRepository
 import com.toeicspace.android.testing.FakeQrImageExporter
@@ -36,6 +38,7 @@ class CheckoutViewModelTest {
 
     private val repository = FakeCheckoutRepository()
     private val exporter = FakeQrImageExporter()
+    private val analytics = FakeAnalyticsHelper()
     private val courses =
         FakeCourseRepository().apply {
             detail =
@@ -57,6 +60,7 @@ class CheckoutViewModelTest {
             repository = repository,
             qrImageExporter = exporter,
             courseRepository = courses,
+            analytics = analytics,
         ).also { runCurrent() }
 
     private val CheckoutViewModel.phase get() = uiState.value.phase
@@ -156,6 +160,22 @@ class CheckoutViewModelTest {
             assertTrue(poll.isCompleted)
             advanceTimeBy(ORDER_POLL_INTERVAL_MS * 3)
             assertEquals(3, repository.getOrderIds.size)
+            // The transfer landing is the purchase, logged once.
+            val purchase = analytics.named(AnalyticsEvent.Names.PURCHASE).single()
+            assertEquals("c1", purchase.params[AnalyticsEvent.Params.COURSE_ID])
+        }
+
+    @Test
+    fun `reopening an order that was already paid logs no purchase`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            repository.rememberedOrderId = "o1"
+            repository.orderResults =
+                mutableListOf(AppResult.Success(testOrder(status = OrderStatus.PAID)))
+
+            val viewModel = started()
+
+            assertTrue(viewModel.phase is CheckoutPhase.Paid)
+            assertTrue(analytics.named(AnalyticsEvent.Names.PURCHASE).isEmpty())
         }
 
     @Test

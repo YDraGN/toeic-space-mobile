@@ -5,6 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.toeicspace.android.R
+import com.toeicspace.android.core.analytics.AnalyticsEvent
+import com.toeicspace.android.core.analytics.AnalyticsHelper
+import com.toeicspace.android.core.analytics.NoOpAnalyticsHelper
 import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.feature.checkout.domain.CheckoutOrder
@@ -38,6 +41,7 @@ class CheckoutViewModel
         private val repository: CheckoutRepository,
         private val qrImageExporter: QrImageExporter,
         private val courseRepository: CourseRepository,
+        private val analytics: AnalyticsHelper = NoOpAnalyticsHelper,
     ) : ViewModel() {
         // Read by key, not toRoute(), so plain JVM tests can build the handle from a map.
         val courseId: String =
@@ -338,6 +342,17 @@ class CheckoutViewModel
                     OrderStatus.PAID -> CheckoutPhase.Paid(order)
                     OrderStatus.EXPIRED, OrderStatus.CANCELLED -> CheckoutPhase.Closed(order)
                 }
+            // Only the moment the transfer lands counts, not reopening an order that was paid before.
+            if (next is CheckoutPhase.Paid && phase is CheckoutPhase.AwaitingTransfer) {
+                analytics.logEvent(
+                    AnalyticsEvent.purchase(
+                        courseId = order.courseId,
+                        orderCode = order.orderCode,
+                        amount = order.amounts.finalAmount,
+                        currency = order.amounts.currency,
+                    ),
+                )
+            }
             _uiState.update { it.copy(phase = next, showCancelDialog = false) }
         }
 

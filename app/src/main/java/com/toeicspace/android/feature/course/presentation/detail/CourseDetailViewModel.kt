@@ -3,6 +3,9 @@ package com.toeicspace.android.feature.course.presentation.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.toeicspace.android.core.analytics.AnalyticsEvent
+import com.toeicspace.android.core.analytics.AnalyticsHelper
+import com.toeicspace.android.core.analytics.NoOpAnalyticsHelper
 import com.toeicspace.android.core.common.AppError
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.core.data.repository.SessionRepository
@@ -126,6 +129,7 @@ class CourseDetailViewModel
         private val courseRepository: CourseRepository,
         private val enrollmentRepository: EnrollmentRepository,
         sessionRepository: SessionRepository,
+        private val analytics: AnalyticsHelper = NoOpAnalyticsHelper,
     ) : ViewModel() {
         // Read by key, not toRoute(), so plain JVM tests can build the handle from a map.
         private val courseId: String =
@@ -297,7 +301,8 @@ class CourseDetailViewModel
             _uiState.update { it.copy(isEnrolling = true) }
             viewModelScope.launch {
                 when (val result = enrollmentRepository.enroll(courseId)) {
-                    is AppResult.Success ->
+                    is AppResult.Success -> {
+                        analytics.logEvent(AnalyticsEvent.enrollCourse(courseId))
                         _uiState.update {
                             it.copy(
                                 isEnrolling = false,
@@ -306,6 +311,7 @@ class CourseDetailViewModel
                                 dialog = null,
                             )
                         }
+                    }
                     is AppResult.Failure -> {
                         val full =
                             (result.error as? AppError.Server)?.code ==

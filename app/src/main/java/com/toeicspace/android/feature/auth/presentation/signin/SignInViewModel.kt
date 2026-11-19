@@ -4,6 +4,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.toeicspace.android.R
+import com.toeicspace.android.core.analytics.AnalyticsEvent
+import com.toeicspace.android.core.analytics.AnalyticsHelper
+import com.toeicspace.android.core.analytics.NoOpAnalyticsHelper
 import com.toeicspace.android.core.common.AppResult
 import com.toeicspace.android.core.data.repository.SessionRepository
 import com.toeicspace.android.feature.auth.domain.AuthRepository
@@ -54,6 +57,7 @@ class SignInViewModel
         @Assisted notice: SignInNotice?,
         private val authRepository: AuthRepository,
         private val sessionRepository: SessionRepository,
+        private val analytics: AnalyticsHelper = NoOpAnalyticsHelper,
     ) : ViewModel() {
         @AssistedFactory
         interface Factory {
@@ -105,10 +109,12 @@ class SignInViewModel
             }
             viewModelScope.launch {
                 when (val result = authRepository.signIn(state.email, state.password)) {
-                    is AppResult.Success ->
+                    is AppResult.Success -> {
+                        analytics.logEvent(AnalyticsEvent.login())
                         _uiState.update {
                             it.copy(isSubmitting = false, nextStep = SignInNextStep.Home)
                         }
+                    }
                     is AppResult.Failure ->
                         if (result.error.isEmailNotVerified) {
                             startEmailVerification(state.email)
